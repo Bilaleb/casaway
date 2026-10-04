@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="description" content="Explore Casablanca grand taxi and petit taxi stations and route traces with Casaway.">
+  <title>Casaway - Casablanca Taxi Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    :root{color-scheme:dark;--bg:#0b0f19;--panel:#111722;--panel-2:#171e2a;--line:#283140;--text:#edf0f5;--muted:#8993a3;--gold:#e5c158;--gold-soft:#4a4025;--green:#86c8a0;--sans:'Space Grotesk',sans-serif;--mono:'DM Mono',monospace}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0}body{overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px}button,input,select{font:inherit}button{color:inherit}#app{height:100dvh;display:grid;grid-template-rows:68px minmax(0,1fr) 40px}.topbar{z-index:600;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);background:rgba(11,15,25,.96)}.brand{display:flex;align-items:center;gap:13px;min-width:0}.brand-mark{width:34px;height:34px;display:grid;place-items:center;border:1px solid #756231;color:var(--gold);font-family:var(--mono);font-size:13px;transform:rotate(-4deg)}.brand-copy{display:flex;align-items:baseline;gap:13px}.brand-copy h1{margin:0;font-size:19px;font-weight:700;letter-spacing:0}.brand-copy span,.top-meta,.eyebrow,.station-type,.count-label,.route-stat-label,.app-footer,.map-chip{font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}.brand-copy span{color:var(--muted);font-size:9px}.top-meta{display:flex;align-items:center;gap:9px;color:#abb3c1;font-size:10px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(134,200,160,.7)}.main{position:relative;min-height:0;display:grid;grid-template-columns:350px minmax(0,1fr)}.sidebar{z-index:500;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line);background:var(--panel)}.side-head{padding:20px 18px 16px;border-bottom:1px solid var(--line)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:9px}.side-head h2{margin:0;font-size:21px;line-height:1.2;font-weight:600}.side-head p:last-child{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.5}.search-wrap{padding:14px 16px 12px}.search-box{height:40px;display:flex;align-items:center;gap:9px;padding:0 11px;border:1px solid var(--line);background:#0d121c}.search-box svg{flex:none;color:var(--muted)}.search-box input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}.search-box input::placeholder{color:#707a89}.filter-row{padding:0 16px 12px;display:flex;align-items:center;gap:8px}.filter-row label{color:var(--muted);font-size:10px}.filter-row select,.route-select{height:33px;min-width:0;padding:0 28px 0 9px;border:1px solid var(--line);border-radius:0;background:var(--panel-2);color:var(--text);font-size:11px}.filter-row select{flex:1}.station-list{min-height:0;flex:1;overflow:auto;padding:0 10px 12px;scrollbar-color:#394353 transparent;scrollbar-width:thin}.station-button{width:100%;min-height:60px;padding:9px 7px;display:grid;grid-template-columns:28px minmax(0,1fr) 8px;gap:9px;align-items:center;border:0;border-top:1px solid rgba(40,49,64,.75);background:transparent;text-align:left;cursor:pointer}.station-button:hover,.station-button.is-active{background:#1a202a}.station-number{width:25px;height:25px;display:grid;place-items:center;border:1px solid #61542f;border-radius:50%;color:var(--gold);font:10px var(--mono)}.station-main{min-width:0}.station-name{display:block;overflow:hidden;color:#e7eaf0;font-size:11px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}.station-sub{margin-top:4px;display:block;overflow:hidden;color:var(--muted);font:9px var(--mono);text-overflow:ellipsis;white-space:nowrap}.station-dot{width:7px;height:7px;border-radius:50%;background:#657080}.station-button.is-active .station-dot{background:var(--gold);box-shadow:0 0 9px rgba(229,193,88,.65)}.no-results{padding:20px 12px;color:var(--muted);font-size:11px;line-height:1.5}.route-panel{padding:14px 16px 15px;border-top:1px solid var(--line);background:#0e141e}.route-heading{margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}.route-heading h3{margin:0;font-size:12px;font-weight:600}.route-heading span{color:var(--muted);font:9px var(--mono)}.route-select{width:100%;height:38px}.route-info{margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:9px 12px}.route-stat-label{display:block;margin-bottom:4px;color:var(--muted);font-size:8px}.route-stat-value{display:block;color:#e8ebf1;font-size:10px;line-height:1.45}.route-stops{grid-column:1/-1}.route-state{min-height:15px;margin:9px 0 0;color:var(--muted);font:9px var(--mono)}.route-state.error{color:#e89b91}.map-wrap{position:relative;min-width:0;min-height:0;background:#171d26}.map{position:absolute;inset:0;background:#171d26}.map-chip{position:absolute;top:16px;right:16px;z-index:400;padding:9px 11px;border:1px solid rgba(114,126,143,.34);background:rgba(11,15,25,.9);color:#d5d9e1;font-size:9px;backdrop-filter:blur(6px)}.map-actions{position:absolute;right:16px;bottom:22px;z-index:400;display:flex;gap:7px}.map-actions button{width:37px;height:37px;display:grid;place-items:center;border:1px solid var(--line);background:rgba(17,23,34,.94);color:#d8dce3;cursor:pointer}.map-actions button:hover{border-color:var(--gold);color:var(--gold)}.map-actions svg{width:16px;height:16px}.app-footer{display:flex;align-items:center;justify-content:center;padding:0 14px;border-top:1px solid var(--line);background:var(--bg);color:#929bab;text-align:center;font-size:9px;letter-spacing:.025em;text-transform:none}.leaflet-container{font-family:var(--sans)}.leaflet-control-attribution{background:rgba(11,15,25,.76)!important;color:#929bab!important;font-size:9px!important}.leaflet-control-attribution a{color:#d4bd72!important}.leaflet-control-zoom{display:none}.taxi-marker{width:25px;height:25px;display:grid;place-items:center;border:2px solid #f7e6a6;border-radius:50%;background:#d5aa3f;color:#111722;box-shadow:0 0 0 5px rgba(229,193,88,.17),0 2px 9px #0009;font:bold 11px var(--mono)}.taxi-marker.mixed{background:#f1d77f}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#111722;color:#edf0f5}.leaflet-popup-content-wrapper{border:1px solid #394252;border-radius:2px;box-shadow:0 8px 24px #0008}.leaflet-popup-content{margin:13px 15px;min-width:185px}.popup-title{margin:0 0 6px;color:#f1d77f;font-size:13px;font-weight:600;line-height:1.35}.popup-meta{margin:0 0 8px;color:#a3adbb;font:9px var(--mono)}.popup-destinations{margin:0;color:#e5e8ed;font-size:10px;line-height:1.55}.popup-destinations b{color:#a3adbb;font-weight:500}.leaflet-interactive.route-line{filter:drop-shadow(0 0 5px rgba(229,193,88,.5))}
+    @media(max-width:760px){#app{grid-template-rows:60px minmax(0,1fr) 43px}.topbar{padding:0 14px}.brand{gap:9px}.brand-mark{width:29px;height:29px}.brand-copy{display:block}.brand-copy h1{font-size:16px}.brand-copy span{display:block;margin-top:3px;font-size:8px}.top-meta{font-size:8px}.main{display:block}.map-wrap{position:absolute;inset:0}.sidebar{position:absolute;right:10px;bottom:10px;left:10px;height:min(47dvh,370px);border:1px solid #303a49;box-shadow:0 8px 32px #0008}.side-head{padding:12px 14px 9px}.side-head h2{font-size:17px}.side-head p:last-child{margin-top:4px;font-size:10px}.search-wrap{padding:9px 12px 8px}.search-box{height:36px}.filter-row{padding:0 12px 7px}.station-list{padding-inline:7px}.station-button{min-height:51px}.route-panel{padding:9px 12px 10px}.route-heading{margin-bottom:7px}.route-info{margin-top:7px;gap:6px 10px}.route-state{margin-top:5px}.map-chip{top:12px;right:12px}.map-actions{right:12px;bottom:calc(min(47dvh,370px) + 22px)}.app-footer{font-size:8px;line-height:1.3}}
+    @media(max-width:380px){.top-meta{gap:5px;font-size:7px}.station-button{min-height:47px}.route-stat-value{font-size:9px}.route-info{gap:5px 7px}}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">CW</div><div class="brand-copy"><h1>Casaway</h1><span>Casablanca Taxi Navigator</span></div></div>
+      <div class="top-meta"><span class="live-dot" aria-hidden="true"></span><span>20 stations mapped</span></div>
+    </header>
+    <main class="main">
+      <aside class="sidebar" aria-label="Taxi station explorer">
+        <div class="side-head"><p class="eyebrow">Casa / Mobility atlas</p><h2>Find your next taxi.</h2><p>Stations, destinations and route traces across Casablanca.</p></div>
+        <div class="search-wrap"><label class="search-box"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="station-search" type="search" placeholder="Search station or district" autocomplete="off" aria-label="Search stations by name or district"></label></div>
+        <div class="filter-row"><label for="taxi-filter">Taxi type</label><select id="taxi-filter"><option value="all">All stations</option><option value="grand">Grand taxi</option><option value="petit">Petit taxi</option></select></div>
+        <div class="station-list" id="station-list" aria-live="polite"></div>
+        <section class="route-panel" aria-label="Route details"><div class="route-heading"><h3>Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><p class="route-state" id="route-state" role="status">Loading route catalogue...</p></section>
+      </aside>
+      <section class="map-wrap" aria-label="Map of Casablanca taxi stations"><div class="map" id="map"></div><div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div><div class="map-actions"><button id="reset-view" type="button" title="Reset map view" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/><path d="M12 8v4l3 2"/></svg></button><button id="locate-casa" type="button" title="Center on Casablanca" aria-label="Center map on Casablanca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button></div></section>
+    </main>
+    <footer class="app-footer">Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</footer>
+  </div>
+
+  <script type="application/json" id="station-data">
+  [
+    {"id":1,"name":"Place de la Concorde (L-Hammam / Bd Lalla Yacout)","district":"Centre Ville","coordinates":[33.5912,-7.6134],"taxiType":"Grand Taxi","destinations":["Oulfa","Maarif","Ain Diab"]},
+    {"id":2,"name":"Station Casa-Port","district":"Casa-Port","coordinates":[33.6002,-7.6119],"taxiType":"Grand & Petit Taxi","destinations":["Ain Sebaa","Sidi Bernoussi","Mohammedia"]},
+    {"id":3,"name":"Station Casa-Voyageurs","district":"Casa-Voyageurs","coordinates":[33.5892,-7.5891],"taxiType":"Grand & Petit Taxi","destinations":["Centre Ville","Hay Mohammadi","Derb Sultan"]},
+    {"id":4,"name":"Station Garage Allal (Derb Sultan)","district":"Derb Sultan","coordinates":[33.5715,-7.6045],"taxiType":"Grand Taxi","destinations":["Mediouna","Tit Mellil","Bouskoura"]},
+    {"id":5,"name":"Station Rond-Point Bachkou","district":"Bachkou","coordinates":[33.5583,-7.6251],"taxiType":"Grand Taxi","destinations":["Near University","Oulfa","Sidi Maalouf"]},
+    {"id":6,"name":"Station L-Oulfa (Terminus / Bd Moulay Rachid)","district":"Oulfa","coordinates":[33.5511,-7.6698],"taxiType":"Grand Taxi","destinations":["Centre Ville","Maarif","Errahma"]},
+    {"id":7,"name":"Station Sidi Bernoussi (Bd Imam Ali)","district":"Sidi Bernoussi","coordinates":[33.6085,-7.5214],"taxiType":"Grand Taxi","destinations":["Mohammedia","Tit Mellil","Casa-Port"]},
+    {"id":8,"name":"Station Ain Sebaa (L-Gara / Near Train Station)","district":"Ain Sebaa","coordinates":[33.6068,-7.5452],"taxiType":"Grand Taxi","destinations":["Sidi Bernoussi","Centre Ville"]},
+    {"id":9,"name":"Station Maarif (Bd Bir Anzarane / Twin Center)","district":"Maarif","coordinates":[33.5824,-7.6361],"taxiType":"Petit Taxi & Grand Taxi Hub","destinations":["Grand taxi hub","Twin Center","Ain Diab"]},
+    {"id":10,"name":"Station Hay Hassani (SOUK / Terminus)","district":"Hay Hassani","coordinates":[33.5602,-7.6582],"taxiType":"Grand Taxi","destinations":["Oulfa","Lissasfa","Maarif"]},
+    {"id":11,"name":"Station Lissasfa (Route d'El Jadida / Rond Point)","district":"Lissasfa","coordinates":[33.5341,-7.6781],"taxiType":"Grand Taxi","destinations":["Azemmour","Had Soualem","Errahma"]},
+    {"id":12,"name":"Station Derb Omar / Bd Mohammed V","district":"Derb Omar","coordinates":[33.5938,-7.6087],"taxiType":"Petit Taxi & Regional Grand Taxi","destinations":["Centre Ville","Casa-Voyageurs","Regional routes"]},
+    {"id":13,"name":"Station Sidi Moumen (Terminus Tramway Anassi)","district":"Sidi Moumen","coordinates":[33.5871,-7.5023],"taxiType":"Grand Taxi","destinations":["Bernoussi","Tit Mellil"]},
+    {"id":14,"name":"Station Hay Mohammadi (Place Bouchentouf / Bd Ali Yata)","district":"Hay Mohammadi","coordinates":[33.5921,-7.5658],"taxiType":"Grand Taxi","destinations":["Casa-Voyageurs","Sidi Bernoussi"]},
+    {"id":15,"name":"Station Sbata (Rond Point Jamila)","district":"Sbata","coordinates":[33.5542,-7.5681],"taxiType":"Grand Taxi","destinations":["Garage Allal","Derb Sultan","Ain Chock"]},
+    {"id":16,"name":"Station Ain Chock (Bd Baghdad / Near Faculté)","district":"Ain Chock","coordinates":[33.5488,-7.6012],"taxiType":"Grand Taxi","destinations":["Bachkou","Derb Sultan","Sidi Maalouf"]},
+    {"id":17,"name":"Station Errahma (Ville Nouvelle / Main Roundabout)","district":"Errahma","coordinates":[33.5124,-7.7115],"taxiType":"Grand Taxi","destinations":["Oulfa","Lissasfa"]},
+    {"id":18,"name":"Station Tit Mellil (Centre)","district":"Tit Mellil","coordinates":[33.5540,-7.4812],"taxiType":"Regional Grand Taxi","destinations":["Garage Allal","Bernoussi"]},
+    {"id":19,"name":"Station Sidi Maalouf (Near Technopark)","district":"Sidi Maalouf","coordinates":[33.5421,-7.6385],"taxiType":"Grand Taxi","destinations":["Bachkou","Shorex","Zenith"]},
+    {"id":20,"name":"Station Sidi Bernoussi - Tram Terminus","district":"Sidi Bernoussi","coordinates":[33.6152,-7.5089],"taxiType":"Grand Taxi","destinations":["Zone Industrielle","Mohammedia"]}
+  ]
+  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.js"></script>
+  <script>
+    (() => {
+      const stations = JSON.parse(document.getElementById('station-data').textContent)
+      const casa = [33.5731, -7.5898]
+      const map = L.map('map', { zoomControl: false, preferCanvas: true }).setView(casa, 12)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd', maxZoom: 20
+      }).addTo(map)
+
+      const markerLayer = L.featureGroup().addTo(map)
+      const markerById = new Map()
+      const stationList = document.getElementById('station-list')
+      const searchInput = document.getElementById('station-search')
+      const taxiFilter = document.getElementById('taxi-filter')
+      const routeSelect = document.getElementById('route-select')
+      const routeInfo = document.getElementById('route-info')
+      const routeState = document.getElementById('route-state')
+      let selectedStationId = null
+      let routeLayer = null
+      let routes = []
+
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char])
+      const markerIcon = (station) => L.divIcon({
+        className: '', html: `<span class="taxi-marker ${station.taxiType.includes('&') ? 'mixed' : ''}">${station.id}</span>`,
+        iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -13]
+      })
+      const popupMarkup = (station) => `<h3 class="popup-title">${escapeHtml(station.name)}</h3><p class="popup-meta">${escapeHtml(station.district)} · ${escapeHtml(station.taxiType)}</p><p class="popup-destinations"><b>Destinations</b><br>${station.destinations.map(escapeHtml).join(' · ')}</p>`
+
+      stations.forEach((station) => {
+        const marker = L.marker(station.coordinates, { icon: markerIcon(station), title: station.name, alt: `${station.taxiType}: ${station.name}` })
+          .bindPopup(popupMarkup(station), { maxWidth: 270 })
+          .on('click', () => setSelectedStation(station.id, false))
+          .addTo(markerLayer)
+        markerById.set(station.id, marker)
+      })
+
+      function renderStations() {
+        const query = searchInput.value.trim().toLocaleLowerCase()
+        const kind = taxiFilter.value
+        const shown = stations.filter((station) => {
+          const matchesText = `${station.name} ${station.district} ${station.destinations.join(' ')}`.toLocaleLowerCase().includes(query)
+          const matchesType = kind === 'all' || (kind === 'grand' && /grand/i.test(station.taxiType)) || (kind === 'petit' && /petit/i.test(station.taxiType))
+          return matchesText && matchesType
+        })
+        stationList.innerHTML = shown.length ? shown.map((station) => `<button class="station-button ${station.id === selectedStationId ? 'is-active' : ''}" type="button" data-station-id="${station.id}" aria-pressed="${station.id === selectedStationId}"><span class="station-number">${String(station.id).padStart(2, '0')}</span><span class="station-main"><span class="station-name">${escapeHtml(station.name)}</span><span class="station-sub">${escapeHtml(station.district)} · ${escapeHtml(station.taxiType)}</span></span><span class="station-dot" aria-hidden="true"></span></button>`).join('') : '<p class="no-results">No stations match this search. Try another district or taxi type.</p>'
+        stationList.querySelectorAll('[data-station-id]').forEach((button) => button.addEventListener('click', () => setSelectedStation(Number(button.dataset.stationId), true)))
+      }
+
+      function setSelectedStation(id, openPopup) {
+        selectedStationId = id
+        renderStations()
+        const marker = markerById.get(id)
+        if (!marker) return
+        map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 14), { duration: 0.55 })
+        if (openPopup) marker.openPopup()
+      }
+
+      function renderRouteDetails(route) {
+        routeInfo.innerHTML = `<div><span class="route-stat-label">Origin</span><span class="route-stat-value">${escapeHtml(route.origin)}</span></div><div><span class="route-stat-label">Destination</span><span class="route-stat-value">${escapeHtml(route.destination)}</span></div><div><span class="route-stat-label">Fare estimate</span><span class="route-stat-value">${escapeHtml(route.fareEstimate || 'Not available')}</span></div><div class="route-stops"><span class="route-stat-label">Major stops</span><span class="route-stat-value">${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</span></div>`
+      }
+
+      function routePopupMarkup(route) {
+        return `<h3 class="popup-title">${escapeHtml(route.title)}</h3><p class="popup-meta">Illustrative taxi route</p><p class="popup-destinations"><b>Origin</b> ${escapeHtml(route.origin)}<br><b>Destination</b> ${escapeHtml(route.destination)}<br><b>Fare estimate</b> ${escapeHtml(route.fareEstimate || 'Not available')}<br><b>Major stops</b> ${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</p>`
+      }
+
+      function loadRoute(route) {
+        if (!route) return
+        if (routeLayer) map.removeLayer(routeLayer)
+        routeState.classList.remove('error')
+        routeState.textContent = `Loading ${route.title}...`
+        renderRouteDetails(route)
+        routeLayer = new L.GPX(route.gpx, {
+          async: true,
+          polyline_options: { color: '#e5c158', opacity: 0.95, weight: 5, lineCap: 'round', lineJoin: 'round', className: 'route-line' },
+          marker_options: { startIconUrl: '', endIconUrl: '', shadowUrl: '', wptIconUrls: {} }
+        }).bindPopup(routePopupMarkup(route)).on('click', (event) => {
+          routeLayer.openPopup(event.latlng)
+        }).on('loaded', (event) => {
+          if (routeLayer === event.target && event.target.getBounds().isValid()) map.fitBounds(event.target.getBounds(), { padding: [56, 56], maxZoom: 14, duration: 0.7 })
+          routeState.textContent = 'Illustrative trace · verify route and fare locally.'
+        }).on('error', () => {
+          routeState.classList.add('error')
+          routeState.textContent = `Could not load ${route.gpx}. Check the route file path.`
+        }).addTo(map)
+      }
+
+      function installRoutes(items) {
+        routes = items.filter((route) => route && route.id && route.gpx)
+        document.getElementById('route-count').textContent = `GPX / ${String(routes.length).padStart(2, '0')}`
+        routeSelect.innerHTML = routes.map((route) => `<option value="${escapeHtml(route.id)}">${escapeHtml(route.title)}</option>`).join('')
+        if (routes.length) loadRoute(routes[0])
+        else routeState.textContent = 'No routes listed in the route manifest.'
+      }
+
+      async function loadRouteManifest() {
+        try {
+          const response = await fetch('/routes/manifest.json', { cache: 'no-cache' })
+          if (!response.ok) throw new Error('manifest unavailable')
+          const manifest = await response.json()
+          installRoutes(Array.isArray(manifest) ? manifest : manifest.routes || [])
+        } catch {
+          installRoutes([{ id: 'casa-port-maarif', title: 'Casa-Port → Maarif', origin: 'Casa-Port', destination: 'Maarif', fareEstimate: 'MAD 18–35*', majorStops: ['Casa-Voyageurs', 'Derb Omar', 'Place de la Concorde'], gpx: '/routes/casa-port-to-maarif.gpx' }])
+        }
+      }
+
+      searchInput.addEventListener('input', renderStations)
+      taxiFilter.addEventListener('change', renderStations)
+      routeSelect.addEventListener('change', () => loadRoute(routes.find((route) => route.id === routeSelect.value)))
+      document.getElementById('reset-view').addEventListener('click', () => map.fitBounds(markerLayer.getBounds(), { padding: [35, 35], maxZoom: 12, duration: 0.65 }))
+      document.getElementById('locate-casa').addEventListener('click', () => map.flyTo(casa, 12, { duration: 0.65 }))
+      renderStations()
+      loadRouteManifest()
+    })()
+  </script>
+</body>
+</html>

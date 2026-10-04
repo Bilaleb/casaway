@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {
+      "id": "casa-port-maarif",
+      "title": "Casa-Port to Maarif",
+      "origin": "Casa-Port",
+      "destination": "Maarif",
+      "fareEstimate": "MAD 18-35*",
+      "majorStops": ["Casa-Voyageurs", "Derb Omar", "Place de la Concorde"],
+      "gpx": "/routes/casa-port-to-maarif.gpx"
+    }
+  ]
+}
