@@ -1,0 +1,16 @@
+{
+  "name": "casaway",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend/client",
+    "frontend/admin"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=client",
+    "start": "node backend/server.js",
+    "dev": "npm run build && node backend/server.js",
+    "lint": "npm run lint --workspace=client"
+  }
+}

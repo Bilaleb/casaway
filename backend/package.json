@@ -1,36 +1,27 @@
 {
-  "name": "gmc-backend",
+  "name": "casaway-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Casaway Casablanca Taxi Navigator Backend API",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "enhance:images": "node scripts/enhance-images.js"
+    "dev": "node server.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/khalid-hagane/gmc-backend.git"
+    "url": "git+https://github.com/Bilaleb/casaway.git"
   },
-  "keywords": [],
+  "keywords": [
+    "casaway",
+    "casablanca",
+    "taxi",
+    "navigator"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/khalid-hagane/gmc-backend/issues"
-  },
-  "homepage": "https://github.com/khalid-hagane/gmc-backend#readme",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "connect-mongo": "^6.0.0",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "mongoose": "^9.3.3",
-    "sharp": "^0.35.5",
-    "stripe": "^23.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
+    "express": "^5.2.1"
   }
 }

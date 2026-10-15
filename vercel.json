@@ -1,0 +1,51 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "backend",
+      "framework": "express",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "client",
+          "format": "url",
+          "env": "CLIENT_SERVICE_URL"
+        }
+      ]
+    },
+    "admin": {
+      "root": "frontend/admin",
+      "framework": "vite"
+    },
+    "client": {
+      "root": "frontend/client",
+      "framework": "vite"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "client"
+      }
+    }
+  ]
+}

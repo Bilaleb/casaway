@@ -1,16 +1,12 @@
+const path = require("path");
 require("dotenv").config();
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+
 const app = require("./app");
-const connectDB = require("./config/db");
-const seedProducts = require("./config/seed");
 
-const PORT = process.env.PORT || 5000;
+const PORT = 3000;
+const HOST = "0.0.0.0";
 
-connectDB().then(async () => {
-  await seedProducts();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}).catch((error) => {
-  console.error("Server startup failed", error);
-  process.exit(1);
+app.listen(PORT, HOST, () => {
+  console.log(`Casaway server running on http://${HOST}:${PORT}`);
 });

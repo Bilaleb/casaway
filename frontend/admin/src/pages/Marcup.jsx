@@ -9,7 +9,7 @@ import Layout from '../components/Layout';
 
 function Marcup (){
     return(
-        <BrowserRouter>
+        <BrowserRouter basename="/admin">
     
 
       {/* Routes */}
