@@ -1,0 +1,21 @@
+{
+  "name": "casaway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Casablanca Grand & Petit Taxi Depots and Routes Navigator PWA",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@tmcw/togeojson": "^7.1.3",
+    "@xmldom/xmldom": "^0.9.12",
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.3.3",
+    "stripe": "^23.0.0"
+  }
+}

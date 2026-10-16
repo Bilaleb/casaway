@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Casaway",
+  "short_name": "Casaway",
+  "description": "Casablanca Grand & Petit Taxi Depots & GPX Route Navigator",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable.svg", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Nearest Depot",
+      "short_name": "Nearest depot",
+      "description": "Find the closest taxi depot in Casablanca",
+      "url": "/?nearest=1",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192", "type": "image/svg+xml" }]
+    }
+  ]
+}

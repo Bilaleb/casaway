@@ -48,6 +48,7 @@ function productDetails(fileName, category, color) {
 }
 
 function createCatalog() {
+  if (!require("fs").existsSync(imageDirectory)) return [];
   return require("fs").readdirSync(imageDirectory)
     .filter((fileName) => imageExtensions.has(path.extname(fileName).toLowerCase()))
     .sort((first, second) => first.localeCompare(second))

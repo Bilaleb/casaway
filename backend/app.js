@@ -14,7 +14,7 @@ const mongoClientPromise = mongoose.connection.asPromise().then(() => mongoose.c
 if (!sessionSecret) throw new Error("SESSION_SECRET is required in production");
 
 app.post("/api/orders/stripe-webhook", express.raw({ type: "application/json" }), orderController.handleStripeWebhook);
-app.use(express.json());
+app.use(express.json({ limit: "2mb" })); // GPX uploads can exceed the 100kb default
 app.use(session({
 	name: "libassi.sid",
 	secret: sessionSecret,
@@ -45,6 +45,7 @@ app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/products", require("./routes/product.routes"));
 app.use("/api/orders", require("./routes/order.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
+app.use("/api/routes", require("./routes/api"));
 
 app.use(express.static(clientBuildDirectory));
 app.use((req, res, next) => {

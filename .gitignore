@@ -1,5 +1,20 @@
-**/node_modules/
-**/dist/
-**/logs/
-backend/.env
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+frontend/client/dist/
+frontend/admin/dist/
+
+# App / tooling metadata
+.freebuff/
+probe-casaway-xyz/
 *.log
+build-log.txt
+
+# Local image assets folder (not part of the app)
+libassi images/

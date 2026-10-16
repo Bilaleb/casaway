@@ -1,14 +1,47 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Discover Moroccan traditional clothing for men and women, thoughtfully selected by Libassi." />
-    <meta name="theme-color" content="#faf6f0" />
-    <title>Libassi | Made of Morocco</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Casaway">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Casablanca Grand & Petit Taxi Depots & GPX Route Navigator">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Casaway - Casablanca Taxi Navigator</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <div id="app">
+      <header class="topbar">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle station explorer" aria-expanded="true">☰</button>
+        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span>Casablanca Taxi Navigator</span></div></div>
+        <div class="top-actions"><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 stations mapped</span></span></div>
+      </header>
+      <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and depots.</div>
+      <main class="main">
+        <aside class="sidebar" id="sidebar" aria-label="Taxi station explorer">
+          <div class="side-head"><h2>Find your next taxi.</h2><p>Stations, destinations and route traces across Casablanca.</p></div>
+          <div class="search-wrap"><label class="search-box"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="station-search" type="search" placeholder="Search station or district" autocomplete="off" aria-label="Search stations by name or district"></label></div>
+          <div class="filter-row"><label for="taxi-filter">Taxi type</label><select id="taxi-filter"><option value="all">All stations</option><option value="grand">Grand taxi</option><option value="petit">Petit taxi</option></select></div>
+          <div class="station-list" id="station-list" aria-live="polite"></div>
+          <section class="route-panel" aria-label="Route details"><div class="route-heading"><h3>Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><p class="route-state" id="route-state" role="status">Loading route catalogue...</p></section>
+        </aside>
+        <section class="map-wrap" aria-label="Map of Casablanca taxi stations"><div class="map" id="map"></div><div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div><div class="map-actions"><button id="reset-view" type="button" title="Reset map view" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/><path d="M12 8v4l3 2"/></svg></button><button id="locate-nearest" type="button" title="Find nearest depot" aria-label="Find nearest depot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button></div></section>
+      </main>
+      <footer class="app-footer">Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</footer>
+      <div class="install-banner" id="install-banner" role="dialog" aria-label="Install Casaway" hidden><div><strong>Take Casaway with you</strong><span id="install-hint">Install for quick access to taxi depots.</span></div><button id="install-action">Install</button><button class="dismiss-install" id="dismiss-install" aria-label="Dismiss install prompt">×</button></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.js"></script>
+    <script type="module" src="/app.js"></script>
   </body>
 </html>

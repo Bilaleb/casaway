@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+frontend/client/dist
+.git
+.freebuff
+probe-casaway-xyz
+libassi images
+casaway.jpg
+build-log.txt
+osrm-status.txt
+node-version.txt
+run-build.bat
+*.log
