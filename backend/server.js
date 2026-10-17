@@ -1,16 +1,18 @@
+const path = require("path");
 require("dotenv").config();
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+
+const mongoose = require("mongoose");
 const app = require("./app");
-const connectDB = require("./config/db");
-const seedProducts = require("./config/seed");
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
+const HOST = "0.0.0.0";
 
-connectDB().then(async () => {
-  await seedProducts();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}).catch((error) => {
-  console.error("Server startup failed", error);
-  process.exit(1);
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("Database connected ✅"))
+  .catch((error) => console.error("DB error ❌", error.message));
+
+app.listen(PORT, HOST, () => {
+  console.log(`Casaway server running on http://${HOST}:${PORT}`);
 });

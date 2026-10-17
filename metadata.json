@@ -1,0 +1,8 @@
+{
+  "name": "Casaway",
+  "description": "Casablanca Taxi Navigator - Explore grand taxi and petit taxi stations and route traces across Casablanca.",
+  "prompt": "This app was imported from GitHub repository Bilaleb/casaway.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

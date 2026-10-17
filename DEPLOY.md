@@ -8,32 +8,31 @@ Two deployment targets are supported out of the box.
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `MONGO_URI` | yes | MongoDB connection string (MongoDB Atlas recommended) |
-| `SESSION_SECRET` | yes | Express session secret — the server refuses to boot in production without it |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | for `/api/admin` | Store admin login |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | optional | Card payments (order routes return 503 without them) |
-| `CLIENT_URL` | optional | Base URL used for Stripe return/cancel links |
+
+> The e-commerce variables from the old Libassi stack (`SESSION_SECRET`, Stripe keys,
+> admin credentials) are no longer needed — that code was removed in the Casaway rebrand.
 
 Seed the route catalogue once against your database:
 
 ```bash
-MONGO_URI="mongodb+srv://..." npm run seed:routes --prefix backend
+MONGO_URI="mongodb+srv://..." npm run seed:routes --workspace=backend
 ```
 
 ## Vercel (recommended)
 
-`vercel.json` builds the client and serves the API as a serverless function (`api/index.js`
-wraps the same Express app; DB connections are cached across warm invocations).
+The repo uses npm workspaces (`backend`, `frontend/client`, `frontend/admin`) and a
+multi-service `vercel.json`: the backend deploys as an Express service (root `backend/`),
+while the client and admin SPAs build with Vite. `/api/*` routes to the backend service
+everything else falls through to the client.
 
 ```bash
 npm i -g vercel
 vercel          # link/create the project
 vercel env add MONGO_URI
-vercel env add SESSION_SECRET
 vercel --prod
 ```
 
-Routing: `/api/*` → Express, everything else → the built PWA (SPA fallback). Static
-assets are served from the CDN edge.
+Static assets are served from the CDN edge; the Express service only handles `/api/*`.
 
 ## AWS (Docker → App Runner / ECS Fargate)
 

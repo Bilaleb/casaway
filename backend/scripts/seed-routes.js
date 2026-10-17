@@ -119,8 +119,9 @@ module.exports = seedRoutes;
 
 if (require.main === module) {
   require("dotenv").config();
-  const connectDB = require("../config/db");
-  connectDB()
+  const mongoose = require("mongoose");
+  mongoose
+    .connect(process.env.MONGO_URI)
     .then(async () => {
       await seedRoutes();
       process.exit(0);
