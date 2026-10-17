@@ -23,6 +23,7 @@ export function createRoutePanel({ selectElement, infoElement, statusElement, co
       statRow('Origin', route.origin),
       statRow('Destination', route.destination),
       statRow('Distance', route.distanceKm ? `${route.distanceKm} km` : 'Not available'),
+      statRow('Duration', route.durationMin ? `≈ ${route.durationMin} min` : 'Not available'),
       el('div', { className: 'route-stops' }, [
         el('span', { className: 'route-stat-label', text: 'Major stops' }),
         el('span', { className: 'route-stat-value', text: (route.majorStops || []).join(' · ') || 'Not available' }),

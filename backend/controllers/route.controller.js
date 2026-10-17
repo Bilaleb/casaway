@@ -10,6 +10,24 @@ const NEARBY_LIMIT = 50;
 const nonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
 
 /**
+ * Mongoose surfaces an unreachable database as a buffering/network error
+ * (e.g. Atlas IP whitelist). Those are service-availability problems, so the
+ * API answers 503 — the client falls back to its snapshot/bundled catalogue —
+ * while genuine programming errors still surface as 500.
+ */
+const isDatabaseUnavailable = (err) =>
+  err?.name === "MongooseError" ||
+  err?.name === "MongoServerSelectionError" ||
+  err?.name === "MongoNetworkError" ||
+  err?.code === "ETIMEOUT" ||
+  /buffer|buffering timed out|getaddrinfo|connection/i.test(err?.message || "");
+
+const failDatabase = (res, err) =>
+  isDatabaseUnavailable(err)
+    ? res.status(503).json({ message: "Route data is unavailable right now (database unreachable)" })
+    : res.status(500).json({ message: err.message });
+
+/**
  * Validates and normalises a POST /api/routes payload. Accepts either an
  * explicit GeoJSON LineString trajectory (map draws) or a raw `gpx` string
  * that is converted server-side by utils/gpx.js. When no depot location is
@@ -102,7 +120,7 @@ exports.getRoutes = async (req, res) => {
     const routes = await Route.find(filter).sort({ createdAt: -1 });
     res.json(routes);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    failDatabase(res, err);
   }
 };
 
@@ -114,7 +132,7 @@ exports.searchRoutes = async (req, res) => {
     const routes = await Route.find({ $or: [{ district: pattern }, { depotName: pattern }, { name: pattern }] }).sort({ district: 1, name: 1 });
     res.json(routes);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    failDatabase(res, err);
   }
 };
 
@@ -148,6 +166,6 @@ exports.findNearbyRoutes = async (req, res) => {
       }))
     );
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    failDatabase(res, err);
   }
 };

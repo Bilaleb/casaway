@@ -16,6 +16,10 @@ import { createRoutePanel } from './js/routePanel.js'
 import { buildRoutePopup, routesForStation } from './js/routes.js'
 import { registerServiceWorker, watchConnectivity, setupInstallPrompt } from './js/pwa.js'
 import { readSnapshot, writeSnapshot } from './js/offline.js'
+import { createFloatingSearch } from './js/floatingSearch.js'
+import { createBottomSheet } from './js/bottomSheet.js'
+import { durationLabel, estimateDurationMin, transitChips } from './js/transit.js'
+import { setupFeedbackForm } from './js/feedbackForm.js'
 
 const API_BASE = '/api/routes'
 const SNAPSHOT_KEY = 'route-catalogue'
@@ -124,6 +128,7 @@ function toRouteViewModel(doc) {
     destination: deriveDestination(doc.name) || doc.district,
     taxiType: doc.taxiType,
     distanceKm: meters ? (meters / 1000).toFixed(1) : null,
+    durationMin: meters ? estimateDurationMin(meters / 1000) : null,
     majorStops: [doc.district],
     district: doc.district,
     trajectory: coordinates,
@@ -184,6 +189,11 @@ const dom = {
   routeCount: document.querySelector('#route-count'),
   resetView: document.querySelector('#reset-view'),
   locateNearest: document.querySelector('#locate-nearest'),
+  mapSearch: document.querySelector('#map-search'),
+  suggestions: document.querySelector('#search-suggestions'),
+  suggestionStatus: document.querySelector('#suggestion-status'),
+  mapToast: document.querySelector('#map-toast'),
+  reportIssue: document.querySelector('#report-issue'),
   depotCount: document.querySelector('#depot-count'),
   installBanner: document.querySelector('#install-banner'),
   installHint: document.querySelector('#install-hint'),
@@ -204,6 +214,37 @@ const routePanel = createRoutePanel({
   countElement: dom.routeCount,
   onSelect: (id) => showRoute(routes.find((route) => route.id === id)),
 })
+
+const sheet = createBottomSheet({
+  element: document.querySelector('#bottom-sheet'),
+  grab: document.querySelector('#sheet-grab'),
+  close: document.querySelector('#sheet-close'),
+  eyebrow: document.querySelector('#sheet-eyebrow'),
+  title: document.querySelector('#sheet-title'),
+  body: document.querySelector('#sheet-body'),
+})
+
+const feedback = setupFeedbackForm({
+  dialog: document.querySelector('#feedback-dialog'),
+  form: document.querySelector('#feedback-form'),
+  status: document.querySelector('#feedback-status'),
+  submitButton: document.querySelector('#feedback-submit'),
+  datalist: document.querySelector('#feedback-subjects'),
+})
+dom.reportIssue?.addEventListener('click', () => feedback.open())
+
+// Floating bar over the map: same search pipeline + same selection logic as
+// the sidebar, so there is exactly one source of truth for the query.
+const floatingSearch = dom.mapSearch
+  ? createFloatingSearch({
+      input: dom.mapSearch,
+      list: dom.suggestions,
+      emptyStatus: dom.suggestionStatus,
+      getStations: () => allStationPool,
+      onSelect: (id) => selectStation(id, true),
+      onQuery: (value) => applySearchQuery(value, 'floating'),
+    })
+  : null
 
 let stations = []
 let routes = []
@@ -227,6 +268,9 @@ function remountMarkers(nextStations) {
   const mounted = mountStationMarkers(map, nextStations, (id) => selectStation(id, false))
   markerLayer = mounted.layer
   markerById = mounted.markerById
+  // A late-arriving search response remounts every marker; re-apply the
+  // active highlight so the current selection doesn't visually reset.
+  if (activeStationId) styleStationMarkers(markerById, nextStations, activeStationId, null)
 }
 
 function renderStationList() {
@@ -263,7 +307,14 @@ function selectStation(id, moveMap) {
   const visible = refreshRouteCatalogue()
   renderStationList()
   if (activeStationId && visible.length) showRoute(visible[0])
-  if (!activeStationId) clearRoute()
+  if (activeStationId && !visible.length) {
+    const station = stations.find((item) => item.id === id)
+    if (station) presentStationSheet(station)
+  }
+  if (!activeStationId) {
+    clearRoute()
+    sheet.hide()
+  }
   return visible
 }
 
@@ -278,11 +329,85 @@ function trajectoryEndpoint(label, place) {
   return el('div', {}, [el('b', { text: label }), el('br'), place])
 }
 
+/* ---------------------------------------------------------------- *
+ * Bottom sheet content + toast
+ * ---------------------------------------------------------------- */
+
+let toastTimer = null
+function showToast(message, { error = false } = {}) {
+  if (!dom.mapToast) return
+  dom.mapToast.textContent = message
+  dom.mapToast.classList.toggle('is-error', error)
+  dom.mapToast.hidden = false
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { dom.mapToast.hidden = true }, 5200)
+}
+
+function sheetStat(label, value, { estimate = false } = {}) {
+  return el('div', { className: 'sheet-stat' }, [
+    el('span', { className: 'sheet-stat-label', text: label }),
+    el('span', { className: estimate ? 'sheet-stat-value is-estimate' : 'sheet-stat-value', text: value }),
+  ])
+}
+
+function sheetReportButton(subject, kind, label) {
+  return el('button', {
+    className: 'sheet-report',
+    text: label,
+    attrs: { type: 'button' },
+    on: { click: () => feedback.open({ subject, kind }) },
+  })
+}
+
+function presentRouteSheet(route, openAt = 'half') {
+  const stops = (route.majorStops || []).filter(Boolean).join(' · ')
+  sheet.present({
+    eyebrow: 'Route trace',
+    title: route.title,
+    openAt,
+    content: [
+      el('div', { className: 'sheet-stats' }, [
+        sheetStat('Origin', route.origin || 'Not available'),
+        sheetStat('Destination', route.destination || 'Not available'),
+        sheetStat('Distance', route.distanceKm ? `${route.distanceKm} km` : 'Not available'),
+        sheetStat('Duration', durationLabel(route.distanceKm), { estimate: Boolean(route.distanceKm) }),
+      ]),
+      transitChips(route.taxiType || ''),
+      el('p', {
+        className: 'sheet-note',
+        text: `Duration estimated at the 22 km/h city average${stops ? ` · serves ${stops}` : ''} · traces are illustrative, not official itineraries.`,
+      }),
+      sheetReportButton(route.title, 'route-update', 'Report an issue with this route'),
+    ],
+  })
+}
+
+function presentStationSheet(station) {
+  sheet.present({
+    eyebrow: 'Station',
+    title: station.name,
+    content: [
+      el('div', { className: 'sheet-stats' }, [
+        sheetStat('District', station.district),
+        sheetStat('Taxi type', station.taxiType),
+      ]),
+      transitChips(station.taxiType),
+      station.destinations.length
+        ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': 'Destinations from this station' } },
+            station.destinations.map((target) => el('li', { text: target })))
+        : null,
+      sheetReportButton(station.name, 'station-correction', 'Report incorrect data for this station'),
+    ],
+  })
+}
+
 /** Draws a stored GeoJSON trajectory as a gold polyline linking its start and end points. */
-function showRoute(route) {
+function showRoute(route, { openAt = 'half' } = {}) {
   clearRoute()
-  if (!route || !route.trajectory || route.trajectory.length < 2) {
-    if (route) setStatus('This depot has no stored trajectory yet.')
+  if (!route) return
+  presentRouteSheet(route, openAt)
+  if (!route.trajectory || route.trajectory.length < 2) {
+    setStatus('This depot has no stored trajectory yet.')
     return
   }
   setStatus('Loading route trace…')
@@ -357,25 +482,30 @@ function frameStations(subset) {
 async function locateNearest() {
   if (!navigator.geolocation) {
     setStatus('Geolocation is not supported by this browser.', { error: true })
+    showToast('Geolocation is not supported by this browser.', { error: true })
     return
   }
   setStatus('Locating you…')
+  showToast('Locating you…')
   try {
     const position = await geolocate({ enableHighAccuracy: true, timeout: 10000 })
     userPosition = position
     drawUserPosition(position)
     const { depots, source } = await nearbyDepotsFor(position)
     if (!depots.length) {
-      setStatus(`No depots found within ${(NEARBY_RADIUS_METERS / 1000).toFixed(1)} km of you.`, { error: true })
+      const message = `No depots found within ${(NEARBY_RADIUS_METERS / 1000).toFixed(1)} km of you.`
+      setStatus(message, { error: true })
+      showToast(message, { error: true })
       return
     }
     const nearest = depots[0]
-    setStatus(
-      `Nearest depot ${source === 'api' ? '(API $near)' : '(offline estimate)'}: ${nearest.station.name} · ${formatDistance(nearest.meters)}`
-    )
+    const summary = `Nearest depot ${source === 'api' ? '(API $near)' : '(offline estimate)'}: ${nearest.station.name} · ${formatDistance(nearest.meters)}`
+    setStatus(summary)
+    showToast(`Nearest: ${nearest.station.name} · ${formatDistance(nearest.meters)}`)
     selectStation(nearest.station.id, true)
   } catch (error) {
     setStatus(`Could not read your location (${error.message}).`, { error: true })
+    showToast(`Could not read your location (${error.message}).`, { error: true })
   }
 }
 
@@ -477,22 +607,43 @@ async function offerNearbyDepots() {
 }
 
 let searchDebounce = null
-dom.stationSearch?.addEventListener('input', (event) => {
+
+/**
+ * One search pipeline for both inputs (sidebar field + floating map bar):
+ * keep the two fields in sync, filter locally right away for instant
+ * feedback, then fire the server district search after the debounce window.
+ */
+function applySearchQuery(value, source) {
+  if (source !== 'sidebar' && dom.stationSearch && dom.stationSearch.value !== value) dom.stationSearch.value = value
+  if (source !== 'floating' && dom.mapSearch && dom.mapSearch.value !== value) dom.mapSearch.value = value
   clearTimeout(searchDebounce)
-  const query = event.target.value
-  // Local filter first for instant feedback, then the server district search.
   renderStationList()
-  searchDebounce = setTimeout(() => runSearch(query), SEARCH_DEBOUNCE_MS)
-})
+  searchDebounce = setTimeout(() => runSearch(value), SEARCH_DEBOUNCE_MS)
+}
+
+dom.stationSearch?.addEventListener('input', (event) => applySearchQuery(event.target.value, 'sidebar'))
 dom.taxiFilter?.addEventListener('change', () => renderStationList())
 dom.resetView?.addEventListener('click', () => {
   activeStationId = null
+  floatingSearch?.close()
   refreshRouteCatalogue()
   renderStationList()
   clearRoute()
+  sheet.hide()
   recenter(map)
 })
-dom.locateNearest?.addEventListener('click', locateNearest)
+dom.locateNearest?.addEventListener('click', async () => {
+  const button = dom.locateNearest
+  if (button.classList.contains('is-loading')) return
+  button.classList.add('is-loading')
+  button.setAttribute('aria-busy', 'true')
+  try {
+    await locateNearest()
+  } finally {
+    button.classList.remove('is-loading')
+    button.removeAttribute('aria-busy')
+  }
+})
 dom.menuToggle?.addEventListener('click', () => {
   const open = dom.sidebar.classList.toggle('is-open')
   dom.menuToggle.setAttribute('aria-expanded', String(open))
@@ -559,7 +710,11 @@ async function bootstrap() {
   remountMarkers(stations)
   renderStationList()
   refreshRouteCatalogue()
-  if (routes.length) showRoute(routes[0])
+  feedback.setSubjects([
+    ...allStationPool.map((station) => station.name),
+    ...routes.map((route) => route.title),
+  ])
+  if (routes.length) showRoute(routes[0], { openAt: 'peek' })
 
   if (source === 'network') {
     setStatus(`${routes.length} route trace${routes.length === 1 ? '' : 's'} · ${stations.length} depots loaded from the Casaway API.`)

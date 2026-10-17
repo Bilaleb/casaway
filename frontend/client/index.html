@@ -38,10 +38,68 @@
           <div class="station-list" id="station-list" aria-live="polite"></div>
           <section class="route-panel" aria-label="Route details"><div class="route-heading"><h3>Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><p class="route-state" id="route-state" role="status">Loading route catalogue...</p></section>
         </aside>
-        <section class="map-wrap" aria-label="Map of Casablanca taxi stations"><div class="map" id="map"></div><div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div><div class="map-actions"><button id="reset-view" type="button" title="Reset map view" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/><path d="M12 8v4l3 2"/></svg></button><button id="locate-nearest" type="button" title="Find nearest depot" aria-label="Find nearest depot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button></div></section>
+        <section class="map-wrap" aria-label="Map of Casablanca taxi stations">
+          <div class="map" id="map"></div>
+          <div class="map-search">
+            <div class="map-search-field">
+              <svg class="map-search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="map-search" type="search" role="combobox" aria-expanded="false" aria-controls="search-suggestions" aria-autocomplete="list" aria-label="Search stations, districts or destinations" placeholder="Search stations, districts, destinations" autocomplete="off" spellcheck="false">
+              <ul class="suggestions" id="search-suggestions" role="listbox" aria-label="Station suggestions" hidden></ul>
+            </div>
+            <button class="find-near-me" id="locate-nearest" type="button" aria-label="Find near me">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+              <span>Find near me</span>
+            </button>
+            <p class="sr-status" id="suggestion-status" role="status" aria-live="polite"></p>
+          </div>
+          <div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div>
+          <div class="map-actions"><button id="reset-view" type="button" title="Reset map view" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/><path d="M12 8v4l3 2"/></svg></button></div>
+          <section class="bottom-sheet" id="bottom-sheet" hidden aria-label="Selection details">
+            <button class="sheet-grab" id="sheet-grab" type="button" aria-expanded="false" aria-controls="sheet-body"><span class="sheet-grip" aria-hidden="true"></span></button>
+            <div class="sheet-heading">
+              <p class="sheet-eyebrow" id="sheet-eyebrow">Selection</p>
+              <h2 id="sheet-title">Details</h2>
+              <button class="sheet-close" id="sheet-close" type="button" aria-label="Close details panel">×</button>
+            </div>
+            <div class="sheet-body" id="sheet-body"></div>
+          </section>
+          <div class="map-toast" id="map-toast" role="status" hidden></div>
+        </section>
       </main>
-      <footer class="app-footer">Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</footer>
+      <footer class="app-footer"><span>Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</span><button class="footer-report" id="report-issue" type="button">Report a route or station issue</button></footer>
       <div class="install-banner" id="install-banner" role="dialog" aria-label="Install Casaway" hidden><div><strong>Take Casaway with you</strong><span id="install-hint">Install for quick access to taxi depots.</span></div><button id="install-action">Install</button><button class="dismiss-install" id="dismiss-install" aria-label="Dismiss install prompt">×</button></div>
+      <dialog class="feedback-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
+        <form class="feedback-form" id="feedback-form">
+          <div class="form-head">
+            <p class="form-eyebrow">Community check</p>
+            <h2 id="feedback-title">Report a route or station update</h2>
+            <p class="form-sub">Spotted a closed depot, a renamed station or a wrong route? Tell us — reports are reviewed before the map changes.</p>
+          </div>
+          <label class="form-field">What is wrong?
+            <select name="kind" required>
+              <option value="route-update">Route update</option>
+              <option value="station-correction">Incorrect station data</option>
+              <option value="missing-station">Missing station</option>
+              <option value="other">Something else</option>
+            </select>
+          </label>
+          <label class="form-field">Station or route
+            <input name="subject" type="text" list="feedback-subjects" maxlength="160" placeholder="e.g. Station Casa-Port" autocomplete="off">
+            <datalist id="feedback-subjects"></datalist>
+          </label>
+          <label class="form-field">Details <span class="required-mark">required</span>
+            <textarea name="details" required minlength="10" maxlength="2000" rows="4" placeholder="Describe what changed on the ground…"></textarea>
+          </label>
+          <label class="form-field">Email <span class="optional-mark">optional</span>
+            <input name="email" type="email" maxlength="200" placeholder="you@example.com" autocomplete="email">
+          </label>
+          <p class="form-status" id="feedback-status" role="status" aria-live="polite"></p>
+          <div class="form-actions">
+            <button type="button" class="btn-ghost" data-close>Cancel</button>
+            <button type="submit" class="btn-gold" id="feedback-submit">Send report</button>
+          </div>
+        </form>
+      </dialog>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.js"></script>

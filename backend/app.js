@@ -87,6 +87,9 @@ app.get("/api/stations/:id", async (req, res) => {
 // GeoJSON route catalogue (MongoDB, 2dsphere indexes): create/list/search/nearby
 app.use("/api/routes", require("./routes/api"));
 
+// Community route/station reports from the feedback drawer.
+app.use("/api/feedback", require("./routes/feedback"));
+
 // Serve static frontend build
 app.use(express.static(clientBuildDirectory));
 
