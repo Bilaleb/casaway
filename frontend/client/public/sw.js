@@ -1,4 +1,4 @@
-const CACHE_NAME = 'casaway-v2'
+const CACHE_NAME = 'casaway-v3'
 const TILE_CACHE = 'casaway-tiles-v1'
 const TILE_HOST = 'tile.openstreetmap.org'
 const APP_SHELL = [
@@ -82,16 +82,22 @@ self.addEventListener('fetch', (event) => {
 
   const isStaticAsset = url.origin === self.location.origin || ['script', 'style', 'image', 'font'].includes(request.destination)
   if (!isStaticAsset) return
+  // Stale-while-revalidate: instant response from cache, fresh copy fetched in
+  // the background so deploys reach returning users without a SW edit.
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME)
     const cached = await cache.match(request)
-    if (cached) return cached
-    try {
-      const response = await fetch(request)
+    const refresh = fetch(request).then((response) => {
       if (response.ok || response.type === 'opaque') cache.put(request, response.clone())
       return response
+    })
+    if (cached) {
+      event.waitUntil(refresh.catch(() => {}))
+      return cached
+    }
+    try {
+      return await refresh
     } catch {
-      if (request.mode === 'navigate') return cache.match('/')
       return new Response('', { status: 503, statusText: 'Asset unavailable offline' })
     }
   })())

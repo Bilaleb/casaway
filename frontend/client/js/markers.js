@@ -19,15 +19,20 @@ export function buildStationIcon(station, isActive = false) {
 }
 
 export function buildStationPopup(station) {
-  return el('div', {}, [
+  const children = [
     el('h3', { className: 'popup-title', text: station.name }),
     el('p', { className: 'popup-meta', text: `${station.district} · ${station.taxiType}` }),
-    el('p', { className: 'popup-destinations' }, [
-      el('b', { text: 'Destinations' }),
-      el('br'),
-      joinWithSeparator(station.destinations),
-    ]),
-  ])
+  ]
+  if (station.destinations?.length) {
+    children.push(
+      el('p', { className: 'popup-destinations' }, [
+        el('b', { text: 'Destinations' }),
+        el('br'),
+        joinWithSeparator(station.destinations),
+      ]),
+    )
+  }
+  return el('div', {}, children)
 }
 
 export function mountStationMarkers(map, stations, onSelect) {

@@ -110,6 +110,7 @@ select:focus { border-color: var(--gold); }
 
 /* Install banner */
 .install-banner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid #8d743a; border-radius: 3px; padding: 12px 16px; box-shadow: 0 12px 40px #000a; font-size: 12px; }
+.install-banner[hidden] { display: none; }
 .install-banner strong { display: block; }
 .install-banner span { color: var(--muted); font-size: 11px; }
 .install-banner button { background: var(--gold); color: #14120c; border: 0; border-radius: 2px; padding: 8px 14px; font-weight: 600; }
@@ -126,10 +127,15 @@ select:focus { border-color: var(--gold); }
   .sidebar.is-open { display: block; }
   .side-head h2 { font-size: 21px; }
   .station-list { max-height: 180px; overflow: auto; }
-  .map-wrap { height: 60vh; min-height: 380px; }
+  /* Let the map stretch to whatever height remains instead of leaving a dead
+     strip below it: auto height + min-height keeps the grid row stretchable. */
+  .map-wrap { height: auto; min-height: 55vh; }
   .map-chip { top: 10px; left: 10px; font-size: 9px; }
   .map-actions { top: 10px; right: 10px; }
   .brand-mark { width: 32px; height: 32px; }
+  /* Full-width banner on phones so the copy and action never squeeze. */
+  .install-banner { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); transform: none; flex-wrap: wrap; gap: 8px 12px; }
+  .install-banner .dismiss-install { margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

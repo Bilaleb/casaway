@@ -49,7 +49,6 @@ const routeSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     depotName: { type: String, required: true, trim: true },
     taxiType: { type: String, enum: TAXI_TYPES, required: true },
-    fareEstimate: { type: Number, min: 0 },
     district: { type: String, required: true, trim: true },
     // Depot/origin marker.
     location: { type: pointSchema, required: true },

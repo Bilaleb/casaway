@@ -22,7 +22,6 @@ export function createRoutePanel({ selectElement, infoElement, statusElement, co
     replaceChildren(infoElement, [
       statRow('Origin', route.origin),
       statRow('Destination', route.destination),
-      statRow('Fare estimate', route.fareEstimate || 'Not available'),
       statRow('Distance', route.distanceKm ? `${route.distanceKm} km` : 'Not available'),
       el('div', { className: 'route-stops' }, [
         el('span', { className: 'route-stat-label', text: 'Major stops' }),

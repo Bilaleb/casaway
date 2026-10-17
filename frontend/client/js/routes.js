@@ -53,7 +53,6 @@ export function buildRoutePopup(route) {
     el('p', { className: 'popup-destinations' }, [
       infoRow('Origin', route.origin),
       infoRow('Destination', route.destination),
-      infoRow('Fare estimate', route.fareEstimate || 'Not available'),
       infoRow('Major stops', (route.majorStops || []).join(' · ') || 'Not available'),
     ]),
   ])

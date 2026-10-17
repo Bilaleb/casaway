@@ -26,15 +26,6 @@ function parseRoutePayload(input = {}) {
     errors.push(`"taxiType" must be one of: ${TAXI_TYPES.join(", ")}`);
   }
 
-  let fareEstimate;
-  if (input.fareEstimate !== undefined && input.fareEstimate !== null && input.fareEstimate !== "") {
-    fareEstimate = Number(input.fareEstimate);
-    if (!Number.isFinite(fareEstimate) || fareEstimate < 0) {
-      errors.push('"fareEstimate" must be a positive number (MAD)');
-      fareEstimate = undefined;
-    }
-  }
-
   let trajectory;
   if (input.gpx !== undefined && input.gpx !== null && input.gpx !== "") {
     if (!nonEmptyString(input.gpx)) {
@@ -78,7 +69,6 @@ function parseRoutePayload(input = {}) {
       name: input.name.trim(),
       depotName: input.depotName.trim(),
       taxiType: input.taxiType,
-      fareEstimate,
       district: input.district.trim(),
       location,
       trajectory,

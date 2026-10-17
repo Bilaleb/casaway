@@ -121,11 +121,11 @@
       }
 
       function renderRouteDetails(route) {
-        routeInfo.innerHTML = `<div><span class="route-stat-label">Origin</span><span class="route-stat-value">${escapeHtml(route.origin)}</span></div><div><span class="route-stat-label">Destination</span><span class="route-stat-value">${escapeHtml(route.destination)}</span></div><div><span class="route-stat-label">Fare estimate</span><span class="route-stat-value">${escapeHtml(route.fareEstimate || 'Not available')}</span></div><div class="route-stops"><span class="route-stat-label">Major stops</span><span class="route-stat-value">${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</span></div>`
+        routeInfo.innerHTML = `<div><span class="route-stat-label">Origin</span><span class="route-stat-value">${escapeHtml(route.origin)}</span></div><div><span class="route-stat-label">Destination</span><span class="route-stat-value">${escapeHtml(route.destination)}</span></div><div class="route-stops"><span class="route-stat-label">Major stops</span><span class="route-stat-value">${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</span></div>`
       }
 
       function routePopupMarkup(route) {
-        return `<h3 class="popup-title">${escapeHtml(route.title)}</h3><p class="popup-meta">Illustrative taxi route</p><p class="popup-destinations"><b>Origin</b> ${escapeHtml(route.origin)}<br><b>Destination</b> ${escapeHtml(route.destination)}<br><b>Fare estimate</b> ${escapeHtml(route.fareEstimate || 'Not available')}<br><b>Major stops</b> ${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</p>`
+        return `<h3 class="popup-title">${escapeHtml(route.title)}</h3><p class="popup-meta">Illustrative taxi route</p><p class="popup-destinations"><b>Origin</b> ${escapeHtml(route.origin)}<br><b>Destination</b> ${escapeHtml(route.destination)}<br><b>Major stops</b> ${(route.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</p>`
       }
 
       function loadRoute(route) {
@@ -142,7 +142,7 @@
           routeLayer.openPopup(event.latlng)
         }).on('loaded', (event) => {
           if (routeLayer === event.target && event.target.getBounds().isValid()) map.fitBounds(event.target.getBounds(), { padding: [56, 56], maxZoom: 14, duration: 0.7 })
-          routeState.textContent = 'Illustrative trace · verify route and fare locally.'
+          routeState.textContent = 'Illustrative trace · verify the route locally.'
         }).on('error', () => {
           routeState.classList.add('error')
           routeState.textContent = `Could not load ${route.gpx}. Check the route file path.`
@@ -164,7 +164,7 @@
           const manifest = await response.json()
           installRoutes(Array.isArray(manifest) ? manifest : manifest.routes || [])
         } catch {
-          installRoutes([{ id: 'casa-port-maarif', title: 'Casa-Port → Maarif', origin: 'Casa-Port', destination: 'Maarif', fareEstimate: 'MAD 18–35*', majorStops: ['Casa-Voyageurs', 'Derb Omar', 'Place de la Concorde'], gpx: '/routes/casa-port-to-maarif.gpx' }])
+          installRoutes([{ id: 'casa-port-maarif', title: 'Casa-Port → Maarif', origin: 'Casa-Port', destination: 'Maarif', majorStops: ['Casa-Voyageurs', 'Derb Omar', 'Place de la Concorde'], gpx: '/routes/casa-port-to-maarif.gpx' }])
         }
       }
 

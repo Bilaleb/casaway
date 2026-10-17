@@ -123,7 +123,6 @@ function toRouteViewModel(doc) {
     origin: doc.depotName,
     destination: deriveDestination(doc.name) || doc.district,
     taxiType: doc.taxiType,
-    fareEstimate: Number.isFinite(doc.fareEstimate) ? `${doc.fareEstimate} MAD` : 'Not available',
     distanceKm: meters ? (meters / 1000).toFixed(1) : null,
     majorStops: [doc.district],
     district: doc.district,
@@ -224,7 +223,8 @@ function setStatus(message, options = {}) {
 
 function remountMarkers(nextStations) {
   if (markerLayer) map.removeLayer(markerLayer)
-  const mounted = mountStationMarkers(map, nextStations, (station) => selectStation(station.id, false))
+  // markers.js invokes onSelect with the station id.
+  const mounted = mountStationMarkers(map, nextStations, (id) => selectStation(id, false))
   markerLayer = mounted.layer
   markerById = mounted.markerById
 }
@@ -510,7 +510,7 @@ dom.menuToggle?.addEventListener('click', () => {
 async function warmShellCache() {
   if (!('caches' in window)) return
   try {
-    const cache = await caches.open('casaway-v2')
+    const cache = await caches.open('casaway-v3')
     await cache.addAll(['/', '/styles.css', '/manifest.json', import.meta.url])
   } catch {
     // A cache miss must never block startup; offline falls back to the snapshot.
@@ -532,14 +532,27 @@ async function bootstrap() {
   stations = allStationPool
   routes = docs.map(toRouteViewModel).filter((route) => route.trajectory.length > 1)
 
+  // Destination strings are short place names ("Oulfa", "L-Oulfa"), while
+  // stations carry long canonical names — match loosely so arrival depots
+  // get their incoming routes too.
+  const findDestinationStation = (destination) =>
+    allStationPool.find((station) => station.name === destination)
+    || allStationPool.find((station) => station.district === destination)
+    || allStationPool.find((station) => station.name.includes(destination))
   for (const route of routes) {
     route.originStationId = allStationPool.find((station) => station.name === route.depotName)?.id
-    route.destinationStationId = allStationPool.find((station) => station.name === route.destination)?.id
+    route.destinationStationId = findDestinationStation(route.destination)?.id
   }
   for (const route of routes) {
-    const station = allStationPool.find((item) => item.id === route.originStationId)
-    if (station && route.destination && !station.destinations.includes(route.destination)) {
-      station.destinations.push(route.destination)
+    const origin = allStationPool.find((item) => item.id === route.originStationId)
+    if (origin && route.destination && !origin.destinations.includes(route.destination)) {
+      origin.destinations.push(route.destination)
+    }
+    // Bidirectional: the arrival depot also lists this route as a connection.
+    const destinationStation = allStationPool.find((item) => item.id === route.destinationStationId)
+    const shortOrigin = route.title?.includes(' to ') ? route.title.split(' to ')[0] : origin.name
+    if (destinationStation && origin && !destinationStation.destinations.includes(shortOrigin)) {
+      destinationStation.destinations.push(shortOrigin)
     }
   }
 

@@ -26,14 +26,14 @@ const DEPOTS = [
 ];
 
 const ROUTES = [
-  { from: 0, to: 5, name: "Place de la Concorde to Oulfa", fareEstimate: 20 },
-  { from: 0, to: 18, name: "Place de la Concorde to Sidi Maalouf", fareEstimate: 30 },
-  { from: 1, to: 6, name: "Casa-Port to Sidi Bernoussi", fareEstimate: 25 },
-  { from: 2, to: 13, name: "Casa-Voyageurs to Hay Mohammadi", fareEstimate: 15 },
-  { from: 11, to: 5, name: "Derb Omar to Oulfa", fareEstimate: 25 },
-  { from: 8, to: 5, name: "Maarif to L-Oulfa", fareEstimate: 20 },
-  { from: 3, to: 17, name: "Garage Allal to Tit Mellil", fareEstimate: 35 },
-  { from: 9, to: 8, name: "Hay Hassani to Maarif", fareEstimate: 15 },
+  { from: 0, to: 5, name: "Place de la Concorde to Oulfa" },
+  { from: 0, to: 18, name: "Place de la Concorde to Sidi Maalouf" },
+  { from: 1, to: 6, name: "Casa-Port to Sidi Bernoussi" },
+  { from: 2, to: 13, name: "Casa-Voyageurs to Hay Mohammadi" },
+  { from: 11, to: 5, name: "Derb Omar to Oulfa" },
+  { from: 8, to: 5, name: "Maarif to L-Oulfa" },
+  { from: 3, to: 17, name: "Garage Allal to Tit Mellil" },
+  { from: 9, to: 8, name: "Hay Hassani to Maarif" },
 ];
 
 // Builds a gently bent illustrative trajectory between two depots.
@@ -89,7 +89,6 @@ async function seedRoutes() {
       depotName: origin.name,
       taxiType: origin.taxiType.includes("Petit") ? "Grand & Petit Taxi" : "Grand Taxi",
       district: origin.district,
-      fareEstimate: route.fareEstimate,
       location: { type: "Point", coordinates: [origin.coordinates[1], origin.coordinates[0]] },
       trajectory: trace(origin.coordinates, destination.coordinates),
     };
@@ -105,7 +104,6 @@ async function seedRoutes() {
     depotName: gpxOrigin.name,
     taxiType: "Grand Taxi",
     district: gpxOrigin.district,
-    fareEstimate: 10,
     location: { type: "Point", coordinates: [gpxOrigin.coordinates[1], gpxOrigin.coordinates[0]] },
     trajectory: gpxToLineString(toGpx("Sbata to Ain Chock", trace(gpxOrigin.coordinates, gpxDestination.coordinates, { points: 12 }))),
   };

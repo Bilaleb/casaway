@@ -252,10 +252,7 @@ export default function App() {
         const fallback = [
           {
             id: 'casa-port-maarif',
-            title: 'Casa-Port → Maarif',
-            origin: 'Casa-Port',
-            destination: 'Maarif',
-            fareEstimate: 'MAD 18–35*',
+            title: 'Casa-Port → Maarif',            origin: 'Casa-Port', destination: 'Maarif',
             majorStops: ['Casa-Voyageurs', 'Derb Omar', 'Place de la Concorde'],
             gpx: '/routes/casa-port-to-maarif.gpx',
           },
@@ -283,7 +280,6 @@ export default function App() {
       const routePopupMarkup = (r) =>
         `<h3 class="popup-title">${escapeHtml(r.title)}</h3><p class="popup-meta">Illustrative taxi route</p>` +
         `<p class="popup-destinations"><b>Origin</b> ${escapeHtml(r.origin)}<br><b>Destination</b> ${escapeHtml(r.destination)}<br>` +
-        `<b>Fare estimate</b> ${escapeHtml(r.fareEstimate || 'Not available')}<br>` +
         `<b>Major stops</b> ${(r.majorStops || []).map(escapeHtml).join(' · ') || 'Not available'}</p>`;
 
       const layer = new L.GPX(currentRoute.gpx, {
@@ -306,7 +302,7 @@ export default function App() {
           if (routeLayerRef.current === event.target && event.target.getBounds().isValid()) {
             map.fitBounds(event.target.getBounds(), { padding: [56, 56], maxZoom: 14, duration: 0.7 });
           }
-          setRouteState('Illustrative trace · verify route and fare locally.');
+          setRouteState('Illustrative trace · verify the route locally.');
         })
         .on('error', () => {
           setRouteState(`Could not load ${currentRoute.gpx}. Check the route file path.`);
@@ -536,10 +532,6 @@ export default function App() {
                 <div>
                   <span className="route-stat-label">Destination</span>
                   <span className="route-stat-value">{activeRoute.destination}</span>
-                </div>
-                <div>
-                  <span className="route-stat-label">Fare estimate</span>
-                  <span className="route-stat-value">{activeRoute.fareEstimate || 'Not available'}</span>
                 </div>
                 <div className="route-stops">
                   <span className="route-stat-label">Major stops</span>
