@@ -1,7 +1,7 @@
 {
   "name": "casaway-backend",
   "version": "1.0.0",
-  "description": "Casaway Casablanca Taxi Navigator Backend API",
+  "description": "Casaway backend API - Your Way Through Casablanca",
   "main": "app.js",
   "scripts": {
     "dev": "node server.js",

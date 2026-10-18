@@ -390,7 +390,7 @@ export default function App() {
           <div className="brand-mark" aria-hidden="true">CW</div>
           <div className="brand-copy">
             <h1>Casaway</h1>
-            <span>Casablanca Taxi Navigator</span>
+            <span>Your Way Through Casablanca</span>
           </div>
         </div>
         <div className="top-actions">

@@ -1,5 +1,5 @@
 export const APP_NAME = 'Casaway'
-export const APP_TAGLINE = 'Casablanca Taxi Navigator'
+export const APP_TAGLINE = 'Your Way Through Casablanca'
 export const DISCLAIMER = 'Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.'
 
 export const CASABLANCA_CENTER = [33.5731, -7.5898]

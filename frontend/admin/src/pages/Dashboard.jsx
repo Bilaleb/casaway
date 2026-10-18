@@ -35,7 +35,7 @@ export default function Dashboard() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #283140', paddingBottom: '16px' }}>
         <div>
           <h1 style={{ margin: 0, fontSize: '24px', color: '#e5c158' }}>Casaway Stations Directory</h1>
-          <p style={{ margin: '6px 0 0', color: '#8993a3', fontSize: '13px' }}>Casablanca Taxi Navigator Admin Dashboard</p>
+          <p style={{ margin: '6px 0 0', color: '#8993a3', fontSize: '13px' }}>Casaway admin — Your Way Through Casablanca</p>
         </div>
         <a href="/" style={{ color: '#e5c158', textDecoration: 'none', border: '1px solid #756231', padding: '8px 14px', borderRadius: '4px', fontSize: '12px' }}>
           ← Back to Map

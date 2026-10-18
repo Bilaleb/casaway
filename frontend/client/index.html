@@ -4,9 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Explore Casablanca grand taxi and petit taxi stations and route traces with Casaway." />
-    <meta property="og:title" content="Casaway - Casablanca Taxi Navigator" />
+    <meta property="og:title" content="Casaway - Your Way Through Casablanca" />
     <meta property="og:description" content="Explore Casablanca grand taxi and petit taxi stations and route traces with Casaway." />
     <meta name="theme-color" content="#0b0f19" />
+    <script>
+      // Apply the saved (or OS) theme before first paint to avoid a flash of the wrong theme.
+      (function () {
+        try {
+          var saved = localStorage.getItem('casaway-theme');
+          var theme = saved === 'light' || saved === 'dark' ? saved
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.dataset.theme = theme;
+          document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f6f4ee' : '#0b0f19';
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Casaway" />
@@ -20,14 +34,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.1/dist/geosearch.css" />
     <link rel="stylesheet" href="/styles.css" />
-    <title>Casaway - Casablanca Taxi Navigator</title>
+    <title>Casaway - Your Way Through Casablanca</title>
   </head>
   <body>
     <div id="app">
       <header class="topbar">
         <button class="menu-toggle" id="menu-toggle" aria-label="Toggle station explorer" aria-expanded="false">☰</button>
-        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span>Casablanca Taxi Navigator</span></div></div>
-        <div class="top-actions"><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 stations mapped</span></span></div>
+        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span>Your Way Through Casablanca</span></div></div>
+        <div class="top-actions"><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 stations mapped</span></span></div>
       </header>
       <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and depots.</div>
       <main class="main">
@@ -73,7 +87,7 @@
           <div class="form-head">
             <p class="form-eyebrow">Community check</p>
             <h2 id="feedback-title">Report a route or station update</h2>
-            <p class="form-sub">Spotted a closed depot, a renamed station or a wrong route? Tell us — reports are reviewed before the map changes.</p>
+            <p class="form-sub">Spotted a closed depot, a renamed station or a wrong route? Tell us — every report is reviewed before the map changes and reaches <b>bilalelaouab16@gmail.com</b> directly.</p>
           </div>
           <label class="form-field">What is wrong?
             <select name="kind" required>

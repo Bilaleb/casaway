@@ -20,6 +20,7 @@ import { createFloatingSearch } from './js/floatingSearch.js'
 import { createBottomSheet } from './js/bottomSheet.js'
 import { durationLabel, estimateDurationMin, transitChips } from './js/transit.js'
 import { setupFeedbackForm } from './js/feedbackForm.js'
+import { setupTheme } from './js/theme.js'
 
 const API_BASE = '/api/routes'
 const SNAPSHOT_KEY = 'route-catalogue'
@@ -669,6 +670,7 @@ async function warmShellCache() {
 }
 
 async function bootstrap() {
+  setupTheme()
   registerServiceWorker()
   watchConnectivity(dom.offlineBanner)
   setupInstallPrompt({
