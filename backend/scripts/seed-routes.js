@@ -1,5 +1,6 @@
 const Route = require("../models/Route");
 const { gpxToLineString } = require("../utils/gpx");
+const { FARES } = require("../config/fares");
 
 // The 20 Casaway taxi depots, as [latitude, longitude].
 const DEPOTS = [
@@ -65,6 +66,24 @@ const toGpx = (name, lineString) =>
     .join("")}</trkseg></trk>
 </gpx>`;
 
+/**
+ * Attaches the regulated per-seat fare (day/night/Courssa basis) to each of
+ * the top-20 depot documents. Upsert-safe: fare-only datasets can be re-run
+ * any time prices change (see scripts/seed-fares.js).
+ */
+async function seedFares() {
+  let attached = 0;
+  for (const fare of FARES) {
+    const { depotName, ...update } = fare;
+    const result = await Route.updateMany(
+      { name: depotName, depotName },
+      { $set: { fare: update } }
+    );
+    attached += result.modifiedCount || 0;
+  }
+  return attached;
+}
+
 async function seedRoutes() {
   let inserted = 0;
 
@@ -110,10 +129,12 @@ async function seedRoutes() {
   const gpxResult = await Route.updateOne({ name: gpxRoute.name, depotName: gpxRoute.depotName }, { $setOnInsert: gpxRoute }, { upsert: true });
   if (gpxResult.upsertedCount) inserted += 1;
 
-  console.log(`Seeded ${inserted} Casaway depots/routes (${await Route.countDocuments()} total)`);
+  const faresAttached = await seedFares();
+  console.log(`Seeded ${inserted} Casaway depots/routes (${await Route.countDocuments()} total) · ${faresAttached} fares attached`);
 }
 
 module.exports = seedRoutes;
+module.exports.seedFares = seedFares;
 
 if (require.main === module) {
   require("dotenv").config();

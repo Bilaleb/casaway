@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "seed:routes": "node scripts/seed-routes.js"
+    "seed:routes": "node scripts/seed-routes.js",
+    "seed:fares": "node scripts/seed-fares.js"
   },
   "repository": {
     "type": "git",

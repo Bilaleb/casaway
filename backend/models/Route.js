@@ -26,9 +26,7 @@ const pointSchema = new mongoose.Schema(
     },
   },
   { _id: false }
-);
-
-const lineStringSchema = new mongoose.Schema(
+);const lineStringSchema = new mongoose.Schema(
   {
     type: { type: String, enum: ["LineString"], default: "LineString", required: true },
     coordinates: {
@@ -36,10 +34,46 @@ const lineStringSchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: (coordinates) =>
-          Array.isArray(coordinates) && coordinates.length >= 2 && coordinates.every(isPosition),
+          Array.isArray(coordinates) &&
+          coordinates.length >= 2 &&
+          coordinates.every(isPosition),
         message: "LineString coordinates must be at least two valid [longitude, latitude] positions",
       },
     },
+  },
+  { _id: false }
+);
+
+/**
+ * Regulated Grand Taxi fare for one depot/route (prices are PER SEAT):
+ * day rate until 20:00, night rate (+~50%) after 20:00, and the
+ * "Courssa" full-taxi buyout is simply the per-seat rate x 6 seats.
+ */
+const fareSchema = new mongoose.Schema(
+  {
+    origin: { type: String, trim: true },
+    destination: { type: String, trim: true },
+    baseDayPriceMAD: {
+      type: Number,
+      required: [true, "baseDayPriceMAD is required"],
+      min: [0, "baseDayPriceMAD cannot be negative"],
+    },
+    baseNightPriceMAD: {
+      type: Number,
+      required: [true, "baseNightPriceMAD is required"],
+      min: [0, "baseNightPriceMAD cannot be negative"],
+    },
+    estimatedDistanceKM: {
+      type: Number,
+      required: [true, "estimatedDistanceKM is required"],
+      min: [0, "estimatedDistanceKM cannot be negative"],
+    },
+    estimatedTimeMins: {
+      type: Number,
+      required: [true, "estimatedTimeMins is required"],
+      min: [0, "estimatedTimeMins cannot be negative"],
+    },
+    currency: { type: String, default: "MAD", trim: true },
   },
   { _id: false }
 );
@@ -54,6 +88,8 @@ const routeSchema = new mongoose.Schema(
     location: { type: pointSchema, required: true },
     // Full route trajectory; depot-only documents simply omit it.
     trajectory: { type: lineStringSchema },
+    // Regulated per-seat fare for this depot/route (seeded for the top 20).
+    fare: { type: fareSchema },
   },
   { timestamps: true }
 );
@@ -69,3 +105,4 @@ routeSchema.set("toJSON", { virtuals: true });
 module.exports = mongoose.model("Route", routeSchema);
 module.exports.TAXI_TYPES = TAXI_TYPES;
 module.exports.isPosition = isPosition;
+module.exports.fareSchema = fareSchema;

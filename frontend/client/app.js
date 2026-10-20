@@ -7,13 +7,16 @@
  * degrades gracefully: API -> IndexedDB/localStorage snapshot -> bundled list.
  */
 import { DEFAULT_ZOOM, STATION_FOCUS_ZOOM, GOLD } from './js/constants.js'
-import { el } from './js/dom.js'
+import { el, replaceChildren } from './js/dom.js'
 import { createMap, focusOn, fitLayer, recenter } from './js/map.js'
 import { STATIONS, formatDistance, distanceMeters } from './js/stations.js'
-import { mountStationMarkers, styleStationMarkers } from './js/markers.js'
+import { mountStationMarkers, styleStationMarkers, buildStationIcon, updateStationPriceTag } from './js/markers.js'
 import { createStationList } from './js/sidebar.js'
 import { createRoutePanel } from './js/routePanel.js'
 import { buildRoutePopup, routesForStation } from './js/routes.js'
+import { fareMode, onFareChange } from './js/fares.js'
+import { buildFareWidget, buildFareOverview, updateFareWidget } from './js/fareWidget.js'
+import { directionsLink } from './js/directions.js'
 import { registerServiceWorker, watchConnectivity, setupInstallPrompt } from './js/pwa.js'
 import { readSnapshot, writeSnapshot } from './js/offline.js'
 import { createFloatingSearch } from './js/floatingSearch.js'
@@ -196,6 +199,9 @@ const dom = {
   mapToast: document.querySelector('#map-toast'),
   reportIssue: document.querySelector('#report-issue'),
   depotCount: document.querySelector('#depot-count'),
+  farePeriod: document.querySelector('#fare-period'),
+  fareWidget: document.querySelector('#fare-widget'),
+  sheetElement: document.querySelector('#bottom-sheet'),
   installBanner: document.querySelector('#install-banner'),
   installHint: document.querySelector('#install-hint'),
   installAction: document.querySelector('#install-action'),
@@ -205,7 +211,7 @@ const dom = {
 const map = createMap('map')
 const stationList = createStationList({
   listElement: document.querySelector('#station-list'),
-  emptyMessage: 'No depots match this search.',
+  emptyMessage: 'No dépôts match this search.',
   onSelect: (id) => selectStation(id, true),
 })
 const routePanel = createRoutePanel({
@@ -280,8 +286,22 @@ function renderStationList() {
     taxiType: dom.taxiFilter.value,
     activeId: activeStationId,
   })
-  if (dom.depotCount) dom.depotCount.textContent = `${shown.length} station${shown.length === 1 ? '' : 's'} mapped`
+  if (dom.depotCount) dom.depotCount.textContent = `${shown.length} dépôt${shown.length === 1 ? '' : 's'} mapped`
+  renderSidebarFare()
   return shown
+}
+
+/** The depot whose fare/directions the sidebar and sheet are showing. */
+function activeDepot() {
+  return activeStationId ? stations.find((item) => item.id === activeStationId) || null : null
+}
+
+/** Sidebar fare calculator: full widget for the selected depot, range otherwise. */
+function renderSidebarFare() {
+  if (!dom.fareWidget) return
+  const depot = activeDepot()
+  replaceChildren(dom.fareWidget, [depot ? buildFareWidget(depot) : buildFareOverview()])
+  if (dom.farePeriod) dom.farePeriod.textContent = fareMode() === 'night' ? 'NIGHT RATE' : 'DAY RATE'
 }
 
 function refreshRouteCatalogue() {
@@ -362,6 +382,7 @@ function sheetReportButton(subject, kind, label) {
 
 function presentRouteSheet(route, openAt = 'half') {
   const stops = (route.majorStops || []).filter(Boolean).join(' · ')
+  const depot = activeDepot()
   sheet.present({
     eyebrow: 'Route trace',
     title: route.title,
@@ -374,6 +395,8 @@ function presentRouteSheet(route, openAt = 'half') {
         sheetStat('Duration', durationLabel(route.distanceKm), { estimate: Boolean(route.distanceKm) }),
       ]),
       transitChips(route.taxiType || ''),
+      depot ? buildFareWidget(depot) : null,
+      depot ? el('div', { className: 'sheet-actions' }, [directionsLink(depot, userPosition, { className: 'dir-link dir-link-lg', label: `Directions to ${depot.name}` })]) : null,
       el('p', {
         className: 'sheet-note',
         text: `Duration estimated at the 22 km/h city average${stops ? ` · serves ${stops}` : ''} · traces are illustrative, not official itineraries.`,
@@ -381,12 +404,16 @@ function presentRouteSheet(route, openAt = 'half') {
       sheetReportButton(route.title, 'route-update', 'Report an issue with this route'),
     ],
   })
+  sheetRepaint = (nextOpenAt) => presentRouteSheet(route, nextOpenAt)
 }
 
-function presentStationSheet(station) {
+let sheetRepaint = null
+
+function presentStationSheet(station, openAt = 'half') {
   sheet.present({
-    eyebrow: 'Station',
+    eyebrow: 'Dépôt',
     title: station.name,
+    openAt,
     content: [
       el('div', { className: 'sheet-stats' }, [
         sheetStat('District', station.district),
@@ -394,13 +421,42 @@ function presentStationSheet(station) {
       ]),
       transitChips(station.taxiType),
       station.destinations.length
-        ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': 'Destinations from this station' } },
+        ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': 'Destinations from this dépôt' } },
             station.destinations.map((target) => el('li', { text: target })))
         : null,
-      sheetReportButton(station.name, 'station-correction', 'Report incorrect data for this station'),
+      buildFareWidget(station),
+      el('div', { className: 'sheet-actions' }, [directionsLink(station, userPosition, { className: 'dir-link dir-link-lg' })]),
+      sheetReportButton(station.name, 'station-correction', 'Report incorrect data for this dépôt'),
     ],
   })
+  sheetRepaint = (nextOpenAt) => presentStationSheet(station, nextOpenAt)
 }
+
+/**
+ * Re-renders every fare surface when the day/night rate (or seat count)
+ * changes: marker price tags in real time, plus the open popup, the sidebar
+ * calculator and the detail sheet.
+ */
+function refreshFareSurfaces() {
+  for (const [id, marker] of markerById) {
+    const station = stations.find((item) => item.id === id)
+    if (!station) continue
+    // In-place updates only: rebuilding an open popup's DOM (or its source
+    // marker's icon) makes Leaflet close the popup, so both refreshes mutate
+    // existing nodes and only fall back to a rebuild when structure changed.
+    if (!updateStationPriceTag(marker, station)) {
+      marker.setIcon(buildStationIcon(station, id === activeStationId))
+    }
+    const popup = marker.getPopup()
+    if (popup?.isOpen()) {
+      const widgetNode = popup.getElement()?.querySelector('.fare-widget')
+      if (widgetNode) updateFareWidget(widgetNode, station)
+    }
+  }
+  renderSidebarFare()
+  if (dom.sheetElement && !dom.sheetElement.hidden && sheetRepaint) sheetRepaint(sheet.getState())
+}
+onFareChange(refreshFareSurfaces)
 
 /** Draws a stored GeoJSON trajectory as a gold polyline linking its start and end points. */
 function showRoute(route, { openAt = 'half' } = {}) {
@@ -408,7 +464,7 @@ function showRoute(route, { openAt = 'half' } = {}) {
   if (!route) return
   presentRouteSheet(route, openAt)
   if (!route.trajectory || route.trajectory.length < 2) {
-    setStatus('This depot has no stored trajectory yet.')
+    setStatus('This dépôt has no stored trajectory yet.')
     return
   }
   setStatus('Loading route trace…')
@@ -459,7 +515,7 @@ async function runSearch(query) {
     remountMarkers(stations)
     renderStationList()
     if (stations.length) frameStations(stations)
-    setStatus(`${stations.length} depot${stations.length === 1 ? '' : 's'} match “${trimmed}”.`)
+    setStatus(`${stations.length} dépôt${stations.length === 1 ? '' : 's'} match “${trimmed}”.`)
     return stations
   } catch (error) {
     if (token !== searchToken) return null
@@ -494,13 +550,13 @@ async function locateNearest() {
     drawUserPosition(position)
     const { depots, source } = await nearbyDepotsFor(position)
     if (!depots.length) {
-      const message = `No depots found within ${(NEARBY_RADIUS_METERS / 1000).toFixed(1)} km of you.`
+      const message = `No dépôts found within ${(NEARBY_RADIUS_METERS / 1000).toFixed(1)} km of you.`
       setStatus(message, { error: true })
       showToast(message, { error: true })
       return
     }
     const nearest = depots[0]
-    const summary = `Nearest depot ${source === 'api' ? '(API $near)' : '(offline estimate)'}: ${nearest.station.name} · ${formatDistance(nearest.meters)}`
+    const summary = `Nearest dépôt ${source === 'api' ? '(API $near)' : '(offline estimate)'}: ${nearest.station.name} · ${formatDistance(nearest.meters)}`
     setStatus(summary)
     showToast(`Nearest: ${nearest.station.name} · ${formatDistance(nearest.meters)}`)
     selectStation(nearest.station.id, true)
@@ -582,8 +638,8 @@ function nearbyPopupContent(depots, source) {
     ])
   )
   return el('div', { className: 'nearby-popup' }, [
-    el('h3', { className: 'popup-title', text: 'Taxi depots near you' }),
-    el('p', { className: 'popup-meta', text: source === 'api' ? 'Live from the Casaway API' : 'Offline estimate from cached depots' }),
+    el('h3', { className: 'popup-title', text: 'Taxi dépôts near you' }),
+    el('p', { className: 'popup-meta', text: source === 'api' ? 'Live from the Casaway API' : 'Offline estimate from cached dépôts' }),
     ...rows,
   ])
 }
@@ -662,7 +718,7 @@ dom.menuToggle?.addEventListener('click', () => {
 async function warmShellCache() {
   if (!('caches' in window)) return
   try {
-    const cache = await caches.open('casaway-v3')
+    const cache = await caches.open('casaway-v4')
     await cache.addAll(['/', '/styles.css', '/manifest.json', import.meta.url])
   } catch {
     // A cache miss must never block startup; offline falls back to the snapshot.
@@ -719,12 +775,12 @@ async function bootstrap() {
   if (routes.length) showRoute(routes[0], { openAt: 'peek' })
 
   if (source === 'network') {
-    setStatus(`${routes.length} route trace${routes.length === 1 ? '' : 's'} · ${stations.length} depots loaded from the Casaway API.`)
+    setStatus(`${routes.length} route trace${routes.length === 1 ? '' : 's'} · ${stations.length} dépôts loaded from the Casaway API.`)
     warmShellCache()
   } else if (source === 'cache') {
     setStatus(`Offline — showing the snapshot saved ${new Date(savedAt).toLocaleString()}.`, { error: false })
   } else {
-    setStatus('The route API is unreachable and no snapshot exists. Showing the bundled depot list.', { error: true })
+    setStatus('The route API is unreachable and no snapshot exists. Showing the bundled dépôt list.', { error: true })
   }
 
   if (stations.length) showAllStationsFallback()
@@ -742,3 +798,10 @@ bootstrap().catch((error) => {
 
 // Keep the map sized when the sidebar drawer opens/closes on mobile.
 window.addEventListener('resize', () => map.invalidateSize())
+
+// Fare price tags stay readable: hide them while the map is zoomed far out
+// and depots crowd together (the pins themselves remain).
+const MAP_ELEMENT = document.getElementById('map')
+const syncTagVisibility = () => MAP_ELEMENT?.classList.toggle('is-zoomed-out', map.getZoom() < 11.5)
+map.on('zoomend', syncTagVisibility)
+syncTagVisibility()

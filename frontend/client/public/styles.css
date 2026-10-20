@@ -86,8 +86,8 @@ button { cursor: pointer; }
 .offline-banner { background: var(--banner-bg); color: var(--warn); border-bottom: 1px solid var(--banner-line); padding: 9px 22px; font: 11px var(--mono); }
 
 /* Layout */
-.main { flex: 1; display: grid; grid-template-columns: 365px minmax(0, 1fr); min-height: calc(100vh - 112px); }
-.sidebar { background: var(--panel); border-right: 1px solid var(--line); padding: 24px 22px; overflow: auto; max-height: calc(100vh - 112px); }
+.main { flex: 1; display: grid; grid-template-columns: 365px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); min-height: 0; }
+.sidebar { background: var(--panel); border-right: 1px solid var(--line); padding: 24px 22px; overflow: auto; max-height: calc(100dvh - 112px); }
 .side-head .eyebrow, .eyebrow { font: 10px var(--mono); color: var(--gold); text-transform: uppercase; letter-spacing: .05em; margin: 0; }
 .side-head h2 { font-size: 25px; line-height: 1.08; margin: 9px 0 7px; }
 .side-head p:last-child { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 18px; }
@@ -303,3 +303,96 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
 .btn-ghost:hover { border-color: var(--muted); }
 .btn-gold { background: var(--gold-fill); border: 0; color: #14120c; font-weight: 600; font-size: 13px; padding: 9px 16px; border-radius: 2px; }
 .btn-gold:disabled { opacity: .6; cursor: wait; }
+
+/* ============================================================= *
+ * Grand taxi fare calculator (popups, sidebar panel, detail sheet)
+ * ============================================================= */
+.fare-panel { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 16px; }
+.fare-widget-host { margin-top: 12px; }
+.fare-widget { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px; }
+.leaflet-popup-content .fare-widget { margin-top: 10px; padding: 10px; gap: 8px; }
+.fare-widget.is-empty { gap: 6px; }
+.fare-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.fare-eyebrow { font: 10px var(--mono); color: var(--gold); text-transform: uppercase; letter-spacing: .05em; }
+.fare-toggle { display: inline-flex; flex: none; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+.fare-mode { background: transparent; border: 0; color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .04em; padding: 6px 9px; }
+.fare-mode:hover { color: var(--ink); }
+.fare-mode.is-active { background: var(--gold-fill); color: #14120c; font-weight: 700; }
+.fare-route { margin: 0; font-size: 12px; line-height: 1.45; color: var(--ink-soft); }
+.fare-seats { display: flex; align-items: center; gap: 10px; }
+.fare-label { flex: none; font: 10px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.fare-seat-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.fare-seat { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft); border-radius: 3px; font: 11px var(--mono); }
+.fare-seat:hover, .fare-seat:focus-visible { border-color: var(--gold-line); color: var(--gold); outline: none; }
+.fare-seat.is-active { background: var(--gold-fill); border-color: var(--gold-fill); color: #14120c; font-weight: 700; }
+.fare-lines { display: grid; gap: 5px; }
+.fare-line { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; font-size: 12px; color: var(--muted); }
+.fare-line b { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.fare-line.is-total { border-top: 1px dashed var(--line); padding-top: 7px; color: var(--ink-soft); }
+.fare-line.is-total b { color: var(--gold); font-size: 14px; }
+.fare-line.is-courssa { background: var(--chip-on-bg); border: 1px solid var(--gold-line); border-radius: 3px; padding: 7px 9px; color: var(--ink); }
+.fare-line.is-courssa b { color: var(--gold); font-weight: 700; }
+.fare-note { margin: 0; font: 9px/1.55 var(--mono); color: var(--muted); }
+
+/* ============================================================= *
+ * Marker price tags (real-time day/night per-seat prices)
+ * ============================================================= */
+.marker-pin { position: relative; display: block; width: 25px; height: 25px; }
+.fare-tag { position: absolute; top: calc(100% + 5px); left: 50%; transform: translateX(-50%); z-index: 1; white-space: nowrap; background: var(--float-strong); border: 1px solid var(--gold-line); color: var(--gold); font: 9px var(--mono); line-height: 1.4; padding: 2px 5px; border-radius: 3px; box-shadow: 0 4px 12px #0008; pointer-events: none; }
+[data-theme="light"] .fare-tag { background: var(--float); box-shadow: 0 3px 10px #0003; }
+/* At city-overview zoom the depots crowd together — drop the tags until the
+   map is close enough for them to stay readable (pins remain). */
+.map.is-zoomed-out .fare-tag { display: none; }
+
+/* ============================================================= *
+ * Directions to a depot
+ * ============================================================= */
+.popup-actions { display: flex; gap: 8px; margin-top: 11px; }
+.dir-link { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: var(--gold-fill); color: #14120c; border: 0; border-radius: 3px; padding: 9px 12px; font-size: 12px; font-weight: 600; text-decoration: none; }
+.dir-link::after { content: '↗'; font-weight: 700; }
+.dir-link:hover, .dir-link:focus-visible { filter: brightness(1.07); outline: none; }
+.dir-link-lg { padding: 11px 14px; font-size: 13px; }
+.sheet-actions { display: flex; gap: 8px; }
+
+/* ============================================================= *
+ * Responsiveness — phone, tablet and laptop
+ * ============================================================= */
+#app { min-height: 100dvh; height: 100dvh; }
+/* The map grows into whatever height remains — no page-level scroll on any
+   viewport, so the topbar and footer always sit in place. */
+.main { min-height: 0; }
+@media (min-width: 761px) and (max-width: 1180px) {
+  .main { grid-template-columns: 330px minmax(0, 1fr); }
+}
+@media (min-width: 761px) and (max-width: 1024px) {
+  .main { grid-template-columns: 300px minmax(0, 1fr); }
+  .side-head h2 { font-size: 22px; }
+  .sidebar { padding: 20px 18px; }
+  .station-list { max-height: 46vh; overflow: auto; }
+  .route-info > div { grid-template-columns: 76px 1fr; }
+  .bottom-sheet { width: 380px; }
+  .map-chip { font-size: 9px; }
+}
+/* Touch devices: fat-finger targets everywhere. */
+@media (pointer: coarse) {
+  .menu-toggle, .theme-toggle { width: 44px; height: 44px; }
+  .map-actions button { width: 44px; height: 44px; }
+  .sheet-close { width: 40px; height: 40px; }
+  .station-button { min-height: 52px; padding: 13px 8px; }
+  .search-box input { padding-top: 13px; padding-bottom: 13px; }
+  .fare-seat { width: 36px; height: 36px; }
+  .fare-mode { padding: 9px 11px; }
+  .find-near-me { min-height: 44px; }
+  .footer-report { padding: 11px 14px; }
+  .sheet-report { padding: 12px; }
+}
+/* Small phones: let the sheet and drawer use the whole screen. */
+@media (max-width: 760px) {
+  .main { grid-template-rows: auto minmax(0, 1fr); }
+  .sidebar { max-height: 54dvh; }
+  .station-list { max-height: 26dvh; }
+  .map-wrap { min-height: 55vh; }
+  .bottom-sheet { max-height: 92%; }
+  .fare-widget { padding: 11px; }
+  .fare-seat { width: 34px; height: 34px; }
+}

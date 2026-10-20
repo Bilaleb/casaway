@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Explore Casablanca grand taxi and petit taxi stations and route traces with Casaway." />
+    <meta name="description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
     <meta property="og:title" content="Casaway - Your Way Through Casablanca" />
-    <meta property="og:description" content="Explore Casablanca grand taxi and petit taxi stations and route traces with Casaway." />
+    <meta property="og:description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
     <meta name="theme-color" content="#0b0f19" />
     <script>
       // Apply the saved (or OS) theme before first paint to avoid a flash of the wrong theme.
@@ -39,26 +39,27 @@
   <body>
     <div id="app">
       <header class="topbar">
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle station explorer" aria-expanded="false">☰</button>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle dépôt explorer" aria-expanded="false">☰</button>
         <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span>Your Way Through Casablanca</span></div></div>
-        <div class="top-actions"><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 stations mapped</span></span></div>
+        <div class="top-actions"><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 dépôts mapped</span></span></div>
       </header>
-      <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and depots.</div>
+      <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and dépôts.</div>
       <main class="main">
-        <aside class="sidebar" id="sidebar" aria-label="Taxi station explorer">
-          <div class="side-head"><h2>Find your next taxi.</h2><p>Stations, destinations and route traces across Casablanca.</p></div>
-          <div class="search-wrap"><label class="search-box"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="station-search" type="search" placeholder="Search station or district" autocomplete="off" aria-label="Search stations by name or district"></label></div>
-          <div class="filter-row"><label for="taxi-filter">Taxi type</label><select id="taxi-filter"><option value="all">All stations</option><option value="grand">Grand taxi</option><option value="petit">Petit taxi</option></select></div>
+        <aside class="sidebar" id="sidebar" aria-label="Taxi dépôt explorer">
+          <div class="side-head"><h2>Find your next taxi.</h2><p>Dépôts, destinations and route traces across Casablanca.</p></div>
+          <div class="search-wrap"><label class="search-box"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="station-search" type="search" placeholder="Search dépôt or district" autocomplete="off" aria-label="Search dépôts by name or district"></label></div>
+          <div class="filter-row"><label for="taxi-filter">Taxi type</label><select id="taxi-filter"><option value="all">All dépôts</option><option value="grand">Grand taxi</option><option value="petit">Petit taxi</option></select></div>
           <div class="station-list" id="station-list" aria-live="polite"></div>
           <section class="route-panel" aria-label="Route details"><div class="route-heading"><h3>Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><p class="route-state" id="route-state" role="status">Loading route catalogue...</p></section>
+          <section class="fare-panel" aria-label="Fare calculator"><div class="route-heading"><h3>Fare calculator</h3><span id="fare-period">DAY RATE</span></div><div id="fare-widget" class="fare-widget-host"></div></section>
         </aside>
-        <section class="map-wrap" aria-label="Map of Casablanca taxi stations">
+        <section class="map-wrap" aria-label="Map of Casablanca taxi dépôts">
           <div class="map" id="map"></div>
           <div class="map-search">
             <div class="map-search-field">
               <svg class="map-search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input id="map-search" type="search" role="combobox" aria-expanded="false" aria-controls="search-suggestions" aria-autocomplete="list" aria-label="Search stations, districts or destinations" placeholder="Search stations, districts, destinations" autocomplete="off" spellcheck="false">
-              <ul class="suggestions" id="search-suggestions" role="listbox" aria-label="Station suggestions" hidden></ul>
+              <input id="map-search" type="search" role="combobox" aria-expanded="false" aria-controls="search-suggestions" aria-autocomplete="list" aria-label="Search dépôts, districts or destinations" placeholder="Search dépôts, districts, destinations" autocomplete="off" spellcheck="false">
+              <ul class="suggestions" id="search-suggestions" role="listbox" aria-label="Dépôt suggestions" hidden></ul>
             </div>
             <button class="find-near-me" id="locate-nearest" type="button" aria-label="Find near me">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
@@ -80,20 +81,20 @@
           <div class="map-toast" id="map-toast" role="status" hidden></div>
         </section>
       </main>
-      <footer class="app-footer"><span>Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</span><button class="footer-report" id="report-issue" type="button">Report a route or station issue</button></footer>
-      <div class="install-banner" id="install-banner" role="dialog" aria-label="Install Casaway" hidden><div><strong>Take Casaway with you</strong><span id="install-hint">Install for quick access to taxi depots.</span></div><button id="install-action">Install</button><button class="dismiss-install" id="dismiss-install" aria-label="Dismiss install prompt">×</button></div>
+      <footer class="app-footer"><span>Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</span><button class="footer-report" id="report-issue" type="button">Report a route or dépôt issue</button></footer>
+      <div class="install-banner" id="install-banner" role="dialog" aria-label="Install Casaway" hidden><div><strong>Take Casaway with you</strong><span id="install-hint">Install for quick access to taxi dépôts.</span></div><button id="install-action">Install</button><button class="dismiss-install" id="dismiss-install" aria-label="Dismiss install prompt">×</button></div>
       <dialog class="feedback-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
         <form class="feedback-form" id="feedback-form">
           <div class="form-head">
             <p class="form-eyebrow">Community check</p>
-            <h2 id="feedback-title">Report a route or station update</h2>
-            <p class="form-sub">Spotted a closed depot, a renamed station or a wrong route? Tell us — every report is reviewed before the map changes and reaches <b>bilalelaouab16@gmail.com</b> directly.</p>
+            <h2 id="feedback-title">Report a route or dépôt update</h2>
+            <p class="form-sub">Spotted a closed dépôt, a renamed dépôt or a wrong route? Tell us — every report is reviewed before the map changes and reaches <b>bilalelaouab16@gmail.com</b> directly.</p>
           </div>
           <label class="form-field">What is wrong?
             <select name="kind" required>
               <option value="route-update">Route update</option>
-              <option value="station-correction">Incorrect station data</option>
-              <option value="missing-station">Missing station</option>
+              <option value="station-correction">Incorrect dépôt data</option>
+              <option value="missing-station">Missing dépôt</option>
               <option value="other">Something else</option>
             </select>
           </label>

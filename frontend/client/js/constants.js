@@ -24,7 +24,7 @@ export const TAXI_FILTERS = {
 export const TAXI_LABELS = {
   grand: 'Grand taxi',
   petit: 'Petit taxi',
-  all: 'All stations',
+  all: 'All dépôts',
 }
 
 export const METERS_PER_KILOMETER = 1000

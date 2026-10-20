@@ -14,15 +14,14 @@ export function estimateDurationMin(distanceKm) {
 
 /**
  * Maps a stored taxiType ("Grand Taxi", "Grand & Petit Taxi", ...) onto the
- * rider-facing transit options: Large Taxi, Small Taxi and Bus. Bus lines are
- * not part of the Casaway dataset yet, so that chip renders as honestly
- * unavailable instead of pretending to offer a service.
+ * rider-facing options: Large Taxi and Small Taxi. Bus lines are not part of
+ * Casaway and are deliberately not offered here (the section was removed
+ * until bus data actually ships).
  */
 export function transitOptions(taxiType = '') {
   return [
     { key: 'large', label: 'Large Taxi', available: /grand/i.test(taxiType) },
     { key: 'small', label: 'Small Taxi', available: /petit/i.test(taxiType) },
-    { key: 'bus', label: 'Bus', available: false, note: 'Casa bus lines — coming soon' },
   ]
 }
 

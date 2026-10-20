@@ -1,4 +1,4 @@
-const CACHE_NAME = 'casaway-v3'
+const CACHE_NAME = 'casaway-v4'
 const TILE_CACHE = 'casaway-tiles-v1'
 const TILE_HOST = 'tile.openstreetmap.org'
 const APP_SHELL = [

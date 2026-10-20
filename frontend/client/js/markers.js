@@ -1,6 +1,17 @@
 import { el, joinWithSeparator } from './dom.js'
+import { fareForStation, fareMode, seatPrice, formatMAD } from './fares.js'
+import { buildFareWidget } from './fareWidget.js'
+import { directionsLink } from './directions.js'
+
+/** Current per-seat price tag ("8.00 MAD") or null for unpriced depots. */
+export function stationPriceTag(station) {
+  const fare = fareForStation(station)
+  const price = seatPrice(fare, fareMode())
+  return price === null ? null : formatMAD(price)
+}
 
 export function buildStationIcon(station, isActive = false) {
+  const priceTag = stationPriceTag(station)
   const badge = el('span', {
     className: [
       'taxi-marker',
@@ -9,13 +20,35 @@ export function buildStationIcon(station, isActive = false) {
     ].filter(Boolean).join(' '),
     text: station.id,
   })
+  const pin = el('span', { className: 'marker-pin' }, [badge])
+  if (priceTag) {
+    pin.append(el('span', { className: 'fare-tag', text: priceTag }))
+  }
   return L.divIcon({
     className: '',
-    html: badge,
+    html: pin,
     iconSize: [25, 25],
     iconAnchor: [12, 12],
     popupAnchor: [0, -13],
   })
+}
+
+/**
+ * Updates a marker's price tag in place (text only, node kept).
+ *
+ * Swapping a marker's icon while its popup is open makes Leaflet drop the
+ * popup, so the day/night refresh prefers this; returns false only when the
+ * tag's presence changed and a full icon rebuild is unavoidable.
+ */
+export function updateStationPriceTag(marker, station) {
+  const icon = marker.getElement?.()
+  if (!icon) return false
+  const tag = icon.querySelector('.fare-tag')
+  const next = stationPriceTag(station)
+  if (next === null) return !tag // priced -> unpriced: rebuild
+  if (!tag) return false // unpriced -> priced: rebuild
+  tag.textContent = next
+  return true
 }
 
 export function buildStationPopup(station) {
@@ -32,6 +65,10 @@ export function buildStationPopup(station) {
       ]),
     )
   }
+  children.push(buildFareWidget(station))
+  children.push(
+    el('div', { className: 'popup-actions' }, [directionsLink(station, null)]),
+  )
   return el('div', {}, children)
 }
 

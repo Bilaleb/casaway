@@ -61,7 +61,7 @@ export function createFloatingSearch({ input, list, emptyStatus, getStations, on
   function render(stationList, needle) {
     if (!stationList.length) {
       close()
-      if (emptyStatus && needle) emptyStatus.textContent = `No stations match “${needle}”.`
+      if (emptyStatus && needle) emptyStatus.textContent = `No dépôts match “${needle}”.`
       return
     }
     options = stationList
