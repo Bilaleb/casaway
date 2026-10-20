@@ -349,7 +349,9 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
  * ============================================================= */
 .popup-actions { display: flex; gap: 8px; margin-top: 11px; }
 .dir-link { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: var(--gold-fill); color: #14120c; border: 0; border-radius: 3px; padding: 9px 12px; font-size: 12px; font-weight: 600; text-decoration: none; }
-.dir-link::after { content: '↗'; font-weight: 700; }
+/* In-app directions: the arrow points INTO the map, not off-site. */
+.dir-link::after { content: '→'; font-weight: 700; }
+.directions-line { filter: drop-shadow(0 1px 5px rgba(106, 169, 255, .65)); }
 .dir-link:hover, .dir-link:focus-visible { filter: brightness(1.07); outline: none; }
 .dir-link-lg { padding: 11px 14px; font-size: 13px; }
 .sheet-actions { display: flex; gap: 8px; }
@@ -395,4 +397,10 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
   .bottom-sheet { max-height: 92%; }
   .fare-widget { padding: 11px; }
   .fare-seat { width: 34px; height: 34px; }
+  /* Phone simplification: drop decorative/low-value chrome so the map and
+     one detail sheet are the entire experience. */
+  .map-chip { display: none; }
+  .fare-widget .fare-note { display: none; }
+  .sheet-note { display: none; }
+  .sheet-stats { gap: 8px; }
 }

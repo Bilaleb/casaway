@@ -1,7 +1,7 @@
 import { el, joinWithSeparator } from './dom.js'
 import { fareForStation, fareMode, seatPrice, formatMAD } from './fares.js'
 import { buildFareWidget } from './fareWidget.js'
-import { directionsLink } from './directions.js'
+import { directionsButton } from './directions.js'
 
 /** Current per-seat price tag ("8.00 MAD") or null for unpriced depots. */
 export function stationPriceTag(station) {
@@ -67,14 +67,20 @@ export function buildStationPopup(station) {
   }
   children.push(buildFareWidget(station))
   children.push(
-    el('div', { className: 'popup-actions' }, [directionsLink(station, null)]),
+    el('div', { className: 'popup-actions' }, [directionsButton(station, { label: 'Show directions' })]),
   )
   return el('div', {}, children)
 }
 
+// Phones get ONE detail surface: the bottom sheet. Binding a Leaflet popup
+// as well meant two overlapping panels on a small screen, so markers only
+// bind popups where there is room for them.
+const POPUP_MEDIA = '(min-width: 761px)'
+
 export function mountStationMarkers(map, stations, onSelect) {
   const layer = L.featureGroup().addTo(map)
   const markerById = new Map()
+  const allowsPopups = window.matchMedia(POPUP_MEDIA).matches
 
   for (const station of stations) {
     const marker = L.marker(station.coordinates, {
@@ -82,9 +88,8 @@ export function mountStationMarkers(map, stations, onSelect) {
       title: station.name,
       alt: `${station.taxiType}: ${station.name}`,
     })
-      .bindPopup(buildStationPopup(station), { maxWidth: 280 })
-      .on('click', () => onSelect(station.id))
-      .addTo(layer)
+    if (allowsPopups) marker.bindPopup(buildStationPopup(station), { maxWidth: 280 })
+    marker.on('click', () => onSelect(station.id)).addTo(layer)
     markerById.set(station.id, marker)
   }
 

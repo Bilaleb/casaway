@@ -5,25 +5,25 @@ const { FARES } = require("../config/fares");
 // The 20 Casaway taxi depots, as [latitude, longitude].
 const DEPOTS = [
   { name: "Place de la Concorde (L-Hammam / Bd Lalla Yacout)", district: "Centre Ville", taxiType: "Grand Taxi", coordinates: [33.5912, -7.6134] },
-  { name: "Station Casa-Port", district: "Casa-Port", taxiType: "Grand & Petit Taxi", coordinates: [33.6002, -7.6119] },
-  { name: "Station Casa-Voyageurs", district: "Casa-Voyageurs", taxiType: "Grand & Petit Taxi", coordinates: [33.5892, -7.5891] },
-  { name: "Station Garage Allal (Derb Sultan)", district: "Derb Sultan", taxiType: "Grand Taxi", coordinates: [33.5715, -7.6045] },
-  { name: "Station Rond-Point Bachkou", district: "Bachkou", taxiType: "Grand Taxi", coordinates: [33.5583, -7.6251] },
-  { name: "Station L-Oulfa (Terminus / Bd Moulay Rachid)", district: "Oulfa", taxiType: "Grand Taxi", coordinates: [33.5511, -7.6698] },
-  { name: "Station Sidi Bernoussi (Bd Imam Ali)", district: "Sidi Bernoussi", taxiType: "Grand Taxi", coordinates: [33.6085, -7.5214] },
-  { name: "Station Ain Sebaa (L-Gara / Near Train Station)", district: "Ain Sebaa", taxiType: "Grand Taxi", coordinates: [33.6068, -7.5452] },
-  { name: "Station Maarif (Bd Bir Anzarane / Twin Center)", district: "Maarif", taxiType: "Grand & Petit Taxi", coordinates: [33.5824, -7.6361] },
-  { name: "Station Hay Hassani (SOUK / Terminus)", district: "Hay Hassani", taxiType: "Grand Taxi", coordinates: [33.5602, -7.6582] },
-  { name: "Station Lissasfa (Route d'El Jadida / Rond Point)", district: "Lissasfa", taxiType: "Grand Taxi", coordinates: [33.5341, -7.6781] },
-  { name: "Station Derb Omar / Bd Mohammed V", district: "Derb Omar", taxiType: "Grand & Petit Taxi", coordinates: [33.5938, -7.6087] },
-  { name: "Station Sidi Moumen (Terminus Tramway Anassi)", district: "Sidi Moumen", taxiType: "Grand Taxi", coordinates: [33.5871, -7.5023] },
-  { name: "Station Hay Mohammadi (Place Bouchentouf / Bd Ali Yata)", district: "Hay Mohammadi", taxiType: "Grand Taxi", coordinates: [33.5921, -7.5658] },
-  { name: "Station Sbata (Rond Point Jamila)", district: "Sbata", taxiType: "Grand Taxi", coordinates: [33.5542, -7.5681] },
-  { name: "Station Ain Chock (Bd Baghdad / Near Faculté)", district: "Ain Chock", taxiType: "Grand Taxi", coordinates: [33.5488, -7.6012] },
-  { name: "Station Errahma (Ville Nouvelle / Main Roundabout)", district: "Errahma", taxiType: "Grand Taxi", coordinates: [33.5124, -7.7115] },
-  { name: "Station Tit Mellil (Centre)", district: "Tit Mellil", taxiType: "Grand Taxi", coordinates: [33.554, -7.4812] },
-  { name: "Station Sidi Maalouf (Near Technopark)", district: "Sidi Maalouf", taxiType: "Grand Taxi", coordinates: [33.5421, -7.6385] },
-  { name: "Station Sidi Bernoussi - Tram Terminus", district: "Sidi Bernoussi", taxiType: "Grand Taxi", coordinates: [33.6152, -7.5089] },
+  { name: "Dépôt Casa-Port", district: "Casa-Port", taxiType: "Grand & Petit Taxi", coordinates: [33.6002, -7.6119] },
+  { name: "Dépôt Casa-Voyageurs", district: "Casa-Voyageurs", taxiType: "Grand & Petit Taxi", coordinates: [33.5892, -7.5891] },
+  { name: "Dépôt Garage Allal (Derb Sultan)", district: "Derb Sultan", taxiType: "Grand Taxi", coordinates: [33.5715, -7.6045] },
+  { name: "Dépôt Rond-Point Bachkou", district: "Bachkou", taxiType: "Grand Taxi", coordinates: [33.5583, -7.6251] },
+  { name: "Dépôt L-Oulfa (Terminus / Bd Moulay Rachid)", district: "Oulfa", taxiType: "Grand Taxi", coordinates: [33.5511, -7.6698] },
+  { name: "Dépôt Sidi Bernoussi (Bd Imam Ali)", district: "Sidi Bernoussi", taxiType: "Grand Taxi", coordinates: [33.6085, -7.5214] },
+  { name: "Dépôt Ain Sebaa (L-Gara / Near Train Station)", district: "Ain Sebaa", taxiType: "Grand Taxi", coordinates: [33.6068, -7.5452] },
+  { name: "Dépôt Maarif (Bd Bir Anzarane / Twin Center)", district: "Maarif", taxiType: "Grand & Petit Taxi", coordinates: [33.5824, -7.6361] },
+  { name: "Dépôt Hay Hassani (SOUK / Terminus)", district: "Hay Hassani", taxiType: "Grand Taxi", coordinates: [33.5602, -7.6582] },
+  { name: "Dépôt Lissasfa (Route d'El Jadida / Rond Point)", district: "Lissasfa", taxiType: "Grand Taxi", coordinates: [33.5341, -7.6781] },
+  { name: "Dépôt Derb Omar / Bd Mohammed V", district: "Derb Omar", taxiType: "Grand & Petit Taxi", coordinates: [33.5938, -7.6087] },
+  { name: "Dépôt Sidi Moumen (Terminus Tramway Anassi)", district: "Sidi Moumen", taxiType: "Grand Taxi", coordinates: [33.5871, -7.5023] },
+  { name: "Dépôt Hay Mohammadi (Place Bouchentouf / Bd Ali Yata)", district: "Hay Mohammadi", taxiType: "Grand Taxi", coordinates: [33.5921, -7.5658] },
+  { name: "Dépôt Sbata (Rond Point Jamila)", district: "Sbata", taxiType: "Grand Taxi", coordinates: [33.5542, -7.5681] },
+  { name: "Dépôt Ain Chock (Bd Baghdad / Near Faculté)", district: "Ain Chock", taxiType: "Grand Taxi", coordinates: [33.5488, -7.6012] },
+  { name: "Dépôt Errahma (Ville Nouvelle / Main Roundabout)", district: "Errahma", taxiType: "Grand Taxi", coordinates: [33.5124, -7.7115] },
+  { name: "Dépôt Tit Mellil (Centre)", district: "Tit Mellil", taxiType: "Grand Taxi", coordinates: [33.554, -7.4812] },
+  { name: "Dépôt Sidi Maalouf (Near Technopark)", district: "Sidi Maalouf", taxiType: "Grand Taxi", coordinates: [33.5421, -7.6385] },
+  { name: "Dépôt Sidi Bernoussi - Tram Terminus", district: "Sidi Bernoussi", taxiType: "Grand Taxi", coordinates: [33.6152, -7.5089] },
 ];
 
 const ROUTES = [
@@ -68,17 +68,22 @@ const toGpx = (name, lineString) =>
 
 /**
  * Attaches the regulated per-seat fare (day/night/Courssa basis) to each of
- * the top-20 depot documents. Upsert-safe: fare-only datasets can be re-run
- * any time prices change (see scripts/seed-fares.js).
+ * the top-20 depot documents. Keyed by depot coordinates — stable across the
+ * "Station …" -> "Dépôt …" rename — and $sets name/depotName so the rename
+ * lands on already-seeded databases. Re-run any time prices change (see
+ * scripts/seed-fares.js).
  */
 async function seedFares() {
   let attached = 0;
   for (const fare of FARES) {
     const { depotName, ...update } = fare;
-    const result = await Route.updateMany(
-      { name: depotName, depotName },
-      { $set: { fare: update } }
-    );
+    const depot = DEPOTS.find((entry) => entry.name === depotName);
+    const filter = depot
+      ? { "location.coordinates": [depot.coordinates[1], depot.coordinates[0]] }
+      : { $or: [{ name: depotName }, { depotName }] };
+    const result = await Route.updateMany(filter, {
+      $set: { fare: update, name: depotName, depotName },
+    });
     attached += result.modifiedCount || 0;
   }
   return attached;
@@ -96,7 +101,13 @@ async function seedRoutes() {
       district: depot.district,
       location: { type: "Point", coordinates: [lng, lat] },
     };
-    const result = await Route.updateOne({ name: document.name, depotName: document.depotName }, { $setOnInsert: document }, { upsert: true });
+    // Keyed by coordinates: a rerun updates (renames) the existing depot
+    // document instead of inserting a duplicate under its new name.
+    const result = await Route.updateOne(
+      { "location.coordinates": [lng, lat] },
+      { $set: { name: document.name, depotName: document.depotName, taxiType: document.taxiType, district: document.district } },
+      { upsert: true }
+    );
     if (result.upsertedCount) inserted += 1;
   }
 
@@ -111,7 +122,9 @@ async function seedRoutes() {
       location: { type: "Point", coordinates: [origin.coordinates[1], origin.coordinates[0]] },
       trajectory: trace(origin.coordinates, destination.coordinates),
     };
-    const result = await Route.updateOne({ name: document.name, depotName: document.depotName }, { $setOnInsert: document }, { upsert: true });
+    // Keyed by route name: depot renames update depotName in place, never
+    // duplicating a trajectory under a second document.
+    const result = await Route.updateOne({ name: document.name }, { $set: document }, { upsert: true });
     if (result.upsertedCount) inserted += 1;
   }
 
@@ -126,7 +139,7 @@ async function seedRoutes() {
     location: { type: "Point", coordinates: [gpxOrigin.coordinates[1], gpxOrigin.coordinates[0]] },
     trajectory: gpxToLineString(toGpx("Sbata to Ain Chock", trace(gpxOrigin.coordinates, gpxDestination.coordinates, { points: 12 }))),
   };
-  const gpxResult = await Route.updateOne({ name: gpxRoute.name, depotName: gpxRoute.depotName }, { $setOnInsert: gpxRoute }, { upsert: true });
+  const gpxResult = await Route.updateOne({ name: gpxRoute.name }, { $set: gpxRoute }, { upsert: true });
   if (gpxResult.upsertedCount) inserted += 1;
 
   const faresAttached = await seedFares();

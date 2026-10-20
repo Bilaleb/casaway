@@ -16,7 +16,7 @@ import { createRoutePanel } from './js/routePanel.js'
 import { buildRoutePopup, routesForStation } from './js/routes.js'
 import { fareMode, onFareChange } from './js/fares.js'
 import { buildFareWidget, buildFareOverview, updateFareWidget } from './js/fareWidget.js'
-import { directionsLink } from './js/directions.js'
+import { directionsButton, fetchDirections, formatRouteDistance } from './js/directions.js'
 import { registerServiceWorker, watchConnectivity, setupInstallPrompt } from './js/pwa.js'
 import { readSnapshot, writeSnapshot } from './js/offline.js'
 import { createFloatingSearch } from './js/floatingSearch.js'
@@ -38,6 +38,18 @@ const ROUTE_LINE_STYLE = {
   lineCap: 'round',
   lineJoin: 'round',
   className: 'route-line',
+}
+
+// Directions are dashed and cool-toned so they never read as a gold
+// catalogue trace; the rider's own position is the matching blue dot.
+const DIRECTIONS_STYLE = {
+  color: '#6aa9ff',
+  opacity: 0.95,
+  weight: 5,
+  dashArray: '10 8',
+  lineCap: 'round',
+  lineJoin: 'round',
+  className: 'directions-line',
 }
 
 /* ---------------------------------------------------------------- *
@@ -258,6 +270,7 @@ let routes = []
 let activeStationId = null
 let activeRouteLayer = null
 let userPositionLayer = null
+let directionsLayer = null
 let markerLayer = null
 let markerById = new Map()
 let searchToken = 0
@@ -344,7 +357,60 @@ function clearRoute() {
     map.removeLayer(activeRouteLayer)
     activeRouteLayer = null
   }
+  clearDirections()
 }
+
+function clearDirections() {
+  if (directionsLayer) {
+    map.removeLayer(directionsLayer)
+    directionsLayer = null
+  }
+}
+
+/**
+ * Plots the way to a depot INSIDE the app: road route from the rider (or
+ * the map centre when location is unavailable) drawn on the map, framed,
+ * and summarised in the toast — no external maps redirect.
+ */
+async function startDirections(station) {
+  if (!station) return
+  clearDirections()
+  setStatus(`Plotting directions to ${station.name}…`)
+  showToast('Plotting directions…')
+
+  let origin = userPosition || (await ensureUserPosition())
+  let fromCentre = false
+  if (!origin) {
+    const centre = map.getCenter()
+    origin = [centre.lat, centre.lng]
+    fromCentre = true
+  }
+
+  const route = await fetchDirections(origin, station.coordinates)
+  clearDirections() // a newer selection may have raced this request
+  const line = L.polyline(route.coordinates, DIRECTIONS_STYLE)
+  const fromDot = L.circleMarker(route.coordinates[0], {
+    radius: 6,
+    color: '#6aa9ff',
+    fillColor: '#6aa9ff',
+    fillOpacity: 1,
+    weight: 2,
+    className: 'directions-origin',
+  })
+  directionsLayer = L.featureGroup([line, fromDot]).addTo(map)
+  fitLayer(map, directionsLayer, { padding: [56, 56], maxZoom: 15, duration: 0.7 })
+
+  const minutes = Math.max(1, Math.round(route.seconds / 60))
+  const approx = route.source === 'straight' ? ' · straight-line estimate' : ''
+  const originNote = fromCentre ? ' · from map centre (location unavailable)' : ''
+  const summary = `Directions to ${station.name}: ${formatRouteDistance(route.meters)} · about ${minutes} min${approx}${originNote}`
+  setStatus(summary)
+  showToast(summary)
+}
+
+document.addEventListener('casaway:directions', (event) => {
+  void startDirections(stations.find((item) => item.id === event.detail?.stationId))
+})
 
 function trajectoryEndpoint(label, place) {
   return el('div', {}, [el('b', { text: label }), el('br'), place])
@@ -396,7 +462,7 @@ function presentRouteSheet(route, openAt = 'half') {
       ]),
       transitChips(route.taxiType || ''),
       depot ? buildFareWidget(depot) : null,
-      depot ? el('div', { className: 'sheet-actions' }, [directionsLink(depot, userPosition, { className: 'dir-link dir-link-lg', label: `Directions to ${depot.name}` })]) : null,
+      depot ? el('div', { className: 'sheet-actions' }, [directionsButton(depot, { className: 'dir-link dir-link-lg', label: `Directions to ${depot.name}` })]) : null,
       el('p', {
         className: 'sheet-note',
         text: `Duration estimated at the 22 km/h city average${stops ? ` · serves ${stops}` : ''} · traces are illustrative, not official itineraries.`,
@@ -425,7 +491,7 @@ function presentStationSheet(station, openAt = 'half') {
             station.destinations.map((target) => el('li', { text: target })))
         : null,
       buildFareWidget(station),
-      el('div', { className: 'sheet-actions' }, [directionsLink(station, userPosition, { className: 'dir-link dir-link-lg' })]),
+      el('div', { className: 'sheet-actions' }, [directionsButton(station, { className: 'dir-link dir-link-lg', label: 'Show directions on map' })]),
       sheetReportButton(station.name, 'station-correction', 'Report incorrect data for this dépôt'),
     ],
   })
