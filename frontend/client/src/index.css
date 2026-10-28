@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Casaway is dark-first: the dark palette is the default and
+   [data-theme="light"] on <html> opts into the light one, so Tailwind's
+   dark: variant follows the app's own theme switch. */
+@custom-variant dark (&:where(html:not([data-theme="light"]) *));
+
 :root {
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
   line-height: 1.5;
