@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
-import './App.css';
+import './index.css';
 
 const DEFAULT_STATIONS = [
   { id: 1, name: "Place de la Concorde (L-Hammam / Bd Lalla Yacout)", district: "Centre Ville", coordinates: [33.5912, -7.6134], taxiType: "Grand Taxi", destinations: ["Oulfa", "Maarif", "Ain Diab"] },
@@ -27,7 +27,8 @@ const DEFAULT_STATIONS = [
 const CASA_CENTER = [33.5731, -7.5898];
 
 function escapeHtml(value) {
-  return String(value || '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  const map = { '&': '&', '<': '<', '>': '>', '"': '"' }
+  return String(value || '').replace(/[&<>\"]/g, (char) => map[char] || char)
 }
 
 function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
@@ -38,8 +39,7 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
 }
@@ -67,6 +67,31 @@ export default function App() {
   const routeLayerRef = useRef(null);
   const geosearchLayerRef = useRef(null);
   const geosearchControlRef = useRef(null);
+
+  // Transit network overlay lines connecting primary depots
+  const TRANSIT_LINES = useMemo(() => [
+    {
+      id: 'coastal',
+      name: 'Coastal line',
+      color: '#e5c158',
+      colorLight: '#8a6a12',
+      path: [[33.5912, -7.6134], [33.6002, -7.6119], [33.6068, -7.5452], [33.6085, -7.5214], [33.6152, -7.5089]],
+    },
+    {
+      id: 'ouifa-port',
+      name: 'Oulfa – Port link',
+      color: '#9ad0a0',
+      colorLight: '#2c7a44',
+      path: [[33.5511, -7.6698], [33.5602, -7.6582], [33.5824, -7.6361], [33.5938, -7.6087], [33.6002, -7.6119]],
+    },
+    {
+      id: 'south-loop',
+      name: 'Southern loop',
+      color: '#ef918a',
+      colorLight: '#b23a30',
+      path: [[33.5583, -7.6251], [33.5488, -7.6012], [33.5542, -7.5681], [33.5421, -7.6385], [33.5341, -7.6781], [33.5124, -7.7115]],
+    },
+  ], []);
 
   // Fetch stations from backend API if available, fallback to default
   useEffect(() => {
@@ -104,7 +129,7 @@ export default function App() {
           params: {
             'accept-language': 'fr,ar,en',
             countrycodes: 'ma',
-            viewbox: '-7.80,33.45,-7.42,33.68', // Bounding box focused on Greater Casablanca
+            viewbox: '-7.80,33.45,-7.42,33.68',
             bounded: 1,
           },
         });
@@ -113,7 +138,7 @@ export default function App() {
           provider,
           style: 'bar',
           position: 'topleft',
-          showMarker: false, // We render our custom interactive marker & connection line
+          showMarker: false,
           showPopup: false,
           autoClose: true,
           retainZoomLevel: false,
@@ -205,14 +230,13 @@ export default function App() {
     markerLayer.clearLayers();
     markersByIdRef.current.clear();
 
-    const markerIcon = (station) =>
-      L.divIcon({
-        className: '',
-        html: `<span class="taxi-marker ${station.taxiType.includes('&') ? 'mixed' : ''}">${station.id}</span>`,
-        iconSize: [25, 25],
-        iconAnchor: [12, 12],
-        popupAnchor: [0, -13],
-      });
+    const markerIcon = (station) => L.divIcon({
+      className: '',
+      html: `<span class="taxi-marker ${station.taxiType.includes('&') ? 'mixed' : ''}">${station.id}</span>`,
+      iconSize: [25, 25],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -13],
+    });
 
     const popupMarkup = (station) =>
       `<h3 class="popup-title">${escapeHtml(station.name)}</h3>` +
@@ -252,7 +276,9 @@ export default function App() {
         const fallback = [
           {
             id: 'casa-port-maarif',
-            title: 'Casa-Port → Maarif',            origin: 'Casa-Port', destination: 'Maarif',
+            title: 'Casa-Port → Maarif',
+            origin: 'Casa-Port',
+            destination: 'Maarif',
             majorStops: ['Casa-Voyageurs', 'Derb Omar', 'Place de la Concorde'],
             gpx: '/routes/casa-port-to-maarif.gpx',
           },
@@ -352,7 +378,6 @@ export default function App() {
   const filteredStations = useMemo(() => {
     const q = search.trim().toLowerCase();
 
-    // Calculate proximity distance if a location has been searched
     const list = stations.map((st) => {
       let distanceMeters = null;
       if (geosearchResult) {
@@ -570,6 +595,73 @@ export default function App() {
       <footer className="app-footer">
         Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.
       </footer>
+
+      {/* PWA Install Banner - with AnimatePresence and dismissible flow */}
+      <div
+        className="install-banner"
+        id="install-banner"
+        role="dialog"
+        aria-label="Install Casaway"
+        hidden={!bannerVisible}
+        onClick={(e) => e.target === event.target && dismissBanner()}
+      >
+        <div>
+          <strong>Take Casaway with you</strong>
+          <span id="install-hint">Install for quick access to taxi depots.</span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+          }}
+        >
+          <button id="install-action" onClick={() => confirmInstall()} className="btn-gold">Install</button>
+          <button
+            className="dismiss-install"
+            onClick={dismissBanner}
+            aria-label="Dismiss install prompt"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Feedback dialog - keep existing */}
+      <dialog className="feedback-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
+        <form className="feedback-form" id="feedback-form">
+          <div className="form-head">
+            <p className="form-eyebrow">Community check</p>
+            <h2 id="feedback-title">Report a route or dépôt update</h2>
+            <p className="form-sub">
+              Spotted a closed depot, a renamed depot or a wrong route? Tell us — every report is reviewed before the map changes and reaches <b>bilalelaouab16@gmail.com</b> directly.
+            </p>
+          </div>
+          <label className="form-field">What is wrong?
+            <select name="kind" required>
+              <option value="route-update">Route update</option>
+              <option value="station-correction">Incorrect depot data</option>
+              <option value="missing-station">Missing depot</option>
+              <option value="other">Something else</option>
+            </select>
+          </label>
+          <label className="form-field">Depot or route
+            <input name="subject" type="text" list="feedback-subjects" maxlength="160" placeholder="e.g. Depot Casa-Port" autocomplete="off">
+            <datalist id="feedback-subjects"></datalist>
+          </label>
+          <label className="form-field">Details <span className="required-mark">required</span>
+            <textarea name="details" required minlength="10" maxlength="2000" rows="4" placeholder="Describe what changed on the ground…"></textarea>
+          </label>
+          <label className="form-field">Email <span className="optional-mark">optional</span>
+            <input name="email" type="email" maxlength="200" placeholder="you@example.com" autocomplete="email">
+          </label>
+          <p className="form-status" id="feedback-status" role="status" aria-live="polite"></p>
+          <div className="form-actions">
+            <button type="button" className="btn-ghost" data-close>Cancel</button>
+            <button type="submit" className="btn-gold" id="feedback-submit">Send report</button>
+          </div>
+        </form>
+      </dialog>
     </div>
   );
-}
+}
