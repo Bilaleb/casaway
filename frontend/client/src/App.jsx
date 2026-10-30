@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import './App.css';
 
 // ============================================================
 // HOOK: Leaflet event management
