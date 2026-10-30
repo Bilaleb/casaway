@@ -305,6 +305,409 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
 .btn-gold:disabled { opacity: .6; cursor: wait; }
 
 /* ============================================================= *
+ * Glassmorphism — frosted-glass surfaces across the UI
+ * ============================================================= */
+.topbar,
+.sidebar,
+.route-panel,
+.fare-panel,
+.map-chip,
+.map-actions,
+.app-footer,
+.bottom-sheet,
+.sheet-heading,
+.sheet-body,
+.feedback-dialog,
+.feedback-form,
+.map-search-field,
+.suggestions,
+.sr-status,
+.install-banner,
+.fare-widget,
+.fare-head,
+.fare-toggle,
+.fare-line.is-courssa,
+.sheet-stat,
+.transit-chip,
+.nearby-popup,
+.nearby-row,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(13, 18, 28, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-color: rgba(229, 193, 88, 0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.topbar,
+.route-panel,
+.fare-panel,
+.feedback-dialog,
+.sheet-heading,
+.fare-head {
+  background: rgba(11, 15, 25, 0.85);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(229, 193, 88, 0.22);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.35);
+}
+
+.sidebar {
+  background: rgba(13, 18, 28, 0.78);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-right: 1px solid rgba(229, 193, 88, 0.22);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+}
+
+.bottom-sheet {
+  background: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-top: 1px solid rgba(229, 193, 88, 0.25);
+  box-shadow: 0 -16px 46px rgba(0,0,0,0.5);
+}
+
+.map-chip {
+  background: rgba(13, 18, 28, 0.78);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.25);
+}
+
+.map-actions button {
+  background: rgba(13, 18, 28, 0.72);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.map-search-field {
+  background: rgba(13, 18, 28, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.suggestions {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.sr-status {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.install-banner {
+  background: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+.feedback-dialog {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(229, 193, 88, 0.25);
+}
+
+.feedback-dialog::backdrop {
+  background: rgba(5, 7, 13, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.fare-widget {
+  background: rgba(13, 18, 28, 0.72);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.fare-head {
+  background: rgba(11, 15, 25, 0.8);
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+}
+
+.fare-toggle {
+  background: rgba(13, 18, 28, 0.7);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.fare-line.is-courssa {
+  background: rgba(23, 26, 21, 0.85);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+.sheet-stat {
+  background: rgba(13, 18, 28, 0.68);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.18);
+}
+
+.transit-chip {
+  background: rgba(13, 18, 28, 0.7);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.transit-chip.is-available {
+  background: rgba(23, 26, 21, 0.85);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border-color: rgba(229, 193, 88, 0.4);
+}
+
+.nearby-popup {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.2);
+}
+
+.nearby-row {
+  background: transparent;
+  border-top: 1px solid rgba(229, 193, 88, 0.15);
+}
+
+.nearby-row:hover, .nearby-row:focus-visible {
+  background: rgba(23, 26, 21, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.35);
+}
+
+.leaflet-popup-tip {
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.25);
+}
+
+.leaflet-popup-content {
+  background: transparent;
+}
+
+/* Light theme glassmorphism */
+[data-theme="light"] .topbar,
+[data-theme="light"] .sidebar,
+[data-theme="light"] .route-panel,
+[data-theme="light"] .fare-panel,
+[data-theme="light"] .map-chip,
+[data-theme="light"] .map-actions,
+[data-theme="light"] .app-footer,
+[data-theme="light"] .bottom-sheet,
+[data-theme="light"] .sheet-heading,
+[data-theme="light"] .sheet-body,
+[data-theme="light"] .feedback-dialog,
+[data-theme="light"] .feedback-form,
+[data-theme="light"] .map-search-field,
+[data-theme="light"] .suggestions,
+[data-theme="light"] .sr-status,
+[data-theme="light"] .install-banner,
+[data-theme="light"] .fare-widget,
+[data-theme="light"] .fare-head,
+[data-theme="light"] .fare-toggle,
+[data-theme="light"] .fare-line.is-courssa,
+[data-theme="light"] .sheet-stat,
+[data-theme="light"] .transit-chip,
+[data-theme="light"] .nearby-popup,
+[data-theme="light"] .leaflet-popup-content-wrapper,
+[data-theme="light"] .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-color: rgba(229, 193, 88, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .topbar,
+[data-theme="light"] .route-panel,
+[data-theme="light"] .fare-panel,
+[data-theme="light"] .feedback-dialog,
+[data-theme="light"] .sheet-heading,
+[data-theme="light"] .fare-head {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .sidebar {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-right: 1px solid rgba(229, 193, 88, 0.3);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+}
+
+[data-theme="light"] .bottom-sheet {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-top: 1px solid rgba(229, 193, 88, 0.35);
+  box-shadow: 0 -16px 46px rgba(0,0,0,0.15);
+}
+
+[data-theme="light"] .map-chip {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.35);
+}
+
+[data-theme="light"] .map-actions button {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .map-search-field {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .suggestions {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .sr-status {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .install-banner {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.4);
+}
+
+[data-theme="light"] .feedback-dialog {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(229, 193, 88, 0.35);
+}
+
+[data-theme="light"] .feedback-dialog::backdrop {
+  background: rgba(250, 250, 250, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .fare-widget {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .fare-head {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+}
+
+[data-theme="light"] .fare-toggle {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .fare-line.is-courssa {
+  background: rgba(241, 244, 233, 0.85);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.4);
+}
+
+[data-theme="light"] .sheet-stat {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(229, 193, 88, 0.28);
+}
+
+[data-theme="light"] .transit-chip {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .transit-chip.is-available {
+  background: rgba(241, 244, 233, 0.85);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  border-color: rgba(229, 193, 88, 0.5);
+}
+
+[data-theme="light"] .nearby-popup {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .nearby-row {
+  background: transparent;
+  border-top: 1px solid rgba(229, 193, 88, 0.25);
+}
+
+[data-theme="light"] .nearby-row:hover, [data-theme="light"] .nearby-row:focus-visible {
+  background: rgba(241, 244, 233, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(229, 193, 88, 0.35);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(229, 193, 88, 0.35);
+}
+
+/* ============================================================= *
  * Grand taxi fare calculator (popups, sidebar panel, detail sheet)
  * ============================================================= */
 .fare-panel { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 16px; }

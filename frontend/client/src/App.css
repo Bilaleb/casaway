@@ -56,6 +56,374 @@ button {
   backdrop-filter: blur(8px);
 }
 
+/* ============================================================
+   GLASSMORPHISM — Bilal's frosted-glass polish
+   ============================================================ */
+
+:root {
+  --glass-bg: rgba(13, 18, 28, 0.7);
+  --glass-bg-soft: rgba(11, 15, 25, 0.85);
+  --glass-border: rgba(229, 193, 88, 0.22);
+  --glass-border-subtle: rgba(255, 255, 255, 0.04);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur-strong: blur(28px) saturate(200%);
+}
+
+/* Base glass layer */
+.topbar,
+.sidebar,
+.route-panel,
+.fare-panel,
+.map-chip,
+.map-actions,
+.app-footer,
+.bottom-sheet,
+.sheet-heading,
+.sheet-body {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Elevated glass */
+.topbar,
+.route-panel,
+.fare-panel,
+.feedback-dialog,
+.sheet-heading {
+  background: var(--glass-bg-soft);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), 0 8px 32px rgba(0,0,0,0.45);
+}
+
+/* Sidebar */
+.sidebar {
+  background: rgba(13, 18, 28, 0.78);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.32);
+}
+
+/* Search box */
+.search-box {
+  background: rgba(11, 15, 25, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(229, 193, 88, 0.18), 0 4px 16px rgba(229, 193, 88, 0.1);
+}
+
+/* Filter row */
+.filter-row {
+  background: rgba(11, 15, 25, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+/* Station buttons */
+.station-button {
+  background: rgba(11, 15, 25, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.station-button:hover {
+  background: rgba(229, 193, 88, 0.08);
+  border-color: rgba(229, 193, 88, 0.25);
+}
+
+.station-button.is-active {
+  background: rgba(229, 193, 88, 0.12);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(229, 193, 88, 0.22);
+}
+
+/* Map chip */
+.map-chip {
+  background: rgba(11, 15, 25, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  color: #d5d9e1;
+}
+
+/* Map action buttons */
+.map-actions button {
+  background: rgba(13, 18, 28, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-actions button:hover {
+  background: rgba(229, 193, 88, 0.12);
+  border-color: rgba(229, 193, 88, 0.4);
+  box-shadow: 0 2px 8px rgba(229, 193, 88, 0.18);
+}
+
+/* Footer */
+.app-footer {
+  background: rgba(11, 15, 25, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--glass-border);
+  color: #929bab;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  background: rgba(13, 18, 28, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(229, 193, 88, 0.12);
+  border-color: rgba(229, 193, 88, 0.4);
+  box-shadow: 0 2px 8px rgba(229, 193, 88, 0.18);
+}
+
+/* Install banner */
+.install-banner {
+  background: rgba(13, 18, 28, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.42);
+}
+
+/* Offline banner */
+.offline-banner {
+  background: rgba(13, 18, 28, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+}
+
+/* Feedback dialog */
+.feedback-dialog {
+  background: rgba(13, 18, 28, 0.96);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(229, 193, 88, 0.1);
+}
+
+.feedback-form {
+  background: transparent;
+}
+
+.form-field {
+  background: rgba(11, 15, 25, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(229, 193, 88, 0.12);
+}
+
+/* Bottom sheet */
+.bottom-sheet {
+  background: rgba(13, 18, 28, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.32);
+}
+
+.sheet-heading {
+  background: rgba(11, 15, 25, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.sheet-body {
+  background: rgba(13, 18, 28, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Geosearch control glass */
+.leaflet-control-geosearch {
+  background: rgba(13, 18, 28, 0.88) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.32) !important;
+}
+
+.leaflet-control-geosearch .button {
+  background: var(--gold) !important;
+  color: var(--bg) !important;
+  font-weight: 600 !important;
+}
+
+.leaflet-control-geosearch .searchbox {
+  background: var(--bg) !important;
+}
+
+.leaflet-control-geosearch .result:hover {
+  background: rgba(229, 193, 88, 0.14) !important;
+}
+
+/* Popup glass */
+.leaflet-popup-content-wrapper {
+  background: rgba(13, 18, 28, 0.88) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(13, 18, 28, 0.88) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
+}
+
+.popup-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.popup-meta {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.popup-destinations {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.popup-destinations b {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Travel options glass card */
+.travel-options {
+  background: rgba(11, 15, 25, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+
+.travel-options b {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.travel-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text);
+  margin: 2px 0;
+}
+
+.travel-icon {
+  font-size: 13px;
+}
+
+/* Zoom controls glass */
+.leaflet-control-zoom a {
+  background: rgba(13, 18, 28, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 6px !important;
+  transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(229, 193, 88, 0.12) !important;
+  border-color: rgba(229, 193, 88, 0.4) !important;
+}
+
+/* Marker glass */
+.taxi-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, var(--gold), #c49a1e);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bg);
+  box-shadow: 0 2px 8px rgba(229, 193, 88, 0.42), 0 0 0 4px rgba(229, 193, 88, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.taxi-marker:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px rgba(229, 193, 88, 0.5), 0 0 0 6px rgba(229, 193, 88, 0.26);
+}
+
+.taxi-marker.mixed {
+  background: linear-gradient(135deg, #f1d77f, #c49a1e);
+}
+
+/* ============================================================
+   END GLASSMORPHISM — Bilal
+   ============================================================ */
+
 .brand {
   display: flex;
   align-items: center;
@@ -865,3 +1233,6 @@ button {
     line-height: 1.3;
   }
 }
+
+/* ============================================================
+   
