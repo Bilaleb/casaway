@@ -360,6 +360,18 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
   border-right: 1px solid rgba(229, 193, 88, 0.22);
   box-shadow: 4px 0 24px rgba(0,0,0,0.3);
 }
+@media (max-width: 760px) {
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(229, 193, 88, 0.22);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+  }
+  .bottom-sheet {
+    border-top: 1px solid rgba(229, 193, 88, 0.3);
+    border-radius: 14px 14px 0 0;
+  }
+  .map-chip { display: none; }
+}
 
 .bottom-sheet {
   background: rgba(11, 15, 25, 0.88);
@@ -626,11 +638,26 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* Mobile: sidebar becomes bottom drawer, feedback dialog becomes bottom sheet */
+@media (max-width: 760px) {
+  .feedback-dialog {
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+  }
+}
+
 [data-theme="light"] .fare-widget {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   border: 1px solid rgba(229, 193, 88, 0.3);
+}
+
+[data-theme="light"] .leaflet-popup-content .fare-widget {
+  background: rgba(241, 244, 233, 0.7);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border-color: rgba(229, 193, 88, 0.3);
 }
 
 [data-theme="light"] .fare-head {
@@ -713,8 +740,13 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
 .fare-panel { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 16px; }
 .fare-widget-host { margin-top: 12px; }
 .fare-widget { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 12px; }
-.leaflet-popup-content .fare-widget { margin-top: 10px; padding: 10px; gap: 8px; }
+.leaflet-popup-content .fare-widget { margin-top: 10px; padding: 10px; gap: 8px; background: rgba(13, 18, 28, 0.65); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); border-color: rgba(229, 193, 88, 0.2); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
 .fare-widget.is-empty { gap: 6px; }
+
+@media (max-width: 760px) {
+  .leaflet-popup-content .fare-widget { padding: 8px; gap: 6px; }
+  .fare-widget .fare-note { display: none; }
+}
 .fare-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .fare-eyebrow { font: 10px var(--mono); color: var(--gold); text-transform: uppercase; letter-spacing: .05em; }
 .fare-toggle { display: inline-flex; flex: none; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
