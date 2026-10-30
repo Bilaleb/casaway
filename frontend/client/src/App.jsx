@@ -1,5 +1,26 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import './index.css';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+
+// ============================================================
+// HOOK: Leaflet event management
+// Ensures event listeners are properly cleaned up to prevent
+// memory leaks and stale closures when components unmount.
+// Usage: useLeafletEvent(map, eventName, handler, [deps])
+// Returns a cleanup function for the event listener.
+function useLeafletEvent(map, eventName, handler, deps = []) {
+  useEffect(() => {
+    if (!map) return;
+    const id = '__leaflet_event_' + eventName;
+    map.on(eventName, handler);
+    return () => {
+      map.off(eventName, handler);
+    };
+  }, [map, eventName, ...deps]);
+  return undefined;
+}
+
+// ============================================================
+// DATA: Default taxi stations for Casablanca
+// ============================================================
 
 const DEFAULT_STATIONS = [
   { id: 1, name: "Place de la Concorde (L-Hammam / Bd Lalla Yacout)", district: "Centre Ville", coordinates: [33.5912, -7.6134], taxiType: "Grand Taxi", destinations: ["Oulfa", "Maarif", "Ain Diab"] },
@@ -27,8 +48,9 @@ const DEFAULT_STATIONS = [
 const CASA_CENTER = [33.5731, -7.5898];
 
 function escapeHtml(value) {
-  const map = { '&': '&', '<': '<', '>': '>', '"': '"' }
-  return String(value || '').replace(/[&<>\"]/g, (char) => map[char] || char)
+  const div = document.createElement('div');
+  div.textContent = value || '';
+  return div.innerHTML;
 }
 
 function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
@@ -42,12 +64,118 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
+}function formatDistance(meters) {
+  if (meters == null) return ''
+  if (meters < 1000) return `${meters} m`
+  return `${(meters / 1000).toFixed(1)} km`
 }
 
-function formatDistance(meters) {
-  if (meters == null) return '';
-  if (meters < 1000) return `${meters} m`;
-  return `${(meters / 1000).toFixed(1)} km`;
+const LOCALES = [
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'ar', label: 'العربية' }
+]
+
+const STRINGS = {
+  en: {
+    tagline: 'Your Way Through Casablanca',
+    searchLabel: 'Search depots, districts or destinations',
+    searchPlaceholder: 'Search depots, districts, destinations',
+    pillAll: 'All',
+    pillNear: 'Near Me',
+    pillGrand: 'Grand taxi',
+    pillPetit: 'Petit taxi',
+    legendToggle: 'Toggle map legend',
+    legendTitle: 'Map legend',
+    legendMarkers: 'Markers',
+    legendLines: 'Transit lines',
+    markerGrand: 'Grand taxi depot',
+    markerPetit: 'Petit taxi depot',
+    markerMixed: 'Mixed depot',
+    markerYou: 'Your position',
+    lineCoastal: 'Coastal line',
+    lineOulfa: 'Oulfa – Port link',
+    lineSouth: 'Southern loop',
+    lineOn: 'Show line',
+    lineOff: 'Hide line',
+    bannerAria: 'Install Casaway',
+    bannerTitle: 'Take Casaway with you',
+    bannerBody: 'Install for quick access to taxi depots.',
+    install: 'Install',
+    dismiss: 'Dismiss install prompt',
+    localeLabel: 'Language',
+    themeToLight: 'Switch to light mode',
+    themeToDark: 'Switch to dark mode',
+    locating: 'Finding your nearest depots…',
+    locationDenied: 'Location unavailable — allow location access to use Near Me.',
+    noResults: 'No depots match this search. Try another district or taxi type.'
+  },
+  fr: {
+    tagline: 'Votre chemin à Casablanca',
+    searchLabel: 'Rechercher un dépôt, un quartier ou une destination',
+    searchPlaceholder: 'Rechercher un dépôt, un quartier ou une destination',
+    pillAll: 'Tous',
+    pillNear: 'Près de moi',
+    pillGrand: 'Grand taxi',
+    pillPetit: 'Petit taxi',
+    legendToggle: 'Afficher ou masquer la légende',
+    legendTitle: 'Légende',
+    legendMarkers: 'Repères',
+    legendLines: 'Lignes de transport',
+    markerGrand: 'Dépôt grand taxi',
+    markerPetit: 'Dépôt petit taxi',
+    markerMixed: 'Dépôt mixte',
+    markerYou: 'Votre position',
+    lineCoastal: 'Ligne côtière',
+    lineOulfa: 'Liaison Oulfa – Port',
+    lineSouth: 'Boucle sud',
+    lineOn: 'Montrer la ligne',
+    lineOff: 'Masquer la ligne',
+    bannerAria: 'Installer Casaway',
+    bannerTitle: 'Prenez Casaway avec vous',
+    bannerBody: 'Installez-vous pour un accès rapide aux depot.',
+    install: 'Installer',
+    dismiss: 'Fermer l\'invitation',
+    localeLabel: 'Langue',
+    themeToLight: 'Passer en mode clair',
+    themeToDark: 'Passer en mode sombre',
+    locating: 'Trouver vos dépôts les plus proches…',
+    locationDenied: 'Emplacement indisponible — autorisez l\'accès localisation pour utiliser Near Me.',
+    noResults: 'Aucun dépôt ne correspond à cette recherche. Essayez un autre quartier ou type de taxi.'
+  },
+  ar: {
+    tagline: 'طريقك في الدار البيضاء',
+    searchLabel: 'ابحث عن محطة أو حي أو وجهة',
+    searchPlaceholder: 'ابحث عن محطة، حي، وجهة',
+    pillAll: 'الكل',
+    pillNear: 'بالقرب مني',
+    pillGrand: 'طاكسي كبير',
+    pillPetit: 'طاكسي صغير',
+    legendToggle: 'إظهار أو إخفاء مفتاح الخريطة',
+    legendTitle: 'مفتاح الخريطة',
+    legendMarkers: 'الرموز',
+    legendLines: 'خطوط النقل',
+    markerGrand: 'محطة طاكسي كبير',
+    markerPetit: 'محطة طاكسي صغير',
+    markerMixed: 'محطة مختلطة',
+    markerYou: 'موقعك',
+    lineCoastal: 'الخط الساحلي',
+    lineOulfa: 'وصلة أولفا – الميناء',
+    lineSouth: 'الحلقة الجنوبية',
+    lineOn: 'إخفاء الخط',
+    lineOff: 'إظهار الخط',
+    bannerAria: 'ثبّت كاساوي',
+    bannerTitle: 'خذ كاساوي معك',
+    bannerBody: 'ثبّت التطبيق للوصول السريع إلى محطات الطاكسي.',
+    install: 'ثبّت',
+    dismiss: 'إغلاق الدعوة',
+    localeLabel: 'اللغة',
+    themeToLight: 'التبديل إلى الوضع الفاتح',
+    themeToDark: 'التبديل إلى الوضع الداكن',
+    locating: 'جارِ البحث عن أقرب المحطات…',
+    locationDenied: 'تعذّر Determining الموقع — اسمح بالوصول إلى الموقع لاستخدام «بالقرب مني».',
+    noResults: 'لا توجد محطات مطابقة. جرّب حيًا آخر أو نوعًا آخر.'
+  }
 }
 
 export default function App() {
@@ -230,18 +358,21 @@ export default function App() {
     markerLayer.clearLayers();
     markersByIdRef.current.clear();
 
-    const markerIcon = (station) => L.divIcon({
-      className: '',
-      html: `<span class="taxi-marker ${station.taxiType.includes('&') ? 'mixed' : ''}">${station.id}</span>`,
-      iconSize: [25, 25],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, -13],
-    });
+    function markerIcon(station) {
+      return L.divIcon({
+        className: '',
+        html: `<span class="taxi-marker ${station.taxiType.includes('&') ? 'mixed' : ''}">${station.id}</span>`,
+        iconSize: [25, 25],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -13],
+      });
+    }
 
-    const popupMarkup = (station) =>
-      `<h3 class="popup-title">${escapeHtml(station.name)}</h3>` +
-      `<p class="popup-meta">${escapeHtml(station.district)} · ${escapeHtml(station.taxiType)}</p>` +
-      `<p class="popup-destinations"><b>Destinations</b><br>${(station.destinations || []).map(escapeHtml).join(' · ')}</p>`;
+    function popupMarkup(station) {
+      return `<h3 class="popup-title">${escapeHtml(station.name)}</h3>` +
+        `<p class="popup-meta">${escapeHtml(station.district)} · ${escapeHtml(station.taxiType)}</p>` +
+        `<p class="popup-destinations"><b>Destinations</b><br>${(station.destinations || []).map(escapeHtml).join(' · ')}</p>`;
+    }
 
     stations.forEach((station) => {
       const marker = L.marker(station.coordinates, {
@@ -250,10 +381,12 @@ export default function App() {
         alt: `${station.taxiType}: ${station.name}`,
       })
         .bindPopup(popupMarkup(station), { maxWidth: 270 })
-        .on('click', () => {
-          setSelectedStationId(station.id);
-        })
         .addTo(markerLayer);
+
+      // Use useLeafletEvent for click handler cleanup
+      useLeafletEvent(marker, 'click', () => {
+        setSelectedStationId(station.id);
+      }, [station.id]);
 
       markersByIdRef.current.set(station.id, marker);
     });
