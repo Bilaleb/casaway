@@ -108,7 +108,13 @@ const STRINGS = {
     themeToDark: 'Switch to dark mode',
     locating: 'Finding your nearest depots…',
     locationDenied: 'Location unavailable — allow location access to use Near Me.',
-    noResults: 'No depots match this search. Try another district or taxi type.'
+    noResults: 'No depots match this search. Try another district or taxi type.',
+    travelOptions: 'Getting there',
+    travelWalking: 'Walk',
+    travelDriving: 'Drive/taxi',
+    travelTransit: 'Bus/tram',
+    travelTime: 'Est. time',
+    travelNote: 'How to get there'
   },
   fr: {
     tagline: 'Votre chemin à Casablanca',
@@ -141,7 +147,13 @@ const STRINGS = {
     themeToDark: 'Passer en mode sombre',
     locating: 'Trouver vos dépôts les plus proches…',
     locationDenied: 'Emplacement indisponible — autorisez l\'accès localisation pour utiliser Near Me.',
-    noResults: 'Aucun dépôt ne correspond à cette recherche. Essayez un autre quartier ou type de taxi.'
+    noResults: 'Aucun dépôt ne correspond à cette recherche. Essayez un autre quartier ou type de taxi.',
+travelOptions: 'Comment s\'y rendre',
+travelWalking: 'Marche',
+travelDriving: 'Voiture/taxi',
+travelTransit: 'Bus/tram',
+travelTime: 'Temps estimé',
+travelNote: 'Comment s\'y rendre'
   },
   ar: {
     tagline: 'طريقك في الدار البيضاء',
@@ -173,8 +185,14 @@ const STRINGS = {
     themeToLight: 'التبديل إلى الوضع الفاتح',
     themeToDark: 'التبديل إلى الوضع الداكن',
     locating: 'جارِ البحث عن أقرب المحطات…',
-    locationDenied: 'تعذّر Determining الموقع — اسمح بالوصول إلى الموقع لاستخدام «بالقرب مني».',
-    noResults: 'لا توجد محطات مطابقة. جرّب حيًا آخر أو نوعًا آخر.'
+    locationDenied: 'تعذّر تحديد الموقع — اسمح بالوصول إلى الموقع لاستخدام «بالقرب مني».',
+    noResults: 'لا توجد محطات مطابقة. جرّب حيًا آخر أو نوعًا آخر.',
+travelOptions: 'كيف تصل إلى هناك',
+travelWalking: 'مشي',
+travelDriving: 'سيارة/طاكسي',
+travelTransit: 'حافلة/ترام',
+travelTime: 'الوقت المقدر',
+travelNote: 'كيف تصل إلى المحطة'
   }
 }
 
@@ -349,7 +367,6 @@ export default function App() {
 
           group.addTo(map);
           geosearchLayerRef.current = group;
-          searchedMarker.openPopup();
         });
       }
     }
@@ -369,11 +386,19 @@ export default function App() {
     }
 
     function popupMarkup(station) {
-      return `<h3 class="popup-title">${escapeHtml(station.name)}</h3>` +
-        `<p class="popup-meta">${escapeHtml(station.district)} · ${escapeHtml(station.taxiType)}</p>` +
-        `<p class="popup-destinations"><b>Destinations</b><br>${(station.destinations || []).map(escapeHtml).join(' · ')}</p>`;
+      const destinationsHtml = (station.destinations || []).map(escapeHtml).join(' · ');
+      const travelHtml =
+        '<div class="travel-options">' +
+        '<b>Getting there:</b><br>' +
+        '<span class="travel-item"><span class="travel-icon">🚶</span> Walk: ~15-30 min</span><br>' +
+        '<span class="travel-item"><span class="travel-icon">🚗</span> Taxi: ~5-15 min</span><br>' +
+        '<span class="travel-item"><span class="travel-icon">🚌</span> Bus/Tram: available nearby</span>' +
+        '</div>';
+      return '<h3 class="popup-title">' + escapeHtml(station.name) + '</h3>' +
+        '<p class="popup-meta">' + escapeHtml(station.district) + ' · ' + escapeHtml(station.taxiType) + '</p>' +
+        '<p class="popup-destinations"><b>Destinations</b><br>' + destinationsHtml + '</p>' +
+        travelHtml;
     }
-
     stations.forEach((station) => {
       const marker = L.marker(station.coordinates, {
         icon: markerIcon(station),
@@ -479,7 +504,6 @@ export default function App() {
     const map = mapInstanceRef.current;
     if (marker && map) {
       map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 14), { duration: 0.55 });
-      marker.openPopup();
     }
   };
 
