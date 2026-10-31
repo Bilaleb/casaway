@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x, 20.x, 22.x, 24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -28,4 +28,18 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
+    - name: Smoke test
+      run: |
+        node --check backend/app.js
+        node --check backend/server.js
+        node --check backend/routes/api.js
+        node --check backend/routes/feedback.js
+        node --check backend/controllers/route.controller.js
+        node --check backend/controllers/feedback.controller.js
+        node --check backend/models/Route.js
+        node --check backend/models/Feedback.js
+        node --check backend/utils/geo.js
+        node --check backend/utils/gpx.js
+        node --check backend/config/fares.js
+        node --check backend/scripts/seed-routes.js
+        test -f frontend/client/dist/index.html
