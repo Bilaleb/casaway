@@ -1,0 +1,145 @@
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LOCALES } from '../../data/depots.js';
+
+/**
+ * Top bar chrome for Casaway.
+ *
+ * Keeps the existing topbar layout from App.css and adds a locale switcher
+ * with a small animated dropdown. All icons are inline SVG so this refactor
+ * does not require extra icon dependencies.
+ */
+export default function Navbar({
+  brandMark = 'CW',
+  brandName = 'Casaway',
+  tagline,
+  live = true,
+  depotCount,
+  theme,
+  onThemeToggle,
+  locale,
+  onLocaleChange,
+}) {
+  const [localeOpen, setLocaleOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!localeOpen) return;
+    const onPointer = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setLocaleOpen(false);
+      }
+    };
+    const onKey = (event) => {
+      if (event.key === 'Escape') setLocaleOpen(false);
+    };
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [localeOpen]);
+
+  return (
+    <header className="topbar">
+      <div className="brand">
+        <div className="brand-mark" aria-hidden="true">{brandMark}</div>
+        <div className="brand-copy">
+          <h1>{brandName}</h1>
+          <span>{tagline ?? 'Your Way Through Casablanca'}</span>
+        </div>
+      </div>
+
+      <div className="top-actions">
+        {live && (
+          <div className="top-meta">
+            <span className="live-dot" aria-hidden="true" />
+            <span>{depotCount != null ? `${depotCount} stations mapped` : 'Live'}</span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          className="theme-toggle-btn"
+          onClick={onThemeToggle}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" />
+            </svg>
+          )}
+        </button>
+
+        <div className="locale-wrap" ref={menuRef}>
+          <button
+            type="button"
+            className="locale-btn"
+            onClick={() => setLocaleOpen((open) => !open)}
+            aria-haspopup="listbox"
+            aria-expanded={localeOpen}
+            aria-label="Language"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20" />
+            </svg>
+            {locale?.toUpperCase()}
+            <motion.span
+              animate={{ rotate: localeOpen ? 180 : 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </motion.span>
+          </button>
+
+          <AnimatePresence>
+            {localeOpen && (
+              <motion.ul
+                className="locale-menu"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.16 }}
+                role="listbox"
+                aria-label="Language"
+              >
+                {LOCALES.map((option) => (
+                  <li key={option.code}>
+                    <button
+                      type="button"
+                      className={`locale-opt ${locale === option.code ? 'is-on' : ''}`}
+                      onClick={() => {
+                        onLocaleChange?.(option.code);
+                        setLocaleOpen(false);
+                      }}
+                      role="option"
+                      aria-selected={locale === option.code}
+                    >
+                      <span>{option.label}</span>
+                      {locale === option.code && (
+                        <span className="locale-check" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M5 12l5 5L20 7" />
+                          </svg>
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </header>
+  );
+}
