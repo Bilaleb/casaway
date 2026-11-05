@@ -5,7 +5,7 @@
   --muted: #9299a8;
   --gold: #e5c158;
   --gold-fill: #e5c158;
-  --gold-line: var(--gold-line);
+  --gold-line: #756231;
   --gold-glow: rgba(229, 193, 88, .55);
   --base: #0b0f19;
   --panel: #111722;
@@ -16,7 +16,7 @@
   --float-strong: rgba(13, 18, 28, .97);
   --line: #252d3a;
   --line-soft: #222a35;
-  --line-2: var(--line-2);
+  --line-2: #333d4e;
   --grip: #3a4453;
   --dot-off: #4a5261;
   --chip-on-bg: #171a15;
@@ -68,6 +68,16 @@ body { margin: 0; background: var(--base); color: var(--ink); font-family: var(-
 button, input, select { font: inherit; }
 button, select { color: inherit; }
 button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* Topbar */
 .topbar { height: 72px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; padding: 0 22px; background: var(--base); padding-top: calc(0px + env(safe-area-inset-top)); }
@@ -185,16 +195,15 @@ html:not([data-theme]) .theme-toggle .icon-sun { display: block; }
 @media (max-width: 760px) {
   .topbar { height: 64px; padding: 0 16px; padding-top: calc(0px + env(safe-area-inset-top)); }
   .menu-toggle { display: grid; place-items: center; }
+  .menu-toggle, .theme-toggle, .map-actions button { min-width: 44px; min-height: 44px; }
   .top-meta { font-size: 0; }
   .top-meta .live-dot { display: inline-block; }
-  .main { grid-template-columns: 1fr; }
-  .sidebar { display: none; max-height: 48vh; border-right: 0; border-bottom: 1px solid var(--line); padding: 17px 16px; }
+  .main { position: relative; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
+  .sidebar { display: none; position: absolute; inset: 0 0 auto; z-index: 1000; max-height: 48vh; border-right: 0; border-bottom: 1px solid var(--line); padding: 17px 16px; }
   .sidebar.is-open { display: block; }
   .side-head h2 { font-size: 21px; }
   .station-list { max-height: 180px; overflow: auto; }
-  /* Let the map stretch to whatever height remains instead of leaving a dead
-     strip below it: auto height + min-height keeps the grid row stretchable. */
-  .map-wrap { height: auto; min-height: 55vh; }
+  .map-wrap { height: 55vh; min-height: 360px; max-height: 560px; }
   .map-chip { top: 56px; right: 10px; font-size: 9px; }
   .map-actions { top: 10px; right: 10px; }
   .map-search { top: 10px; left: 10px; width: calc(100% - 84px); }

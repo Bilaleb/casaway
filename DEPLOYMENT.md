@@ -67,6 +67,10 @@ Then add secrets to GitHub:
    - `VERCEL_ORG_ID`: From Vercel account settings
    - `VERCEL_PROJECT_ID`: From Vercel project settings
 
+## Environment Variables
+
+Set `ROUTE_WRITE_TOKEN` on the backend only if an authorized ingestion client needs to call `POST /api/routes`. Send it as an `Authorization: Bearer <token>` header. Route writes fail closed with `503` when the variable is unset; do not expose this token in frontend code.
+
 ## Environment Variables (Optional)
 
 Create `.env.local` in `frontend/client/`:

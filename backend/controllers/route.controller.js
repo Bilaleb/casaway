@@ -22,10 +22,13 @@ const isDatabaseUnavailable = (err) =>
   err?.code === "ETIMEOUT" ||
   /buffer|buffering timed out|getaddrinfo|connection/i.test(err?.message || "");
 
-const failDatabase = (res, err) =>
-  isDatabaseUnavailable(err)
-    ? res.status(503).json({ message: "Route data is unavailable right now (database unreachable)" })
-    : res.status(500).json({ message: err.message });
+const failDatabase = (res, err) => {
+  if (isDatabaseUnavailable(err)) {
+    return res.status(503).json({ message: "Route data is unavailable right now (database unreachable)" });
+  }
+  console.error("Route API request failed", err);
+  return res.status(500).json({ message: "Unable to process route request" });
+};
 
 /**
  * Validates and normalises a POST /api/routes payload. Accepts either an
@@ -104,7 +107,10 @@ exports.createRoute = async (req, res) => {
     if (err.code === 11000) {
       return res.status(409).json({ message: "A route with this name already exists at this depot" });
     }
-    res.status(400).json({ message: err.message });
+    if (err.name === "ValidationError") {
+      return res.status(400).json({ message: "Invalid route payload" });
+    }
+    return failDatabase(res, err);
   }
 };
 

@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const requireRouteWriteToken = require("../middleware/requireRouteWriteToken");
 const routeController = require("../controllers/route.controller");
 
 // Ingest a route (GeoJSON trajectory or raw GPX payload).
-router.post("/", routeController.createRoute);
+router.post("/", requireRouteWriteToken, routeController.createRoute);
 // Full catalogue for the initial map load.
 router.get("/", routeController.getRoutes);
 // District / station name search.

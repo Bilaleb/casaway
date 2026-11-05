@@ -6,6 +6,16 @@ const Route = require("./models/Route");
 const app = express();
 const clientBuildDirectory = path.join(__dirname, "..", "frontend", "client", "dist");
 
+app.use((req, res, next) => {
+  res.set({
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(self)",
+  });
+  next();
+});
+
 app.use(express.json({ limit: "2mb" })); // GPX uploads can exceed the 100kb default
 
 // Casaway API routes

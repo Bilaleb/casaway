@@ -8,6 +8,7 @@ Two deployment targets are supported out of the box.
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `MONGO_URI` | yes | MongoDB connection string (MongoDB Atlas recommended) |
+| `ROUTE_WRITE_TOKEN` | for API ingestion | Bearer token required by `POST /api/routes`; leave unset to disable route writes |
 
 > The e-commerce variables from the old Libassi stack (`SESSION_SECRET`, Stripe keys,
 > admin credentials) are no longer needed — that code was removed in the Casaway rebrand.
