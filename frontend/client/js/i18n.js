@@ -2,7 +2,7 @@ const MESSAGES = {
   en: {
     pageTitle: 'Casaway - Your Way Through Casablanca', language: 'Language',
     disclaimer: 'Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.',
-    tagline: 'Your Way Through Casablanca', menuToggle: 'Toggle depot explorer',
+    tagline: 'Your Casa Your Way', menuToggle: 'Toggle depot explorer',
     themeToLight: 'Switch to light mode', themeToDark: 'Switch to dark mode',
     depotCount: (count) => `${count} depots mapped`, findTaxi: 'Find your next taxi.',
     sidebarDescription: 'Depots, destinations and route traces across Casablanca.',
@@ -16,9 +16,10 @@ const MESSAGES = {
     rateSelection: 'Day or night rate', grandTaxiFare: 'Grand taxi fare',
     fareNotListed: 'Official fare not listed for this depot yet.', perSeat: 'Per seat',
     totalSeats: (count) => `Total · ${count} ${count === 1 ? 'seat' : 'seats'}`,
-    courssaFullTaxi: (count) => `Courssa · full taxi (${count} seats)`, regulatedRange: 'Regulated range',
+    courssaFullTaxi: (count) => `Courssa · full taxi (${count} seats)`, regulatedRange: 'Estimated range',
     pickDepotFare: 'Pick a depot to calculate its fare — 6 seats per grand taxi.',
-    regulatedFareNote: (distance, minutes) => `Regulated Casablanca fare · night rate after 20:00 · est. ${distance} km ≈ ${minutes} min`,
+    regulatedFareNote: (distance, minutes) => `Estimated fare, not exact · night rate after 20:00 · about ${distance} km ≈ ${minutes} min`,
+    fareDisclaimer: 'Prices are estimates, not exact fares. Actual prices may differ.',
     courssaNote: (count) => `Courssa = all ${count} seats · night rate after 20:00`, distanceUnknown: 'distance unknown',
     mapLabel: 'Map of Casablanca taxi depots', mapSearch: 'Search depots, districts or destinations',
     mapSearchPlaceholder: 'Search depots, districts, destinations', findNearMe: 'Find near me',
@@ -50,6 +51,7 @@ const MESSAGES = {
     destinations: 'Destinations', start: 'Start', end: 'End', showDirections: 'Show directions',
     showDirectionsTo: (name) => `Show directions to ${name} on the map`, minutes: 'min',
     mixedTaxi: 'Grand & Petit Taxi', largeTaxi: 'Large taxi', smallTaxi: 'Small taxi',
+    grandTaxiHub: 'Grand taxi hub', regionalTaxi: 'Regional grand taxi',
     availableTaxiOptions: 'Available taxi options', comingSoon: ' soon', depot: 'Depot',
     reportRouteIssue: 'Report an issue with this route', reportDepotIssue: 'Report incorrect data for this depot',
     directionsTo: (name) => `Directions to ${name}`, directionsOnMap: 'Show directions on map',
@@ -62,7 +64,7 @@ const MESSAGES = {
   fr: {
     pageTitle: 'Casaway - Vos trajets à Casablanca', language: 'Langue',
     disclaimer: 'Casaway est un projet libre et indépendant, sans affiliation avec Casa Transport ni les autorités locales.',
-    tagline: 'Votre chemin à Casablanca', menuToggle: 'Ouvrir ou fermer les dépôts',
+    tagline: 'Casa, à votre façon', menuToggle: 'Ouvrir ou fermer les dépôts',
     themeToLight: 'Passer en mode clair', themeToDark: 'Passer en mode sombre',
     depotCount: (count) => `${count} dépôts cartographiés`, findTaxi: 'Trouvez votre taxi.',
     sidebarDescription: 'Dépôts, destinations et itinéraires de taxi à Casablanca.',
@@ -76,9 +78,10 @@ const MESSAGES = {
     rateSelection: 'Tarif de jour ou de nuit', grandTaxiFare: 'Tarif du grand taxi',
     fareNotListed: 'Tarif officiel non renseigné pour ce dépôt.', perSeat: 'Par place',
     totalSeats: (count) => `Total · ${count} ${count === 1 ? 'place' : 'places'}`,
-    courssaFullTaxi: (count) => `Courssa · taxi complet (${count} places)`, regulatedRange: 'Fourchette réglementée',
+    courssaFullTaxi: (count) => `Courssa · taxi complet (${count} places)`, regulatedRange: 'Fourchette estimée',
     pickDepotFare: 'Choisissez un dépôt pour calculer le tarif · 6 places par grand taxi.',
-    regulatedFareNote: (distance, minutes) => `Tarif réglementé à Casablanca · nuit après 20 h · estimé ${distance} km ≈ ${minutes} min`,
+    regulatedFareNote: (distance, minutes) => `Tarif estimé, non exact · nuit après 20 h · environ ${distance} km ≈ ${minutes} min`,
+    fareDisclaimer: 'Les prix sont des estimations, pas des tarifs exacts. Le prix réel peut varier.',
     courssaNote: (count) => `Courssa = les ${count} places · tarif de nuit après 20 h`, distanceUnknown: 'distance inconnue',
     mapLabel: 'Carte des dépôts de taxi de Casablanca', mapSearch: 'Rechercher un dépôt, un quartier ou une destination',
     mapSearchPlaceholder: 'Dépôt, quartier, destination', findNearMe: 'Près de moi',
@@ -110,6 +113,7 @@ const MESSAGES = {
     destinations: 'Destinations', start: 'Départ', end: 'Arrivée', showDirections: 'Afficher l’itinéraire',
     showDirectionsTo: (name) => `Afficher l’itinéraire vers ${name} sur la carte`, minutes: 'min',
     mixedTaxi: 'Grand et petit taxis', largeTaxi: 'Grand taxi', smallTaxi: 'Petit taxi',
+    grandTaxiHub: 'Station de grands taxis', regionalTaxi: 'Grand taxi régional',
     availableTaxiOptions: 'Options de taxi disponibles', comingSoon: ' bientôt', depot: 'Dépôt',
     reportRouteIssue: 'Signaler un problème avec cet itinéraire', reportDepotIssue: 'Signaler une donnée incorrecte pour ce dépôt',
     directionsTo: (name) => `Itinéraire vers ${name}`, directionsOnMap: 'Afficher l’itinéraire sur la carte',
@@ -122,7 +126,7 @@ const MESSAGES = {
   ar: {
     pageTitle: 'كازاوي - تنقلاتك في الدار البيضاء', language: 'اللغة',
     disclaimer: 'كازاوي مشروع مستقل ومفتوح المصدر، ولا يرتبط بشركة كازا ترانسبور أو السلطات المحلية.',
-    tagline: 'طريقك في الدار البيضاء', menuToggle: 'إظهار أو إخفاء المحطات',
+    tagline: 'كازا بطريقتك', menuToggle: 'إظهار أو إخفاء المحطات',
     themeToLight: 'التبديل إلى الوضع الفاتح', themeToDark: 'التبديل إلى الوضع الداكن',
     depotCount: (count) => `${count} محطة على الخريطة`, findTaxi: 'اعثر على سيارة أجرة.',
     sidebarDescription: 'محطات سيارات الأجرة والوجهات والمسارات في الدار البيضاء.',
@@ -136,9 +140,10 @@ const MESSAGES = {
     rateSelection: 'أجرة النهار أو الليل', grandTaxiFare: 'أجرة الطاكسي الكبير',
     fareNotListed: 'السعر الرسمي غير متوفر لهذه المحطة بعد.', perSeat: 'للمقعد الواحد',
     totalSeats: (count) => `المجموع · ${count} مقاعد`,
-    courssaFullTaxi: (count) => `كورصة · الطاكسي كاملًا (${count} مقاعد)`, regulatedRange: 'النطاق المحدد',
+    courssaFullTaxi: (count) => `كورصة · الطاكسي كاملًا (${count} مقاعد)`, regulatedRange: 'نطاق تقديري',
     pickDepotFare: 'اختر محطة لحساب الأجرة · ٦ مقاعد للطاكسي الكبير.',
-    regulatedFareNote: (distance, minutes) => `أجرة محددة في الدار البيضاء · أجرة الليل بعد ٢٠:٠٠ · نحو ${distance} كم و${minutes} دقيقة`,
+    regulatedFareNote: (distance, minutes) => `أجرة تقديرية وليست دقيقة · أجرة الليل بعد ٢٠:٠٠ · نحو ${distance} كم و${minutes} دقيقة`,
+    fareDisclaimer: 'الأسعار تقديرية وليست دقيقة. قد يختلف السعر الفعلي.',
     courssaNote: (count) => `كورصة = جميع المقاعد وعددها ${count} · أجرة الليل بعد ٢٠:٠٠`, distanceUnknown: 'المسافة غير معروفة',
     mapLabel: 'خريطة محطات سيارات الأجرة في الدار البيضاء', mapSearch: 'ابحث عن محطة أو حي أو وجهة',
     mapSearchPlaceholder: 'المحطة، الحي، الوجهة', findNearMe: 'بالقرب مني',
@@ -170,6 +175,7 @@ const MESSAGES = {
     destinations: 'الوجهات', start: 'البداية', end: 'النهاية', showDirections: 'اعرض الاتجاهات',
     showDirectionsTo: (name) => `اعرض الاتجاهات إلى ${name} على الخريطة`, minutes: 'دقيقة',
     mixedTaxi: 'طاكسي كبير وصغير', largeTaxi: 'طاكسي كبير', smallTaxi: 'طاكسي صغير',
+    grandTaxiHub: 'محطة الطاكسي الكبير', regionalTaxi: 'طاكسي كبير للجهات',
     availableTaxiOptions: 'خيارات سيارات الأجرة المتاحة', comingSoon: ' قريبًا', depot: 'المحطة',
     reportRouteIssue: 'الإبلاغ عن مشكلة في هذا المسار', reportDepotIssue: 'الإبلاغ عن بيانات غير صحيحة لهذه المحطة',
     directionsTo: (name) => `الاتجاهات إلى ${name}`, directionsOnMap: 'اعرض الاتجاهات على الخريطة',
@@ -178,6 +184,68 @@ const MESSAGES = {
     offlineSnapshot: (savedAt) => `أنت غير متصل · تعرض نسخة محفوظة بتاريخ ${savedAt}.`,
     apiUnavailable: 'واجهة المسارات غير متاحة ولا توجد نسخة محفوظة. يتم عرض قائمة المحطات المحلية.',
     startupFailed: (error) => `تعذر تشغيل كازاوي: ${error}`,
+  },
+}
+
+const PLACE_TRANSLATIONS = {
+  fr: {
+    'Place de la Concorde (L-Hammam / Bd Lalla Yacout)': 'Place de la Concorde (L-Hammam / boulevard Lalla Yacout)',
+    'Dépôt Casa-Port': 'Dépôt Casa-Port',
+    'Dépôt Casa-Voyageurs': 'Dépôt Casa-Voyageurs',
+    'Dépôt Garage Allal (Derb Sultan)': 'Dépôt Garage Allal (Derb Sultan)',
+    'Dépôt Rond-Point Bachkou': 'Dépôt Rond-Point Bachkou',
+    'Dépôt L-Oulfa (Terminus / Bd Moulay Rachid)': 'Dépôt de L’Oulfa (terminus / boulevard Moulay Rachid)',
+    'Dépôt Sidi Bernoussi (Bd Imam Ali)': 'Dépôt Sidi Bernoussi (boulevard Imam Ali)',
+    'Near University': 'Près de l’université',
+    'Grand taxi hub': 'Station de grands taxis',
+    'Regional routes': 'Lignes régionales',
+    'Zone Industrielle': 'Zone industrielle',
+    'Dépôt Ain Sebaa (L-Gara / Near Train Station)': 'Dépôt Ain Sebaa (Gare / près de la gare)',
+    'Dépôt Hay Hassani (SOUK / Terminus)': 'Dépôt Hay Hassani (Souk / terminus)',
+    "Dépôt Lissasfa (Route d'El Jadida / Rond Point)": 'Dépôt Lissasfa (Route d’El Jadida / rond-point)',
+    'Dépôt Sidi Moumen (Terminus Tramway Anassi)': 'Dépôt Sidi Moumen (Terminus du tramway Anassi)',
+    'Dépôt Maarif (Bd Bir Anzarane / Twin Center)': 'Dépôt du Maârif (boulevard Bir Anzarane / Twin Center)',
+    'Dépôt Derb Omar / Bd Mohammed V': 'Dépôt Derb Omar / boulevard Mohammed V',
+    'Dépôt Hay Mohammadi (Place Bouchentouf / Bd Ali Yata)': 'Dépôt Hay Mohammadi (place Bouchentouf / boulevard Ali Yata)',
+    'Dépôt Sbata (Rond Point Jamila)': 'Dépôt Sbata (rond-point Jamila)',
+    'Dépôt Tit Mellil (Centre)': 'Dépôt Tit Mellil (centre)',
+    'Dépôt Ain Chock (Bd Baghdad / Near Faculté)': 'Dépôt Ain Chock (Bd Baghdad / près de la faculté)',
+    'Dépôt Errahma (Ville Nouvelle / Main Roundabout)': 'Dépôt Errahma (Ville nouvelle / rond-point principal)',
+    'Dépôt Sidi Maalouf (Near Technopark)': 'Dépôt Sidi Maalouf (près du Technopark)',
+    'Dépôt Sidi Bernoussi - Tram Terminus': 'Dépôt Sidi Bernoussi - Terminus du tramway',
+    'Centre Ville': 'Centre-ville',
+  },
+  ar: {
+    'Place de la Concorde (L-Hammam / Bd Lalla Yacout)': 'ساحة الكونكورد (الحمام / شارع للا الياقوت)',
+    'Dépôt Casa-Port': 'محطة كازا بورت',
+    'Dépôt Casa-Voyageurs': 'محطة الدار البيضاء المسافرين',
+    'Dépôt Garage Allal (Derb Sultan)': 'محطة كراج علال (درب السلطان)',
+    'Dépôt Rond-Point Bachkou': 'محطة مدار باشكو',
+    'Dépôt L-Oulfa (Terminus / Bd Moulay Rachid)': 'محطة الألفة (المحطة النهائية / شارع مولاي رشيد)',
+    'Dépôt Sidi Bernoussi (Bd Imam Ali)': 'محطة سيدي البرنوصي (شارع الإمام علي)',
+    'Dépôt Ain Sebaa (L-Gara / Near Train Station)': 'محطة عين السبع (الكَار / قرب محطة القطار)',
+    'Dépôt Maarif (Bd Bir Anzarane / Twin Center)': 'محطة المعاريف (شارع بئر أنزران / توين سنتر)',
+    'Dépôt Hay Hassani (SOUK / Terminus)': 'محطة الحي الحسني (السوق / المحطة النهائية)',
+    "Dépôt Lissasfa (Route d'El Jadida / Rond Point)": 'محطة ليساسفة (طريق الجديدة / المدار)',
+    'Dépôt Derb Omar / Bd Mohammed V': 'محطة درب عمر / شارع محمد الخامس',
+    'Dépôt Sidi Moumen (Terminus Tramway Anassi)': 'محطة سيدي مومن (نهاية ترامواي أناسي)',
+    'Dépôt Hay Mohammadi (Place Bouchentouf / Bd Ali Yata)': 'محطة الحي المحمدي (ساحة بوشنتوف / شارع علي يعتة)',
+    'Dépôt Sbata (Rond Point Jamila)': 'محطة سباتة (مدار جميلة)',
+    'Dépôt Ain Chock (Bd Baghdad / Near Faculté)': 'محطة عين الشق (شارع بغداد / قرب الكلية)',
+    'Dépôt Errahma (Ville Nouvelle / Main Roundabout)': 'محطة الرحمة (المدينة الجديدة / المدار الرئيسي)',
+    'Dépôt Tit Mellil (Centre)': 'محطة تيط مليل (المركز)',
+    'Dépôt Sidi Maalouf (Near Technopark)': 'محطة سيدي معروف (قرب تكنوبارك)',
+    'Dépôt Sidi Bernoussi - Tram Terminus': 'محطة سيدي البرنوصي - نهاية الترامواي',
+    'Centre Ville': 'وسط المدينة', 'Oulfa': 'الألفة', 'Maarif': 'المعاريف', 'Ain Diab': 'عين الذئاب',
+    'Ain Sebaa': 'عين السبع', 'Sidi Bernoussi': 'سيدي البرنوصي', 'Mohammedia': 'المحمدية',
+    'Hay Mohammadi': 'الحي المحمدي', 'Derb Sultan': 'درب السلطان', 'Mediouna': 'مديونة',
+    'Tit Mellil': 'تيط مليل', 'Bouskoura': 'بوسكورة', 'Bachkou': 'باشكو', 'Near University': 'قرب الجامعة',
+    'Lissasfa': 'ليساسفة', 'Azemmour': 'أزمور', 'Had Soualem': 'حد السوالم', 'Errahma': 'الرحمة',
+    'Grand taxi hub': 'محطة الطاكسي الكبير', 'Twin Center': 'توين سنتر', 'Regional routes': 'الخطوط الجهوية',
+    'Derb Omar': 'درب عمر', 'Casa-Voyageurs': 'الدار البيضاء المسافرين', 'Bernoussi': 'البرنوصي',
+    'Garage Allal': 'كراج علال', 'Sbata': 'سباتة', 'Ain Chock': 'عين الشق', 'Shorex': 'شوريكس',
+    'Zenith': 'زينيت', 'Zone Industrielle': 'المنطقة الصناعية', 'Hay Hassani': 'الحي الحسني',
+    'Sidi Moumen': 'سيدي مومن', 'Sidi Maalouf': 'سيدي معروف',
   },
 }
 
@@ -192,6 +260,19 @@ export function setupI18n() {
   } catch { /* private browsing */ }
 
   function t(key, ...args) {
+    if (key === 'taxiTypeName') {
+      return String(args[0] ?? '')
+        .replace(/Petit Taxi & Grand Taxi Hub/gi, `${t('petitTaxi')} & ${t('grandTaxiHub')}`)
+        .replace(/Petit Taxi & Regional Grand Taxi/gi, `${t('petitTaxi')} & ${t('regionalTaxi')}`)
+        .replace(/Regional Grand Taxi/gi, t('regionalTaxi'))
+        .replace(/Grand & Petit Taxi/gi, t('mixedTaxi'))
+        .replace(/Grand Taxi/gi, t('grandTaxi'))
+        .replace(/Petit Taxi/gi, t('petitTaxi'))
+    }
+    if (key === 'placeName') {
+      const place = String(args[0] ?? '')
+      return PLACE_TRANSLATIONS[locale]?.[place] || place
+    }
     const value = MESSAGES[locale][key] ?? MESSAGES.en[key] ?? key
     return typeof value === 'function' ? value(...args) : value
   }

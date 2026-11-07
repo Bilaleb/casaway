@@ -30,13 +30,14 @@ export function getStation(stations, id) {
   return stations.find((station) => station.id === Number(id)) || null
 }
 
-export function filterStations(stations, query, taxiType) {
+export function filterStations(stations, query, taxiType, translate = (value) => value) {
   const needle = query.trim().toLocaleLowerCase()
   return stations.filter((station) => {
     if (taxiType === TAXI_FILTERS.GRAND && !hasGrandTaxi(station)) return false
     if (taxiType === TAXI_FILTERS.PETIT && !hasPetitTaxi(station)) return false
     if (!needle) return true
-    const haystack = [station.name, station.district, station.taxiType, ...station.destinations].join(' ').toLocaleLowerCase()
+    const localizedValues = [station.name, station.district, ...station.destinations].map(translate)
+    const haystack = [station.name, station.district, station.taxiType, ...station.destinations, ...localizedValues].join(' ').toLocaleLowerCase()
     return haystack.includes(needle)
   })
 }

@@ -51,9 +51,9 @@ export function buildRoutePopup(route, t = (key) => key) {
     el('h3', { className: 'popup-title', text: route.title }),
     el('p', { className: 'popup-meta', text: describeRoute(route) || 'Illustrative taxi route' }),
     el('p', { className: 'popup-destinations' }, [
-      infoRow(t('origin'), route.origin),
-      infoRow(t('destination'), route.destination),
-      infoRow(t('majorStops'), (route.majorStops || []).join(' · ') || t('unavailable')),
+      infoRow(t('origin'), t('placeName', route.origin)),
+      infoRow(t('destination'), t('placeName', route.destination)),
+      infoRow(t('majorStops'), route.majorStops?.map((stop) => t('placeName', stop)).join(' · ') || t('unavailable')),
     ]),
   ])
 }

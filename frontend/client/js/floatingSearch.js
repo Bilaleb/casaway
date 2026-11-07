@@ -9,7 +9,7 @@ import { el, replaceChildren } from './dom.js'
  * station names can never inject markup (match highlighting re-uses that
  * guarantee by splitting into <mark> + text nodes).
  */
-export function createFloatingSearch({ input, list, emptyStatus, getStations, onSelect, onQuery }) {
+export function createFloatingSearch({ input, list, emptyStatus, getStations, onSelect, onQuery, t = (key) => key }) {
   let options = []
   let activeIndex = -1
 
@@ -24,13 +24,14 @@ export function createFloatingSearch({ input, list, emptyStatus, getStations, on
   }
 
   function suggestionRow(station, needle, index) {
+    const displayName = t('placeName', station.name)
     return el('li', {
       className: 'suggestion-row',
       attrs: { role: 'option', id: `search-option-${index}`, 'aria-selected': 'false' },
       dataset: { index: String(index) },
     }, [
-      el('span', { className: 'suggestion-name' }, highlightParts(station.name, needle)),
-      el('span', { className: 'suggestion-meta', text: `${station.district} · ${station.taxiType}` }),
+      el('span', { className: 'suggestion-name' }, highlightParts(displayName, needle)),
+      el('span', { className: 'suggestion-meta', text: `${t('placeName', station.district)} · ${t('taxiTypeName', station.taxiType)}` }),
     ])
   }
 
@@ -61,7 +62,7 @@ export function createFloatingSearch({ input, list, emptyStatus, getStations, on
   function render(stationList, needle) {
     if (!stationList.length) {
       close()
-      if (emptyStatus && needle) emptyStatus.textContent = `No dépôts match “${needle}”.`
+      if (emptyStatus && needle) emptyStatus.textContent = t('noResults')
       return
     }
     options = stationList
@@ -78,8 +79,10 @@ export function createFloatingSearch({ input, list, emptyStatus, getStations, on
     return pool
       .filter((station) =>
         station.name.toLocaleLowerCase().includes(lower) ||
+        t('placeName', station.name).toLocaleLowerCase().includes(lower) ||
         station.district.toLocaleLowerCase().includes(lower) ||
-        station.destinations.some((target) => target.toLocaleLowerCase().includes(lower)))
+        t('placeName', station.district).toLocaleLowerCase().includes(lower) ||
+        station.destinations.some((target) => target.toLocaleLowerCase().includes(lower) || t('placeName', target).toLocaleLowerCase().includes(lower)))
       .slice(0, 6)
   }
 
@@ -87,7 +90,7 @@ export function createFloatingSearch({ input, list, emptyStatus, getStations, on
     const station = options[index]
     if (!station) return
     close()
-    input.value = station.name
+    input.value = t('placeName', station.name)
     onQuery(station.name)
     onSelect(station.id)
   }

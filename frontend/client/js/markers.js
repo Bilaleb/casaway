@@ -3,6 +3,13 @@ import { fareForStation, fareMode, seatPrice, formatMAD } from './fares.js'
 import { buildFareWidget } from './fareWidget.js'
 import { directionsButton } from './directions.js'
 
+function localizedTaxiType(value, t) {
+  return value
+    .replace(/Grand & Petit Taxi/gi, t('mixedTaxi'))
+    .replace(/Grand Taxi/gi, t('grandTaxi'))
+    .replace(/Petit Taxi/gi, t('petitTaxi'))
+}
+
 /** Current per-seat price tag ("8.00 MAD") or null for unpriced depots. */
 export function stationPriceTag(station) {
   const fare = fareForStation(station)
@@ -53,15 +60,15 @@ export function updateStationPriceTag(marker, station) {
 
 export function buildStationPopup(station, t = (key) => key) {
   const children = [
-    el('h3', { className: 'popup-title', text: station.name }),
-    el('p', { className: 'popup-meta', text: `${station.district} · ${station.taxiType}` }),
+    el('h3', { className: 'popup-title', text: t('placeName', station.name) }),
+    el('p', { className: 'popup-meta', text: `${t('placeName', station.district)} · ${localizedTaxiType(station.taxiType, t)}` }),
   ]
   if (station.destinations?.length) {
     children.push(
       el('p', { className: 'popup-destinations' }, [
         el('b', { text: t('destinations') }),
         el('br'),
-        joinWithSeparator(station.destinations),
+        joinWithSeparator(station.destinations.map((destination) => t('placeName', destination))),
       ]),
     )
   }
@@ -69,7 +76,7 @@ export function buildStationPopup(station, t = (key) => key) {
   children.push(
     el('div', { className: 'popup-actions' }, [directionsButton(station, {
       label: t('showDirections'),
-      ariaLabel: t('showDirectionsTo', station.name),
+      ariaLabel: t('showDirectionsTo', t('placeName', station.name)),
     })]),
   )
   return el('div', {}, children)
@@ -88,8 +95,8 @@ export function mountStationMarkers(map, stations, onSelect, { t = (key) => key 
   for (const station of stations) {
     const marker = L.marker(station.coordinates, {
       icon: buildStationIcon(station),
-      title: station.name,
-      alt: `${station.taxiType}: ${station.name}`,
+      title: t('placeName', station.name),
+      alt: `${localizedTaxiType(station.taxiType, t)}: ${t('placeName', station.name)}`,
     })
     if (allowsPopups) marker.bindPopup(buildStationPopup(station, t), { maxWidth: 280 })
     marker.on('click', () => onSelect(station.id)).addTo(layer)

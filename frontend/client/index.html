@@ -40,8 +40,8 @@
     <div id="app">
       <header class="topbar">
         <button class="menu-toggle" id="menu-toggle" data-i18n-aria-label="menuToggle" aria-label="Toggle dépôt explorer" aria-expanded="false">☰</button>
-        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span data-i18n="tagline">Your Way Through Casablanca</span></div></div>
-        <div class="top-actions"><label class="locale-switch"><span class="sr-only" data-i18n="language">Language</span><select id="language-select" data-i18n-aria-label="language" aria-label="Language"><option value="en">EN</option><option value="fr">FR</option><option value="ar">AR</option></select></label><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 dépôts mapped</span></span></div>
+        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span data-i18n="tagline">Your Casa Your Way</span></div></div>
+        <div class="top-actions"><label class="locale-switch"><select id="language-select" data-i18n-aria-label="language" aria-label="Language"><option value="en">EN</option><option value="fr">FR</option><option value="ar">AR</option></select></label><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 dépôts mapped</span></span></div>
       </header>
       <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and dépôts.</div>
       <main class="main">
@@ -51,7 +51,7 @@
           <div class="filter-row"><label for="taxi-filter" data-i18n="taxiType">Taxi type</label><select id="taxi-filter" data-i18n-aria-label="taxiType" aria-label="Taxi type"><option value="all" data-i18n="allDepots">All dépôts</option><option value="grand" data-i18n="grandTaxi">Grand taxi</option><option value="petit" data-i18n="petitTaxi">Petit taxi</option></select></div>
           <div class="station-list" id="station-list" aria-live="polite"></div>
           <section class="route-panel" data-i18n-aria-label="routeDetails" aria-label="Route details"><div class="route-heading"><h3 data-i18n="routeTrace">Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" data-i18n-aria-label="selectRoute" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><div class="route-actions" id="route-actions" hidden><button type="button" id="edit-route" data-i18n="editRoute">Edit route</button><button type="button" id="delete-route" data-i18n="deleteTrace">Delete trace</button></div><p class="route-state" id="route-state" data-i18n="loadingRoutes" role="status">Loading route catalogue...</p></section>
-          <section class="fare-panel" aria-label="Fare calculator"><div class="route-heading"><h3 data-i18n="fareCalculator">Fare calculator</h3><span id="fare-period">DAY RATE</span></div><div id="fare-widget" class="fare-widget-host"></div></section>
+          <section class="fare-panel" aria-label="Fare calculator"><div class="route-heading"><h3 data-i18n="fareCalculator">Fare calculator</h3><span id="fare-period">DAY RATE</span></div><p class="fare-disclaimer" data-i18n="fareDisclaimer">Prices are estimates, not exact fares. Actual prices may differ.</p><div id="fare-widget" class="fare-widget-host"></div></section>
         </aside>
         <section class="map-wrap" data-i18n-aria-label="mapLabel" aria-label="Map of Casablanca taxi dépôts">
           <div class="map" id="map"></div>
@@ -61,10 +61,6 @@
               <input id="map-search" type="search" role="combobox" aria-expanded="false" aria-controls="search-suggestions" aria-autocomplete="list" data-i18n-aria-label="mapSearch" data-i18n-placeholder="mapSearchPlaceholder" aria-label="Search dépôts, districts or destinations" placeholder="Search dépôts, districts, destinations" autocomplete="off" spellcheck="false">
               <ul class="suggestions" id="search-suggestions" role="listbox" aria-label="Dépôt suggestions" hidden></ul>
             </div>
-            <button class="find-near-me" id="locate-nearest" type="button" aria-label="Find near me">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
-              <span data-i18n="findNearMe">Find near me</span>
-            </button>
             <p class="sr-status" id="suggestion-status" role="status" aria-live="polite"></p>
           </div>
           <div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div>

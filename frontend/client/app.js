@@ -275,6 +275,7 @@ const floatingSearch = dom.mapSearch
       getStations: () => allStationPool,
       onSelect: (id) => selectStation(id, true),
       onQuery: (value) => applySearchQuery(value, 'floating'),
+      t: i18n.t,
     })
   : null
 
@@ -324,6 +325,8 @@ routeEditor = setupRouteEditor({
 window.addEventListener('casaway:localechange', () => {
   renderStationList()
   remountMarkers(stations)
+  refreshRouteCatalogue()
+  floatingSearch?.close()
   const selected = routes.find((route) => route.id === dom.routeSelect.value)
   if (selected) showRoute(selected)
   else if (!dom.sheetElement.hidden && sheetRepaint) sheetRepaint(sheet.getState())
@@ -497,16 +500,20 @@ function sheetReportButton(subject, kind, label) {
 }
 
 function presentRouteSheet(route, openAt = 'half') {
-  const stops = (route.majorStops || []).filter(Boolean).join(' · ')
+  const stops = (route.majorStops || []).filter(Boolean).map((stop) => i18n.t('placeName', stop)).join(' · ')
   const depot = activeDepot()
+  const title = [route.origin, route.destination].filter(Boolean).reduce(
+    (value, name) => value.replace(name, i18n.t('placeName', name)),
+    route.title,
+  )
   sheet.present({
     eyebrow: i18n.t('routeTrace'),
-    title: route.title,
+    title,
     openAt,
     content: [
       el('div', { className: 'sheet-stats' }, [
-        sheetStat(i18n.t('origin'), route.origin || i18n.t('unavailable')),
-        sheetStat(i18n.t('destination'), route.destination || i18n.t('unavailable')),
+        sheetStat(i18n.t('origin'), route.origin ? i18n.t('placeName', route.origin) : i18n.t('unavailable')),
+        sheetStat(i18n.t('destination'), route.destination ? i18n.t('placeName', route.destination) : i18n.t('unavailable')),
         sheetStat(i18n.t('distance'), route.distanceKm ? `${route.distanceKm} km` : i18n.t('unavailable')),
         sheetStat(i18n.t('duration'), durationLabel(route.distanceKm), { estimate: Boolean(route.distanceKm) }),
       ]),
@@ -515,7 +522,7 @@ function presentRouteSheet(route, openAt = 'half') {
       depot ? el('div', { className: 'sheet-actions' }, [directionsButton(depot, {
         className: 'dir-link dir-link-lg',
         label: i18n.t('directionsTo', depot.name),
-        ariaLabel: i18n.t('showDirectionsTo', depot.name),
+        ariaLabel: i18n.t('showDirectionsTo', i18n.t('placeName', depot.name)),
       })]) : null,
       el('p', {
         className: 'sheet-note',
@@ -532,23 +539,23 @@ let sheetRepaint = null
 function presentStationSheet(station, openAt = 'half') {
   sheet.present({
     eyebrow: i18n.t('depot'),
-    title: station.name,
+    title: i18n.t('placeName', station.name),
     openAt,
     content: [
       el('div', { className: 'sheet-stats' }, [
-        sheetStat(i18n.t('district'), station.district),
-        sheetStat(i18n.t('taxiType'), station.taxiType),
+        sheetStat(i18n.t('district'), i18n.t('placeName', station.district)),
+        sheetStat(i18n.t('taxiType'), i18n.t('taxiTypeName', station.taxiType)),
       ]),
       transitChips(station.taxiType, i18n.t),
       station.destinations.length
         ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': i18n.t('destinationsFrom') } },
-            station.destinations.map((target) => el('li', { text: target })))
+            station.destinations.map((target) => el('li', { text: i18n.t('placeName', target) })))
         : null,
       buildFareWidget(station, i18n.t),
       el('div', { className: 'sheet-actions' }, [directionsButton(station, {
         className: 'dir-link dir-link-lg',
         label: i18n.t('directionsOnMap'),
-        ariaLabel: i18n.t('showDirectionsTo', station.name),
+        ariaLabel: i18n.t('showDirectionsTo', i18n.t('placeName', station.name)),
       })]),
       sheetReportButton(station.name, 'station-correction', i18n.t('reportDepotIssue')),
     ],
@@ -624,6 +631,19 @@ async function runSearch(query) {
     stations = allStationPool
     remountMarkers(stations)
     renderStationList()
+    return stations
+  }
+  const normalizedQuery = trimmed.toLocaleLowerCase()
+  const localizedMatches = allStationPool.filter((station) =>
+    [station.name, station.district, ...station.destinations].some((value) =>
+      i18n.t('placeName', value).toLocaleLowerCase().includes(normalizedQuery)
+    )
+  )
+  if (localizedMatches.length) {
+    stations = localizedMatches
+    remountMarkers(stations)
+    renderStationList()
+    if (stations.length) frameStations(stations)
     return stations
   }
   try {
