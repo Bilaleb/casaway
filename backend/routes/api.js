@@ -5,6 +5,8 @@ const routeController = require("../controllers/route.controller");
 
 // Ingest a route (GeoJSON trajectory or raw GPX payload).
 router.post("/", requireRouteWriteToken, routeController.createRoute);
+router.patch("/:id", requireRouteWriteToken, routeController.updateRoute);
+router.delete("/:id", requireRouteWriteToken, routeController.deleteRoute);
 // Full catalogue for the initial map load.
 router.get("/", routeController.getRoutes);
 // District / station name search.

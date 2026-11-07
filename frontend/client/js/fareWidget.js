@@ -24,12 +24,10 @@ import {
   setFareSeats,
 } from './fares.js'
 
-const modeLabels = { day: 'Day', night: 'Night +50%' }
-
-function modeToggle() {
+function modeToggle(t) {
   const active = fareMode()
-  return el('div', { className: 'fare-toggle', attrs: { role: 'group', 'aria-label': 'Day or night rate' } },
-    Object.entries(modeLabels).map(([mode, label]) =>
+  return el('div', { className: 'fare-toggle', attrs: { role: 'group', 'aria-label': t('rateSelection') } },
+    [['day', t('day')], ['night', t('nightPlus50')]].map(([mode, label]) =>
       el('button', {
         className: `fare-mode${mode === active ? ' is-active' : ''}`,
         text: label,
@@ -39,11 +37,11 @@ function modeToggle() {
     ))
 }
 
-function seatSelector() {
+function seatSelector(t) {
   const active = fareSeats()
   return el('div', { className: 'fare-seats' }, [
-    el('span', { className: 'fare-label', text: 'Seats' }),
-    el('div', { className: 'fare-seat-options', attrs: { role: 'group', 'aria-label': 'Passenger seats (1 to 6)' } },
+    el('span', { className: 'fare-label', text: t('seats') }),
+    el('div', { className: 'fare-seat-options', attrs: { role: 'group', 'aria-label': t('passengerSeats') } },
       SEAT_OPTIONS.map((count) =>
         el('button', {
           className: `fare-seat${count === active ? ' is-active' : ''}`,
@@ -52,7 +50,7 @@ function seatSelector() {
           attrs: {
             type: 'button',
             'aria-pressed': String(count === active),
-            'aria-label': `${count} seat${count === 1 ? '' : 's'}`,
+            'aria-label': t('seatCount', count),
           },
           on: { click: () => setFareSeats(count) },
         })
@@ -68,12 +66,12 @@ function fareLine(label, value, { className = '', key = '' } = {}) {
 }
 
 /** Full calculator for one depot. Returns null-shown state when unpriced. */
-export function buildFareWidget(station) {
+export function buildFareWidget(station, t = (key) => key) {
   const fare = fareForStation(station)
   if (!fare) {
     return el('div', { className: 'fare-widget is-empty' }, [
-      el('p', { className: 'fare-eyebrow', text: 'Grand taxi fare' }),
-      el('p', { className: 'fare-note', text: 'Official fare not listed for this dépôt yet.' }),
+      el('p', { className: 'fare-eyebrow', text: t('grandTaxiFare') }),
+      el('p', { className: 'fare-note', text: t('fareNotListed') }),
     ])
   }
 
@@ -83,36 +81,36 @@ export function buildFareWidget(station) {
 
   return el('div', { className: 'fare-widget', dataset: { mode, seats: String(seats) } }, [
     el('div', { className: 'fare-head' }, [
-      el('span', { className: 'fare-eyebrow', text: mode === 'night' ? 'Night fare' : 'Day fare' }),
-      modeToggle(),
+      el('span', { className: 'fare-eyebrow', text: t(mode === 'night' ? 'nightFare' : 'dayFare') }),
+      modeToggle(t),
     ]),
     el('p', { className: 'fare-route', text: `${fare.origin || station.name} → ${fare.destination}` }),
-    seatSelector(),
+    seatSelector(t),
     el('div', { className: 'fare-lines' }, [
-      fareLine('Per seat', formatMAD(perSeat), { key: 'seat' }),
-      fareLine(`Total · ${seats} seat${seats === 1 ? '' : 's'}`, formatMAD(fareTotal(fare, mode, seats)), { className: 'is-total', key: 'total' }),
-      fareLine(`Courssa · full taxi (${SEATS_PER_TAXI} seats)`, formatMAD(courssaTotal(fare, mode)), { className: 'is-courssa', key: 'courssa' }),
+      fareLine(t('perSeat'), formatMAD(perSeat), { key: 'seat' }),
+      fareLine(t('totalSeats', seats), formatMAD(fareTotal(fare, mode, seats)), { className: 'is-total', key: 'total' }),
+      fareLine(t('courssaFullTaxi', SEATS_PER_TAXI), formatMAD(courssaTotal(fare, mode)), { className: 'is-courssa', key: 'courssa' }),
     ]),
     el('p', {
       className: 'fare-note',
-      text: `Regulated Casablanca fare · night rate after 20:00 · est. ${fare.estimatedDistanceKM} km ≈ ${fare.estimatedTimeMins} min`,
+      text: t('regulatedFareNote', fare.estimatedDistanceKM, fare.estimatedTimeMins),
     }),
   ])
 }
 
 /** Sidebar state before a depot is selected: the global toggle + fare range. */
-export function buildFareOverview() {
+export function buildFareOverview(t = (key) => key) {
   const mode = fareMode()
   return el('div', { className: 'fare-widget fare-overview', dataset: { mode } }, [
     el('div', { className: 'fare-head' }, [
-      el('span', { className: 'fare-eyebrow', text: 'Per-seat fares' }),
-      modeToggle(),
+      el('span', { className: 'fare-eyebrow', text: t('perSeat') }),
+      modeToggle(t),
     ]),
-    el('p', { className: 'fare-route', text: 'Pick a dépôt to calculate its fare — 6 seats per grand taxi.' }),
-    fareLine('Regulated range', formatMADRange(mode), { className: 'is-total' }),
+    el('p', { className: 'fare-route', text: t('pickDepotFare') }),
+    fareLine(t('regulatedRange'), formatMADRange(mode), { className: 'is-total' }),
     el('p', {
       className: 'fare-note',
-      text: `Courssa = all ${SEATS_PER_TAXI} seats · night rate after 20:00`,
+      text: t('courssaNote', SEATS_PER_TAXI),
     }),
   ])
 }
@@ -130,14 +128,14 @@ function formatMADRange(mode) {
  * instead of rebuilding: texts and pressed-states are written onto the
  * existing elements.
  */
-export function updateFareWidget(root, station) {
+export function updateFareWidget(root, station, t = (key) => key) {
   const fare = fareForStation(station)
   if (!fare || !root || !root.classList.contains('fare-widget')) return false
   const mode = fareMode()
   const seats = fareSeats()
 
   const eyebrow = root.querySelector('.fare-eyebrow')
-  if (eyebrow) eyebrow.textContent = mode === 'night' ? 'Night fare' : 'Day fare'
+  if (eyebrow) eyebrow.textContent = t(mode === 'night' ? 'nightFare' : 'dayFare')
 
   root.querySelectorAll('.fare-mode').forEach((button) => {
     const isActive = button.dataset.mode === mode
@@ -158,9 +156,9 @@ export function updateFareWidget(root, station) {
     if (span) span.textContent = label
     if (bold) bold.textContent = value
   }
-  setLine('seat', 'Per seat', formatMAD(seatPrice(fare, mode)))
-  setLine('total', `Total · ${seats} seat${seats === 1 ? '' : 's'}`, formatMAD(fareTotal(fare, mode, seats)))
-  setLine('courssa', `Courssa · full taxi (${SEATS_PER_TAXI} seats)`, formatMAD(courssaTotal(fare, mode)))
+  setLine('seat', t('perSeat'), formatMAD(seatPrice(fare, mode)))
+  setLine('total', t('totalSeats', seats), formatMAD(fareTotal(fare, mode, seats)))
+  setLine('courssa', t('courssaFullTaxi', SEATS_PER_TAXI), formatMAD(courssaTotal(fare, mode)))
 
   root.dataset.mode = mode
   root.dataset.seats = String(seats)

@@ -18,28 +18,28 @@ export function estimateDurationMin(distanceKm) {
  * Casaway and are deliberately not offered here (the section was removed
  * until bus data actually ships).
  */
-export function transitOptions(taxiType = '') {
+export function transitOptions(taxiType = '', t = (key) => key) {
   return [
-    { key: 'large', label: 'Large Taxi', available: /grand/i.test(taxiType) },
-    { key: 'small', label: 'Small Taxi', available: /petit/i.test(taxiType) },
+    { key: 'large', label: t('largeTaxi'), available: /grand/i.test(taxiType) },
+    { key: 'small', label: t('smallTaxi'), available: /petit/i.test(taxiType) },
   ]
 }
 
-export function transitChips(taxiType) {
-  const chips = transitOptions(taxiType).map((option) =>
+export function transitChips(taxiType, t = (key) => key) {
+  const chips = transitOptions(taxiType, t).map((option) =>
     el('span', {
       className: `transit-chip${option.available ? ' is-available' : ''}`,
       attrs: {
         'aria-disabled': option.available ? 'false' : 'true',
-        title: option.available ? option.label : (option.note || 'Not available'),
+        title: option.available ? option.label : t('unavailable'),
       },
     }, [
       el('span', { className: 'transit-dot', attrs: { 'aria-hidden': 'true' } }),
       option.label,
-      option.available ? null : el('span', { className: 'transit-when', text: ' soon' }),
+      option.available ? null : el('span', { className: 'transit-when', text: t('comingSoon') }),
     ])
   )
-  return el('div', { className: 'transit-chips', attrs: { role: 'group', 'aria-label': 'Available transit options' } }, chips)
+  return el('div', { className: 'transit-chips', attrs: { role: 'group', 'aria-label': t('availableTaxiOptions') } }, chips)
 }
 
 export function durationLabel(distanceKm) {

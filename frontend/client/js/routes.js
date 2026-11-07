@@ -46,14 +46,14 @@ function infoRow(label, value) {
   ])
 }
 
-export function buildRoutePopup(route) {
+export function buildRoutePopup(route, t = (key) => key) {
   return el('div', {}, [
     el('h3', { className: 'popup-title', text: route.title }),
     el('p', { className: 'popup-meta', text: describeRoute(route) || 'Illustrative taxi route' }),
     el('p', { className: 'popup-destinations' }, [
-      infoRow('Origin', route.origin),
-      infoRow('Destination', route.destination),
-      infoRow('Major stops', (route.majorStops || []).join(' · ') || 'Not available'),
+      infoRow(t('origin'), route.origin),
+      infoRow(t('destination'), route.destination),
+      infoRow(t('majorStops'), (route.majorStops || []).join(' · ') || t('unavailable')),
     ]),
   ])
 }

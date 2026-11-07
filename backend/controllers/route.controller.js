@@ -1,4 +1,5 @@
 const Route = require("../models/Route");
+const mongoose = require("mongoose");
 const { TAXI_TYPES } = Route;
 const { isPosition, escapeRegex, haversineMeters } = require("../utils/geo");
 const { gpxToLineString } = require("../utils/gpx");
@@ -110,6 +111,41 @@ exports.createRoute = async (req, res) => {
     if (err.name === "ValidationError") {
       return res.status(400).json({ message: "Invalid route payload" });
     }
+    return failDatabase(res, err);
+  }
+};
+
+exports.updateRoute = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid route id" });
+  }
+
+  try {
+    const existing = await Route.findById(req.params.id);
+    if (!existing) return res.status(404).json({ message: "Route not found" });
+
+    const { route, errors } = parseRoutePayload({ ...existing.toObject(), ...(req.body || {}) });
+    if (errors) return res.status(400).json({ message: "Invalid route payload", errors });
+
+    const updated = await Route.findByIdAndUpdate(existing._id, route, { new: true, runValidators: true });
+    return res.json(updated);
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ message: "A route with this name already exists at this depot" });
+    if (err.name === "ValidationError") return res.status(400).json({ message: "Invalid route payload" });
+    return failDatabase(res, err);
+  }
+};
+
+exports.deleteRoute = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid route id" });
+  }
+
+  try {
+    const deleted = await Route.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Route not found" });
+    return res.status(204).end();
+  } catch (err) {
     return failDatabase(res, err);
   }
 };

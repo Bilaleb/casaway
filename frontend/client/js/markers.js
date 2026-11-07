@@ -51,7 +51,7 @@ export function updateStationPriceTag(marker, station) {
   return true
 }
 
-export function buildStationPopup(station) {
+export function buildStationPopup(station, t = (key) => key) {
   const children = [
     el('h3', { className: 'popup-title', text: station.name }),
     el('p', { className: 'popup-meta', text: `${station.district} · ${station.taxiType}` }),
@@ -59,15 +59,18 @@ export function buildStationPopup(station) {
   if (station.destinations?.length) {
     children.push(
       el('p', { className: 'popup-destinations' }, [
-        el('b', { text: 'Destinations' }),
+        el('b', { text: t('destinations') }),
         el('br'),
         joinWithSeparator(station.destinations),
       ]),
     )
   }
-  children.push(buildFareWidget(station))
+  children.push(buildFareWidget(station, t))
   children.push(
-    el('div', { className: 'popup-actions' }, [directionsButton(station, { label: 'Show directions' })]),
+    el('div', { className: 'popup-actions' }, [directionsButton(station, {
+      label: t('showDirections'),
+      ariaLabel: t('showDirectionsTo', station.name),
+    })]),
   )
   return el('div', {}, children)
 }
@@ -77,7 +80,7 @@ export function buildStationPopup(station) {
 // bind popups where there is room for them.
 const POPUP_MEDIA = '(min-width: 761px)'
 
-export function mountStationMarkers(map, stations, onSelect) {
+export function mountStationMarkers(map, stations, onSelect, { t = (key) => key } = {}) {
   const layer = L.featureGroup().addTo(map)
   const markerById = new Map()
   const allowsPopups = window.matchMedia(POPUP_MEDIA).matches
@@ -88,7 +91,7 @@ export function mountStationMarkers(map, stations, onSelect) {
       title: station.name,
       alt: `${station.taxiType}: ${station.name}`,
     })
-    if (allowsPopups) marker.bindPopup(buildStationPopup(station), { maxWidth: 280 })
+    if (allowsPopups) marker.bindPopup(buildStationPopup(station, t), { maxWidth: 280 })
     marker.on('click', () => onSelect(station.id)).addTo(layer)
     markerById.set(station.id, marker)
   }

@@ -23,30 +23,30 @@ export function currentTheme() {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
 }
 
-export function applyTheme(theme, { persist = false } = {}) {
+export function applyTheme(theme, { persist = false, t = (key) => key } = {}) {
   document.documentElement.dataset.theme = theme
   if (persist) {
     try { localStorage.setItem(STORAGE_KEY, theme) } catch { /* private mode */ }
   }
   const toggle = document.querySelector('#theme-toggle')
   if (toggle) {
-    toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')
+    toggle.setAttribute('aria-label', t(theme === 'dark' ? 'themeToLight' : 'themeToDark'))
   }
   const meta = document.querySelector('meta[name="theme-color"]')
   if (meta) meta.setAttribute('content', THEME_COLOR[theme])
 }
 
-export function setupTheme() {
+export function setupTheme(t = (key) => key) {
   const toggle = document.querySelector('#theme-toggle')
   const saved = storedTheme()
-  applyTheme(saved || currentTheme())
+  applyTheme(saved || currentTheme(), { t })
 
   toggle?.addEventListener('click', () => {
-    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', { persist: true })
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', { persist: true, t })
   })
 
   if (!saved && window.matchMedia) {
     const media = window.matchMedia('(prefers-color-scheme: light)')
-    media.addEventListener?.('change', (event) => applyTheme(event.matches ? 'light' : 'dark'))
+    media.addEventListener?.('change', (event) => applyTheme(event.matches ? 'light' : 'dark', { t }))
   }
 }

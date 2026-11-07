@@ -39,7 +39,7 @@ async function send(payload) {
  * the HTML5 constraints, a POST to /api/feedback, and an offline queue that
  * retries (on `online` and on the next open) when the API is unreachable.
  */
-export function setupFeedbackForm({ dialog, form, status, submitButton, datalist }) {
+export function setupFeedbackForm({ dialog, form, status, submitButton, datalist, t = (key) => key }) {
   let statusTimer = null
 
   function setStatus(message, { tone = 'muted', sticky = false } = {}) {
@@ -93,15 +93,15 @@ export function setupFeedbackForm({ dialog, form, status, submitButton, datalist
     }
 
     submitButton.disabled = true
-    submitButton.textContent = 'Sending…'
+    submitButton.textContent = t('sendingReport')
     const stored = await send(payload)
     submitButton.disabled = false
-    submitButton.textContent = 'Send report'
+    submitButton.textContent = t('sendReport')
 
     if (stored) {
       const sent = await flushQueue()
       setStatus(
-        sent > 0 ? `Thanks — your report and ${sent} queued report${sent > 1 ? 's' : ''} were sent.` : 'Thanks — your report was sent.',
+        sent > 0 ? t('reportsSent', sent) : t('reportSent'),
         { tone: 'ok' }
       )
       form.reset()
@@ -112,7 +112,7 @@ export function setupFeedbackForm({ dialog, form, status, submitButton, datalist
     const queue = readQueue()
     queue.push(payload)
     writeQueue(queue.slice(-20))
-    setStatus('You appear to be offline — your report is saved and will be sent automatically.', { tone: 'warn', sticky: true })
+    setStatus(t('reportQueued'), { tone: 'warn', sticky: true })
     form.reset()
     setTimeout(() => dialog.close(), 1400)
   })

@@ -23,6 +23,8 @@ import { createFloatingSearch } from './js/floatingSearch.js'
 import { createBottomSheet } from './js/bottomSheet.js'
 import { durationLabel, estimateDurationMin, transitChips } from './js/transit.js'
 import { setupFeedbackForm } from './js/feedbackForm.js'
+import { setupI18n } from './js/i18n.js'
+import { setupRouteEditor } from './js/routeEditor.js'
 import { setupTheme } from './js/theme.js'
 
 const API_BASE = '/api/routes'
@@ -30,6 +32,7 @@ const SNAPSHOT_KEY = 'route-catalogue'
 const REQUEST_TIMEOUT_MS = 6000
 const NEARBY_RADIUS_METERS = 2500
 const SEARCH_DEBOUNCE_MS = 300
+const i18n = setupI18n()
 
 const ROUTE_LINE_STYLE = {
   color: GOLD,
@@ -203,6 +206,13 @@ const dom = {
   routeInfo: document.querySelector('#route-info'),
   routeState: document.querySelector('#route-state'),
   routeCount: document.querySelector('#route-count'),
+  routeActions: document.querySelector('#route-actions'),
+  editRoute: document.querySelector('#edit-route'),
+  deleteRoute: document.querySelector('#delete-route'),
+  routeEditDialog: document.querySelector('#route-edit-dialog'),
+  routeEditForm: document.querySelector('#route-edit-form'),
+  routeEditCancel: document.querySelector('#route-edit-cancel'),
+  routeEditSave: document.querySelector('#route-edit-save'),
   resetView: document.querySelector('#reset-view'),
   locateNearest: document.querySelector('#locate-nearest'),
   mapSearch: document.querySelector('#map-search'),
@@ -223,14 +233,16 @@ const dom = {
 const map = createMap('map')
 const stationList = createStationList({
   listElement: document.querySelector('#station-list'),
-  emptyMessage: 'No dépôts match this search.',
+  emptyMessage: () => i18n.t('noResults'),
   onSelect: (id) => selectStation(id, true),
+  t: i18n.t,
 })
 const routePanel = createRoutePanel({
   selectElement: dom.routeSelect,
   infoElement: dom.routeInfo,
   statusElement: dom.routeState,
   countElement: dom.routeCount,
+  t: i18n.t,
   onSelect: (id) => showRoute(routes.find((route) => route.id === id)),
 })
 
@@ -249,6 +261,7 @@ const feedback = setupFeedbackForm({
   status: document.querySelector('#feedback-status'),
   submitButton: document.querySelector('#feedback-submit'),
   datalist: document.querySelector('#feedback-subjects'),
+  t: i18n.t,
 })
 dom.reportIssue?.addEventListener('click', () => feedback.open())
 
@@ -267,6 +280,7 @@ const floatingSearch = dom.mapSearch
 
 let stations = []
 let routes = []
+let routeEditor = null
 let activeStationId = null
 let activeRouteLayer = null
 let userPositionLayer = null
@@ -282,10 +296,45 @@ function setStatus(message, options = {}) {
   routePanel.setStatus(message, options)
 }
 
+routeEditor = setupRouteEditor({
+  actions: dom.routeActions,
+  editButton: dom.editRoute,
+  deleteButton: dom.deleteRoute,
+  dialog: dom.routeEditDialog,
+  form: dom.routeEditForm,
+  cancelButton: dom.routeEditCancel,
+  saveButton: dom.routeEditSave,
+  getRoute: () => routes.find((route) => route.id === dom.routeSelect.value),
+  setStatus,
+  t: i18n.t,
+  onUpdate: (doc) => {
+    const updated = toRouteViewModel(doc)
+    routes = routes.map((route) => route.id === updated.id ? updated : route)
+    refreshRouteCatalogue()
+    showRoute(updated)
+  },
+  onDelete: (id) => {
+    routes = routes.filter((route) => route.id !== id)
+    clearRoute()
+    const visible = refreshRouteCatalogue()
+    if (visible.length) showRoute(visible[0])
+  },
+})
+
+window.addEventListener('casaway:localechange', () => {
+  renderStationList()
+  remountMarkers(stations)
+  const selected = routes.find((route) => route.id === dom.routeSelect.value)
+  if (selected) showRoute(selected)
+  else if (!dom.sheetElement.hidden && sheetRepaint) sheetRepaint(sheet.getState())
+  if (dom.farePeriod) dom.farePeriod.textContent = i18n.t(fareMode() === 'night' ? 'nightRate' : 'dayRate')
+  routeEditor?.refreshActions()
+})
+
 function remountMarkers(nextStations) {
   if (markerLayer) map.removeLayer(markerLayer)
   // markers.js invokes onSelect with the station id.
-  const mounted = mountStationMarkers(map, nextStations, (id) => selectStation(id, false))
+  const mounted = mountStationMarkers(map, nextStations, (id) => selectStation(id, false), { t: i18n.t })
   markerLayer = mounted.layer
   markerById = mounted.markerById
   // A late-arriving search response remounts every marker; re-apply the
@@ -299,7 +348,7 @@ function renderStationList() {
     taxiType: dom.taxiFilter.value,
     activeId: activeStationId,
   })
-  if (dom.depotCount) dom.depotCount.textContent = `${shown.length} dépôt${shown.length === 1 ? '' : 's'} mapped`
+  if (dom.depotCount) dom.depotCount.textContent = i18n.t('depotCount', shown.length)
   renderSidebarFare()
   return shown
 }
@@ -313,13 +362,14 @@ function activeDepot() {
 function renderSidebarFare() {
   if (!dom.fareWidget) return
   const depot = activeDepot()
-  replaceChildren(dom.fareWidget, [depot ? buildFareWidget(depot) : buildFareOverview()])
-  if (dom.farePeriod) dom.farePeriod.textContent = fareMode() === 'night' ? 'NIGHT RATE' : 'DAY RATE'
+  replaceChildren(dom.fareWidget, [depot ? buildFareWidget(depot, i18n.t) : buildFareOverview(i18n.t)])
+  if (dom.farePeriod) dom.farePeriod.textContent = i18n.t(fareMode() === 'night' ? 'nightRate' : 'dayRate')
 }
 
 function refreshRouteCatalogue() {
   const visible = activeStationId ? routesForStation(routes, activeStationId) : routes
   routePanel.setCatalogue(visible)
+  routeEditor?.refreshActions()
   return visible
 }
 
@@ -450,24 +500,28 @@ function presentRouteSheet(route, openAt = 'half') {
   const stops = (route.majorStops || []).filter(Boolean).join(' · ')
   const depot = activeDepot()
   sheet.present({
-    eyebrow: 'Route trace',
+    eyebrow: i18n.t('routeTrace'),
     title: route.title,
     openAt,
     content: [
       el('div', { className: 'sheet-stats' }, [
-        sheetStat('Origin', route.origin || 'Not available'),
-        sheetStat('Destination', route.destination || 'Not available'),
-        sheetStat('Distance', route.distanceKm ? `${route.distanceKm} km` : 'Not available'),
-        sheetStat('Duration', durationLabel(route.distanceKm), { estimate: Boolean(route.distanceKm) }),
+        sheetStat(i18n.t('origin'), route.origin || i18n.t('unavailable')),
+        sheetStat(i18n.t('destination'), route.destination || i18n.t('unavailable')),
+        sheetStat(i18n.t('distance'), route.distanceKm ? `${route.distanceKm} km` : i18n.t('unavailable')),
+        sheetStat(i18n.t('duration'), durationLabel(route.distanceKm), { estimate: Boolean(route.distanceKm) }),
       ]),
-      transitChips(route.taxiType || ''),
-      depot ? buildFareWidget(depot) : null,
-      depot ? el('div', { className: 'sheet-actions' }, [directionsButton(depot, { className: 'dir-link dir-link-lg', label: `Directions to ${depot.name}` })]) : null,
+      transitChips(route.taxiType || '', i18n.t),
+      depot ? buildFareWidget(depot, i18n.t) : null,
+      depot ? el('div', { className: 'sheet-actions' }, [directionsButton(depot, {
+        className: 'dir-link dir-link-lg',
+        label: i18n.t('directionsTo', depot.name),
+        ariaLabel: i18n.t('showDirectionsTo', depot.name),
+      })]) : null,
       el('p', {
         className: 'sheet-note',
-        text: `Duration estimated at the 22 km/h city average${stops ? ` · serves ${stops}` : ''} · traces are illustrative, not official itineraries.`,
+        text: i18n.t('durationEstimate', stops),
       }),
-      sheetReportButton(route.title, 'route-update', 'Report an issue with this route'),
+      sheetReportButton(route.title, 'route-update', i18n.t('reportRouteIssue')),
     ],
   })
   sheetRepaint = (nextOpenAt) => presentRouteSheet(route, nextOpenAt)
@@ -477,22 +531,26 @@ let sheetRepaint = null
 
 function presentStationSheet(station, openAt = 'half') {
   sheet.present({
-    eyebrow: 'Dépôt',
+    eyebrow: i18n.t('depot'),
     title: station.name,
     openAt,
     content: [
       el('div', { className: 'sheet-stats' }, [
-        sheetStat('District', station.district),
-        sheetStat('Taxi type', station.taxiType),
+        sheetStat(i18n.t('district'), station.district),
+        sheetStat(i18n.t('taxiType'), station.taxiType),
       ]),
-      transitChips(station.taxiType),
+      transitChips(station.taxiType, i18n.t),
       station.destinations.length
-        ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': 'Destinations from this dépôt' } },
+        ? el('ul', { className: 'sheet-destinations', attrs: { 'aria-label': i18n.t('destinationsFrom') } },
             station.destinations.map((target) => el('li', { text: target })))
         : null,
-      buildFareWidget(station),
-      el('div', { className: 'sheet-actions' }, [directionsButton(station, { className: 'dir-link dir-link-lg', label: 'Show directions on map' })]),
-      sheetReportButton(station.name, 'station-correction', 'Report incorrect data for this dépôt'),
+      buildFareWidget(station, i18n.t),
+      el('div', { className: 'sheet-actions' }, [directionsButton(station, {
+        className: 'dir-link dir-link-lg',
+        label: i18n.t('directionsOnMap'),
+        ariaLabel: i18n.t('showDirectionsTo', station.name),
+      })]),
+      sheetReportButton(station.name, 'station-correction', i18n.t('reportDepotIssue')),
     ],
   })
   sheetRepaint = (nextOpenAt) => presentStationSheet(station, nextOpenAt)
@@ -516,7 +574,7 @@ function refreshFareSurfaces() {
     const popup = marker.getPopup()
     if (popup?.isOpen()) {
       const widgetNode = popup.getElement()?.querySelector('.fare-widget')
-      if (widgetNode) updateFareWidget(widgetNode, station)
+      if (widgetNode) updateFareWidget(widgetNode, station, i18n.t)
     }
   }
   renderSidebarFare()
@@ -530,28 +588,29 @@ function showRoute(route, { openAt = 'half' } = {}) {
   if (!route) return
   presentRouteSheet(route, openAt)
   if (!route.trajectory || route.trajectory.length < 2) {
-    setStatus('This dépôt has no stored trajectory yet.')
+    setStatus(i18n.t('noTrajectory'))
     return
   }
-  setStatus('Loading route trace…')
+  setStatus(i18n.t('loadingTrace'))
   const geometry = { type: 'LineString', coordinates: route.trajectory }
   const trace = L.geoJSON(geometry, { style: () => ROUTE_LINE_STYLE })
-    .bindPopup(buildRoutePopup(route), { maxWidth: 320, minWidth: 240 })
+    .bindPopup(buildRoutePopup(route, i18n.t), { maxWidth: 320, minWidth: 240 })
 
   const first = route.trajectory[0]
   const last = route.trajectory[route.trajectory.length - 1]
   const startMarker = L.circleMarker([first[1], first[0]], {
     radius: 6, color: '#fff7dd', weight: 2, fillColor: GOLD, fillOpacity: 1,
-  }).bindPopup(trajectoryEndpoint('Start', route.origin), { maxWidth: 240 })
+  }).bindPopup(trajectoryEndpoint(i18n.t('start'), route.origin), { maxWidth: 240 })
   const endMarker = L.circleMarker([last[1], last[0]], {
     radius: 6, color: GOLD, weight: 3, fillColor: '#0b0f19', fillOpacity: 1,
-  }).bindPopup(trajectoryEndpoint('End', route.destination), { maxWidth: 240 })
+  }).bindPopup(trajectoryEndpoint(i18n.t('end'), route.destination), { maxWidth: 240 })
 
   const group = L.featureGroup([trace, startMarker, endMarker]).addTo(map)
   activeRouteLayer = group
   routePanel.showRoute(route)
+  routeEditor?.refreshActions()
   fitLayer(map, group)
-  setStatus(`Trace loaded · ${route.distanceKm ? `${route.distanceKm} km` : 'distance unknown'} · illustrative geometry, not an official itinerary.`)
+  setStatus(i18n.t('traceLoaded', route.distanceKm ? `${route.distanceKm} km` : i18n.t('distanceUnknown')))
 }
 
 /* ---------------------------------------------------------------- *
@@ -792,7 +851,7 @@ async function warmShellCache() {
 }
 
 async function bootstrap() {
-  setupTheme()
+  setupTheme(i18n.t)
   registerServiceWorker()
   watchConnectivity(dom.offlineBanner)
   setupInstallPrompt({
@@ -841,12 +900,12 @@ async function bootstrap() {
   if (routes.length) showRoute(routes[0], { openAt: 'peek' })
 
   if (source === 'network') {
-    setStatus(`${routes.length} route trace${routes.length === 1 ? '' : 's'} · ${stations.length} dépôts loaded from the Casaway API.`)
+    setStatus(i18n.t('routesLoaded', routes.length, stations.length))
     warmShellCache()
   } else if (source === 'cache') {
-    setStatus(`Offline — showing the snapshot saved ${new Date(savedAt).toLocaleString()}.`, { error: false })
+    setStatus(i18n.t('offlineSnapshot', new Date(savedAt).toLocaleString()), { error: false })
   } else {
-    setStatus('The route API is unreachable and no snapshot exists. Showing the bundled dépôt list.', { error: true })
+    setStatus(i18n.t('apiUnavailable'), { error: true })
   }
 
   if (stations.length) showAllStationsFallback()
@@ -859,7 +918,7 @@ function showAllStationsFallback() {
 
 bootstrap().catch((error) => {
   console.error('Casaway failed to start', error)
-  setStatus(`Casaway could not start: ${error.message}`, { error: true })
+  setStatus(i18n.t('startupFailed', error.message), { error: true })
 })
 
 // Keep the map sized when the sidebar drawer opens/closes on mobile.

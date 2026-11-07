@@ -66,11 +66,15 @@ export function formatRouteDistance(meters) {
  * A real <button> that asks app.js to plot directions to `station`.
  * Works identically inside Leaflet popups, the sidebar sheet and any panel.
  */
-export function directionsButton(station, { className = 'dir-link', label = 'Show directions' } = {}) {
+export function directionsButton(station, {
+  className = 'dir-link',
+  label = 'Show directions',
+  ariaLabel = `Show directions to ${station.name} on the map`,
+} = {}) {
   return el('button', {
     className,
     text: label,
-    attrs: { type: 'button', 'aria-label': `Show directions to ${station.name} on the map` },
+    attrs: { type: 'button', 'aria-label': ariaLabel },
     on: {
       click: () =>
         document.dispatchEvent(new CustomEvent('casaway:directions', { detail: { stationId: station.id } })),

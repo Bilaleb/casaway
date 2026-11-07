@@ -7,7 +7,7 @@ function statRow(label, value) {
   ])
 }
 
-export function createRoutePanel({ selectElement, infoElement, statusElement, countElement, onSelect }) {
+export function createRoutePanel({ selectElement, infoElement, statusElement, countElement, onSelect, t = (key) => key }) {
   selectElement.addEventListener('change', () => onSelect(selectElement.value))
 
   function setCatalogue(routes) {
@@ -20,13 +20,13 @@ export function createRoutePanel({ selectElement, infoElement, statusElement, co
     if (!route) return
     selectElement.value = route.id
     replaceChildren(infoElement, [
-      statRow('Origin', route.origin),
-      statRow('Destination', route.destination),
-      statRow('Distance', route.distanceKm ? `${route.distanceKm} km` : 'Not available'),
-      statRow('Duration', route.durationMin ? `≈ ${route.durationMin} min` : 'Not available'),
+      statRow(t('origin'), route.origin || t('unavailable')),
+      statRow(t('destination'), route.destination || t('unavailable')),
+      statRow(t('distance'), route.distanceKm ? `${route.distanceKm} km` : t('unavailable')),
+      statRow(t('duration'), route.durationMin ? `≈ ${route.durationMin} min` : t('unavailable')),
       el('div', { className: 'route-stops' }, [
-        el('span', { className: 'route-stat-label', text: 'Major stops' }),
-        el('span', { className: 'route-stat-value', text: (route.majorStops || []).join(' · ') || 'Not available' }),
+        el('span', { className: 'route-stat-label', text: t('majorStops') }),
+        el('span', { className: 'route-stat-value', text: (route.majorStops || []).join(' · ') || t('unavailable') }),
       ]),
     ])
   }
