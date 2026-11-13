@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import MapContainer from './components/map/MapContainer.jsx';
+import MapContainer, { FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
 import RouteLayer from './components/map/RouteLayer.jsx';
 
@@ -19,7 +19,6 @@ import Navbar from './components/header/Navbar.jsx';
 import {
   DEFAULT_DEPOTS,
   STRINGS,
-  basemapFor,
   CASA_CENTER,
 } from './data/depots.js';
 import { haversineMeters } from './utils/geo.js';
@@ -246,13 +245,8 @@ export default function App() {
             zoomControl={false}
             preferCanvas={true}
           >
-            <TileLayer
-              url={basemapFor(theme).url}
-              attribution={basemapFor(theme).attribution}
-              subdomains="abcd"
-              maxZoom={20}
-            />
-            <ZoomControl position="bottomright" />
+            <FlyTo position={position} />
+            <UserMarker />
             <DepotMarkers
               depots={depots}
               _selectedId={selectedId}
@@ -260,28 +254,26 @@ export default function App() {
               userPosition={position}
             />
             <RouteLayer hiddenLines={hiddenLines} lineColor={lineColor} />
-            <FlyTo position={position} />
-            <UserMarker />
           </MapContainer>
-
-          <div className="map-chip">{CITY_CHIP}</div>
-
-          <div className="map-actions">
-            <button type="button" onClick={resetView} title="Reset map view" aria-label="Reset map view">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-                <path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7" />
-                <path d="M12 8v4l3 2" />
-              </svg>
-            </button>
-            <button type="button" onClick={locateCity} title="Center on Casablanca" aria-label="Center map on Casablanca">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-                <circle cx="12" cy="12" r="7" />
-                <circle cx="12" cy="12" r="2" />
-                <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
-              </svg>
-            </button>
-          </div>
         </section>
+
+        <div className="map-chip">{CITY_CHIP}</div>
+
+        <div className="map-actions">
+          <button type="button" onClick={resetView} title="Reset map view" aria-label="Reset map view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7" />
+              <path d="M12 8v4l3 2" />
+            </svg>
+          </button>
+          <button type="button" onClick={locateCity} title="Center on Casablanca" aria-label="Center map on Casablanca">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="2" />
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <footer className="app-footer">
