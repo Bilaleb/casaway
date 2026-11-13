@@ -54,7 +54,7 @@ html:not([data-theme='dark']) {
   --shadow-soft-lg: 0 14px 34px rgba(23, 74, 105, 0.12);
 
   /* Radii */
-  --r-sm: 12px;
+  --r-sm: 16px;
   --r-md: 16px;
   --r-lg: 20px;
   --r-xl: 24px;
@@ -378,7 +378,7 @@ textarea::placeholder {
 }
 
 .leaflet-popup-tip {
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .sheet-grip {
@@ -787,7 +787,7 @@ a,
   .brand-mark {
     width: 36px;
     height: 36px;
-    border-radius: 14px;
+    border-radius: var(--r-sm);
   }
 
   .brand-copy h1 {
