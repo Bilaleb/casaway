@@ -17,16 +17,18 @@
     <script>
       // Ocean light is the default look; dark stays available via the toggle.
       (function () {
+        // Ocean light is the only theme; clear any legacy dark preference
+        // so phones that saved it never render the old dark shell.
         try {
-          var saved = localStorage.getItem('casaway-theme');
-          var theme = saved === 'dark' ? 'dark' : 'light';
-          document.documentElement.dataset.theme = theme;
-          document
-            .querySelector('meta[name="theme-color"]')
-            .setAttribute('content', theme === 'light' ? '#f2f9fd' : '#0b1620');
+          if (localStorage.getItem('casaway-theme') === 'dark') {
+            localStorage.setItem('casaway-theme', 'light');
+          }
         } catch (error) {
-          document.documentElement.dataset.theme = 'light';
+          /* private mode */
         }
+        document.documentElement.dataset.theme = 'light';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#f2f9fd');
       })();
     </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />

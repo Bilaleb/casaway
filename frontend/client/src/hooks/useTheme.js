@@ -1,43 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const THEME_KEY = 'casaway-theme';
 
+/** Ocean light is the only supported theme now. */
 export function readStoredTheme() {
   try {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved === 'light' || saved === 'dark') return saved;
+    if (localStorage.getItem(THEME_KEY) !== 'light') {
+      localStorage.setItem(THEME_KEY, 'light');
+    }
   } catch {
     /* private mode */
   }
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  return 'light';
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState(() => readStoredTheme());
-
-  const toggleTheme = () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
-
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset.theme = theme;
+    root.dataset.theme = 'light';
     try {
-      localStorage.setItem(THEME_KEY, theme);
+      localStorage.setItem(THEME_KEY, 'light');
     } catch {
       /* private mode */
     }
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#f6f4ee' : '#0b0f19');
-  }, [theme]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const observer = new MutationObserver(() => {
-      const next = root.dataset.theme === 'light' ? 'light' : 'dark';
-      setTheme((previous) => (previous === next ? previous : next));
-    });
-    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => observer.disconnect();
+    if (meta) meta.setAttribute('content', '#f2f9fd');
   }, []);
 
-  return { theme, setTheme, toggleTheme };
+  return {
+    theme: 'light',
+    setTheme: () => {},
+    toggleTheme: () => {},
+  };
 }

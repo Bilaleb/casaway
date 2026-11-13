@@ -10,6 +10,31 @@ import { useGeolocation } from '../../hooks/useGeolocation.js';
  * Renders only the map surface: tiles, zoom controls and layers are passed
  * in as children by App so they stay reactive to the theme and filters.
  */
+/**
+ * Leaflet caches its pixel size at init. On iOS the viewport changes when the
+ * browser chrome collapses, on rotation, and when the sheet reflows the
+ * column — without this the map paints tiles over only part of its box.
+ */
+function AutoResize() {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return undefined;
+    const el = map.getContainer();
+    const refresh = () => map.invalidateSize({ animate: false });
+    const observer =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(refresh) : null;
+    observer?.observe(el);
+    window.addEventListener('orientationchange', refresh);
+    const timer = setTimeout(refresh, 220);
+    return () => {
+      clearTimeout(timer);
+      observer?.disconnect();
+      window.removeEventListener('orientationchange', refresh);
+    };
+  }, [map]);
+  return null;
+}
+
 export function FlyTo({ position, zoom = 14, duration = 0.6 }) {
   const map = useMap();
   useEffect(() => {
@@ -88,6 +113,7 @@ export default function MapContainer({
       zoomControl={false}
       preferCanvas
     >
+      <AutoResize />
       {children}
     </LeafletMap>
   );

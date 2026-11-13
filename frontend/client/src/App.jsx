@@ -20,7 +20,9 @@ import {
   DEFAULT_DEPOTS,
   STRINGS,
   CASA_CENTER,
+  basemapFor,
 } from './data/depots.js';
+import { TileLayer } from 'react-leaflet';
 import { haversineMeters } from './utils/geo.js';
 import { useTheme } from './hooks/useTheme.js';
 import { useGeolocation, readStoredLocale } from './hooks/useGeolocation.js';
@@ -28,7 +30,7 @@ import { useGeolocation, readStoredLocale } from './hooks/useGeolocation.js';
 const CITY_CHIP = 'CASABLANCA · 33.5731° N / 7.5898° W';
 
 export default function App() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { position, requestLocation } = useGeolocation();
   const [depots, setDepots] = useState(DEFAULT_DEPOTS);
   const [query, setQuery] = useState('');
@@ -137,6 +139,7 @@ export default function App() {
   }, [depots, query, filter, position]);
 
   const hiddenLines = useMemo(() => new Set(), []);
+  const basemap = useMemo(() => basemapFor(theme), [theme]);
   const lineColor = (line) => (theme === 'light' ? line.colorLight : line.color);
 
   const handleFilter = useCallback(
@@ -175,8 +178,6 @@ export default function App() {
       <Navbar
         brandMark="CW"
         depotCount={depots.length}
-        theme={theme}
-        onThemeToggle={toggleTheme}
         locale={locale}
         onLocaleChange={setLocale}
         tagline={tr.tagline}
@@ -190,6 +191,29 @@ export default function App() {
               : 'Use the search box or station list to locate taxi hubs across Casablanca.'
           }
         >
+          <AnimatePresence>
+            {bannerVisible && (
+              <motion.div
+                className="install-banner"
+                role="dialog"
+                aria-label={tr.bannerAria}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div>
+                  <strong>{tr.bannerTitle}</strong>
+                  <span id="install-hint">{tr.bannerBody}</span>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button onClick={confirmInstall} className="btn-gold">{tr.install}</button>
+                  <button onClick={dismissBanner} aria-label={tr.dismiss}>×</button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <SidebarSearch
             query={query}
             onQueryChange={setQuery}
@@ -233,6 +257,12 @@ export default function App() {
             zoomControl={false}
             preferCanvas={true}
           >
+            <TileLayer
+              key={theme}
+              url={basemap.url}
+              attribution={basemap.attribution}
+              maxZoom={19}
+            />
             <FlyTo position={position} />
             <UserMarker />
             <DepotMarkers
@@ -268,28 +298,6 @@ export default function App() {
         Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.
       </footer>
 
-      <AnimatePresence>
-        {bannerVisible && (
-          <motion.div
-            className="install-banner"
-            role="dialog"
-            aria-label={tr.bannerAria}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 18 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div>
-              <strong>{tr.bannerTitle}</strong>
-              <span id="install-hint">{tr.bannerBody}</span>
-            </div>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <button onClick={confirmInstall} className="btn-gold">{tr.install}</button>
-              <button onClick={dismissBanner} aria-label={tr.dismiss}>×</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

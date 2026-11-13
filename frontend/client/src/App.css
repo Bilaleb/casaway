@@ -52,6 +52,16 @@ html:not([data-theme='dark']) {
   --glass-shadow-strong: 0 24px 60px rgba(23, 74, 105, 0.16);
   --shadow-soft: 0 6px 18px rgba(23, 74, 105, 0.08);
   --shadow-soft-lg: 0 14px 34px rgba(23, 74, 105, 0.12);
+  --shadow-sm: 0 2px 8px rgba(23, 74, 105, 0.06);
+  --shadow: 0 10px 26px rgba(23, 74, 105, 0.1);
+  --shadow-lg: 0 18px 44px rgba(23, 74, 105, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.92);
+
+  /* Accent aliases used by the component layer */
+  --accent: #2f93c8;
+  --accent-deep: #1f7aa6;
+  --accent-soft: #eaf6fd;
+  --accent-line: #b9dff1;
 
   /* Radii */
   --r-sm: 16px;
@@ -1157,4 +1167,481 @@ html[data-theme='dark'] .map-shell {
 @media (pointer: coarse) {
   .filter-pill, .station-button { min-height: 44px; }
   .map-actions button { width: 46px; height: 46px; }
+}
+
+/* =============================================================
+   12. STRUCTURE RESTORE
+   The base layout file (styles.css) was removed when the React
+   shell landed, so the rules that actually position the header,
+   sidebar, map and footer live here. Everything below is layout,
+   not decoration.
+   ============================================================= */
+
+#app,
+.casaway-app {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---- Header row ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-mark { flex: none; }
+
+.brand-copy { min-width: 0; }
+
+.brand-copy h1 {
+  margin: 0;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.brand-copy span {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.top-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.theme-toggle-btn svg,
+.locale-btn svg {
+  flex: none;
+}
+
+html[dir='rtl'] .top-actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* ---- Content row ---- */
+.main-layout {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.sidebar {
+  position: relative;
+  inset: auto;
+  width: auto;
+  max-height: none;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.side-head {
+  flex: none;
+  margin-bottom: 16px;
+}
+
+.side-head p:last-child {
+  margin: 0;
+}
+
+/* ---- Search field ---- */
+.search-wrap {
+  flex: none;
+  margin: 0 0 12px;
+}
+
+.search-box {
+  position: relative;
+  display: block;
+  color: var(--muted);
+}
+
+.search-box svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 40px 11px 38px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  box-shadow: 0 2px 8px rgba(23, 74, 105, 0.05);
+}
+
+.search-box input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+}
+
+html[dir='rtl'] .search-box svg {
+  left: auto;
+  right: 13px;
+}
+
+html[dir='rtl'] .search-box input {
+  padding-left: 40px;
+  padding-right: 38px;
+}
+
+html[dir='rtl'] .search-clear {
+  right: auto;
+  left: 8px;
+}
+
+/* ---- Depot rows ---- */
+.station-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.station-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  flex: none;
+}
+
+.station-number,
+.station-dot,
+.station-dist-pill {
+  flex: none;
+}
+
+.station-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.station-name { display: block; }
+.station-sub { display: block; }
+
+.station-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2f93c8;
+  opacity: 0.3;
+}
+
+.station-button.is-active .station-dot {
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(47, 147, 200, 0.4);
+}
+
+.station-dist-pill {
+  padding: 3px 9px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: var(--r-pill);
+}
+
+.no-results {
+  padding: 20px 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ---- Map column ---- */
+.map-wrap {
+  position: relative;
+  inset: auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.map-shell,
+.map-shell.leaflet-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 800;
+  display: flex;
+  gap: 8px;
+}
+
+.map-chip {
+  position: absolute;
+  left: auto;
+  right: 16px;
+  top: auto;
+  bottom: 16px;
+  z-index: 700;
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+html[dir='rtl'] .map-actions {
+  right: auto;
+  left: 16px;
+}
+
+html[dir='rtl'] .map-chip {
+  right: auto;
+  left: 16px;
+}
+
+/* ---- Footer row ---- */
+.app-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  min-height: 40px;
+  /* English legal sentence: keep its own reading direction in RTL locales. */
+  direction: ltr;
+}
+
+/* ---- Install banner floats above content, never in the grid ---- */
+.install-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 1200;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+}
+
+.install-banner strong {
+  display: block;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.install-banner span {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .install-banner {
+    left: auto;
+    right: 24px;
+    width: min(420px, calc(100% - 720px));
+  }
+}
+
+/* ---- Tablet / phone ---- */
+@media (max-width: 900px) {
+  .main-layout {
+    display: block;
+    padding: 0;
+    height: 100%;
+  }
+
+  .map-wrap {
+    position: absolute;
+    inset: 0;
+    border-radius: 0 0 var(--r-xl) var(--r-xl);
+  }
+
+  .sidebar {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-height: min(48dvh, 430px);
+    z-index: 600;
+    padding: 16px;
+    border-radius: var(--r-lg);
+    background: rgba(255, 255, 255, 0.94);
+  }
+
+  .map-actions { top: 10px; right: 10px; }
+  html[dir='rtl'] .map-actions { right: auto; left: 10px; }
+  .map-chip { display: none; }
+
+  .brand-copy span { display: none; }
+  .topbar { gap: 10px; }
+  .side-head h2 { font-size: 22px; }
+}
+
+@media (max-width: 560px) {
+  .top-meta span:last-child { display: none; }
+  .top-meta { gap: 0; }
+
+  .brand-copy h1 { font-size: 17px; }
+
+  .theme-toggle-btn,
+  .locale-btn {
+    height: 38px;
+    min-width: 38px;
+    padding: 0 9px;
+  }
+
+  .footer-report { width: auto; }
+}
+
+/* ---- Overlay polish ---- */
+
+/* Header must sit above the map, its controls and the sheet so the
+   language menu is never clipped. */
+.topbar {
+  position: relative;
+  z-index: 1100;
+}
+
+.locale-menu {
+  z-index: 1300;
+}
+
+/* Slim, calm scrollbars inside the panel. */
+.sidebar,
+.station-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cfe4f0 transparent;
+}
+
+.sidebar::-webkit-scrollbar,
+.station-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.station-list::-webkit-scrollbar-thumb {
+  background: #d3e7f2;
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.station-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  /* Keep Esri/OSM attribution visible but clear of the sheet. */
+  .map-wrap .leaflet-bottom.leaflet-right {
+    top: 64px;
+    bottom: auto;
+    right: 10px;
+    left: auto;
+    max-width: 50%;
+  }
+
+  .leaflet-bottom.leaflet-right {
+    z-index: 400;
+  }
+
+  .leaflet-control-attribution {
+    font-size: 9px;
+    line-height: 1.35;
+    padding: 4px 6px;
+    border-radius: var(--r-sm);
+  }
+}
+
+/* Buttons own their own glass; the wrapper is only a layout row. */
+.map-actions {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* The install card lives inside the sidebar, so it can never cover the
+   depot list, the map readouts or the footer. */
+.install-banner {
+  position: static;
+  inset: auto;
+  width: auto;
+  flex: none;
+  margin: 0 0 14px;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.install-banner > div:first-child {
+  min-width: 0;
+}
+
+.brand-mark img {
+  object-fit: contain;
+  background: #fff;
 }
