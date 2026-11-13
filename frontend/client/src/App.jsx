@@ -1,24 +1,25 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import './App.css';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { TileLayer, ZoomControl } from 'react-leaflet';
 import MapContainer, { FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
 import RouteLayer from './components/map/RouteLayer.jsx';
 
-import {
-  Sidebar,
-  SidebarSearch,
-  SidebarRoutePanel,
-} from './components/sidebar/Sidebar.jsx';
+import { Sidebar, SidebarSearch } from './components/sidebar/Sidebar.jsx';
 import TaxiFilter from './components/sidebar/TaxiFilter.jsx';
 import DepotList from './components/sidebar/DepotList.jsx';
 
 import Navbar from './components/header/Navbar.jsx';
+import FareCalculator from './components/ui/FareCalculator.jsx';
 
 import {
   DEFAULT_DEPOTS,
   STRINGS,
+  basemapFor,
   CASA_CENTER,
 } from './data/depots.js';
 import { haversineMeters } from './utils/geo.js';
@@ -34,14 +35,13 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
-  const [routes, _setRoutes] = useState([]);
-  const [selectedRouteId, setSelectedRouteId] = useState('');
-  const [routeState, _setRouteState] = useState('Loading route catalogue…');
   const [locale, setLocale] = useState(readStoredLocale());
   const [bannerVisible, setBannerVisible] = useState(false);
   const [installed, setInstalled] = useState(false);
   const [dismissedBanner, _setDismissedBanner] = useState(false);
+  const [online, setOnline] = useState(() => navigator.onLine);
   const deferredPromptRef = useRef(null);
+  const mapRef = useRef(null);
 
   const tr = STRINGS[locale] ?? STRINGS.en;
 
@@ -67,6 +67,17 @@ export default function App() {
         if (Array.isArray(data) && data.length) setDepots(data);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
   }, []);
 
   useEffect(() => {
@@ -139,7 +150,6 @@ export default function App() {
     return list;
   }, [depots, query, filter, position]);
 
-  const activeRoute = routes.find((r) => r.id === selectedRouteId);
   const hiddenLines = useMemo(() => new Set(), []);
   const lineColor = (line) => (theme === 'light' ? line.colorLight : line.color);
 
@@ -156,22 +166,16 @@ export default function App() {
   }, []);
 
   const resetView = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
+    const map = mapRef.current;
     if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    const bounds = L.latLngBounds
-      ? L.latLngBounds(depots.map((d) => d.coordinates))
-      : null;
-    if (bounds?.isValid()) map.fitBounds(bounds, { padding: [35, 35], maxZoom: 12, duration: 0.65 });
+    const bounds = L.latLngBounds(depots.map((d) => d.coordinates));
+    if (bounds?.isValid()) {
+      map.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
+    }
   };
 
   const locateCity = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
-    if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    map.flyTo(CASA_CENTER, 12, { duration: 0.65 });
+    mapRef.current?.flyTo(CASA_CENTER, 12, { duration: 0.65 });
   };
 
   return (
@@ -185,6 +189,12 @@ export default function App() {
         onLocaleChange={setLocale}
         tagline={tr.tagline}
       />
+
+      {!online && (
+        <div className="offline-banner" role="status">
+          You are offline — showing the cached depot list and map tiles.
+        </div>
+      )}
 
       <div className="main-layout">
         <Sidebar
@@ -229,51 +239,46 @@ export default function App() {
             noResultsMessage={tr.noResults}
           />
 
-          <SidebarRoutePanel
-            route={activeRoute}
-            routes={routes}
-            value={selectedRouteId}
-            onChange={setSelectedRouteId}
-            state={routeState}
-          />
+          <FareCalculator />
         </Sidebar>
 
         <section className="map-wrap" aria-label="Map of Casablanca taxi stations">
-          <MapContainer
-            center={CASA_CENTER}
-            zoom={12}
-            zoomControl={false}
-            preferCanvas={true}
-          >
-            <FlyTo position={position} />
-            <UserMarker />
+          <MapContainer center={CASA_CENTER} zoom={12} mapRef={mapRef}>
+            <TileLayer
+              url={basemapFor(theme).url}
+              attribution={basemapFor(theme).attribution}
+              subdomains="abcd"
+              maxZoom={20}
+            />
+            <ZoomControl position="bottomright" />
             <DepotMarkers
               depots={depots}
-              _selectedId={selectedId}
               onSelect={handleSelected}
               userPosition={position}
             />
             <RouteLayer hiddenLines={hiddenLines} lineColor={lineColor} />
+            <FlyTo position={position} />
+            <UserMarker />
           </MapContainer>
+
+          <div className="map-chip">{CITY_CHIP}</div>
+
+          <div className="map-actions">
+            <button type="button" onClick={resetView} title="Reset map view" aria-label="Reset map view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                <path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7" />
+                <path d="M12 8v4l3 2" />
+              </svg>
+            </button>
+            <button type="button" onClick={locateCity} title="Center on Casablanca" aria-label="Center map on Casablanca">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                <circle cx="12" cy="12" r="7" />
+                <circle cx="12" cy="12" r="2" />
+                <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+              </svg>
+            </button>
+          </div>
         </section>
-
-        <div className="map-chip">{CITY_CHIP}</div>
-
-        <div className="map-actions">
-          <button type="button" onClick={resetView} title="Reset map view" aria-label="Reset map view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-              <path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7" />
-              <path d="M12 8v4l3 2" />
-            </svg>
-          </button>
-          <button type="button" onClick={locateCity} title="Center on Casablanca" aria-label="Center map on Casablanca">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-              <circle cx="12" cy="12" r="7" />
-              <circle cx="12" cy="12" r="2" />
-              <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
-            </svg>
-          </button>
-        </div>
       </div>
 
       <footer className="app-footer">

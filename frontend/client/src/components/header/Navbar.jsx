@@ -11,6 +11,7 @@ import { LOCALES } from '../../data/depots.js';
  */
 export default function Navbar({
   brandMark = 'CW',
+  brandLogo = '/casaway.JPEG',
   brandName = 'Casaway',
   tagline,
   live = true,
@@ -44,7 +45,13 @@ export default function Navbar({
   return (
     <header className="topbar">
       <div className="brand">
-        <div className="brand-mark" aria-hidden="true">{brandMark}</div>
+        <div className="brand-mark" aria-hidden="true">
+          {brandLogo ? (
+            <img src={brandLogo} alt="" loading="eager" />
+          ) : (
+            brandMark
+          )}
+        </div>
         <div className="brand-copy">
           <h1>{brandName}</h1>
           <span>{tagline ?? 'Your Way Through Casablanca'}</span>

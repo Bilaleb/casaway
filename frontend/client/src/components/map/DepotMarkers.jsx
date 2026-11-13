@@ -24,7 +24,7 @@ function markerKind(taxiType = '') {
  * Marker icons are recomputed only when `depots` changes so we do not
  * recreate divIcons on every parent render and cause marker flicker.
  */
-export default function DepotMarkers({ depots, _selectedId, onSelect, userPosition }) {
+export default function DepotMarkers({ depots, onSelect, userPosition }) {
   const icons = useMemo(() => {
     const map = new Map();
     depots.forEach((depot) => {

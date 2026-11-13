@@ -5,7 +5,7 @@
  * the search, filter, depot list, and route details as a single
  * responsive panel.
  */
-export default function Sidebar({
+export function Sidebar({
   heading = 'Find your next taxi.',
   subheading,
   description,
@@ -28,6 +28,8 @@ export default function Sidebar({
     </aside>
   );
 }
+
+export default Sidebar;
 
 export function SidebarSearch({
   query,
@@ -69,63 +71,3 @@ export function SidebarSearch({
   );
 }
 
-export function SidebarFilter({ options, value, onChange }) {
-  return (
-    <div className="filter-row">
-      <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M7 10l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-export function SidebarRoutePanel({ route, routes, value, onChange, state }) {
-  return (
-    <section className="route-panel" aria-label="Route details">
-      <div className="route-heading">
-        <h3>Route trace</h3>
-        <span>GPX · {String(routes.length).padStart(2, '0')}</span>
-      </div>
-
-      <select
-        className="route-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-label="Select a route"
-      >
-        {routes.map((r) => (
-          <option key={r.id} value={r.id}>{r.title}</option>
-        ))}
-      </select>
-
-      {route && (
-        <div className="route-info">
-          <div>
-            <span className="route-stat-label">Origin</span>
-            <span className="route-stat-value">{route.origin}</span>
-          </div>
-          <div>
-            <span className="route-stat-label">Destination</span>
-            <span className="route-stat-value">{route.destination}</span>
-          </div>
-          <div className="route-stops">
-            <span className="route-stat-label">Major stops</span>
-            <span className="route-stat-value">
-              {(route.majorStops || []).join(' · ') || 'Not available'}
-            </span>
-          </div>
-        </div>
-      )}
-
-      <p className={`route-state ${state?.startsWith('Could not') ? 'error' : ''}`} role="status">
-        {state ?? ''}
-      </p>
-    </section>
-  );
-}

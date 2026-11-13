@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
+    <meta
+      name="description"
+      content="Explore Casablanca grand taxi and petit taxi depots and route traces with Casaway."
+    />
     <meta property="og:title" content="Casaway - Your Way Through Casablanca" />
-    <meta property="og:description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
+    <meta
+      property="og:description"
+      content="Explore Casablanca grand taxi and petit taxi depots and route traces with Casaway."
+    />
     <meta name="theme-color" content="#f2f9fd" />
+    <meta name="color-scheme" content="light" />
     <script>
       // Ocean light is the default look; dark stays available via the toggle.
       (function () {
@@ -14,7 +21,9 @@
           var saved = localStorage.getItem('casaway-theme');
           var theme = saved === 'dark' ? 'dark' : 'light';
           document.documentElement.dataset.theme = theme;
-          document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f2f9fd' : '#0b0f19';
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute('content', theme === 'light' ? '#f2f9fd' : '#0b1620');
         } catch (error) {
           document.documentElement.dataset.theme = 'light';
         }
@@ -24,112 +33,19 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Casaway" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="color-scheme" content="light" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.1/dist/geosearch.css" />
-    <link rel="stylesheet" href="/App.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Casaway - Your Way Through Casablanca</title>
   </head>
   <body>
-    <div id="root">
-      <header class="topbar">
-        <button class="menu-toggle" id="menu-toggle" data-i18n-aria-label="menuToggle" aria-label="Toggle dépôt explorer" aria-expanded="false">☰</button>
-        <div class="brand"><div class="brand-mark"><img src="/casaway.JPEG" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span data-i18n="tagline">Your Casa Your Way</span></div></div>
-        <div class="top-actions"><label class="locale-switch"><select id="language-select" data-i18n-aria-label="language" aria-label="Language"><option value="en">EN</option><option value="fr">FR</option><option value="ar">AR</option></select></label><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 dépôts mapped</span></span></div>
-      </header>
-      <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and dépôts.</div>
-      <main class="main">
-        <aside class="sidebar" id="sidebar" aria-label="Taxi dépôt explorer">
-          <div class="side-head"><h2 data-i18n="findTaxi">Find your next taxi.</h2><p data-i18n="sidebarDescription">Dépôts, destinations and route traces across Casablanca.</p></div>
-          <div class="search-wrap"><label class="search-box"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input id="station-search" type="search" data-i18n-placeholder="stationPlaceholder" placeholder="Search dépôt or district" autocomplete="off" data-i18n-aria-label="stationSearch" aria-label="Search dépôts by name or district"></label></div>
-          <div class="filter-row"><label for="taxi-filter" data-i18n="taxiType">Taxi type</label><select id="taxi-filter" data-i18n-aria-label="taxiType" aria-label="Taxi type"><option value="all" data-i18n="allDepots">All dépôts</option><option value="grand" data-i18n="grandTaxi">Grand taxi</option><option value="petit" data-i18n="petitTaxi">Petit taxi</option></select></div>
-          <div class="station-list" id="station-list" aria-live="polite"></div>
-          <section class="route-panel" data-i18n-aria-label="routeDetails" aria-label="Route details"><div class="route-heading"><h3 data-i18n="routeTrace">Route trace</h3><span id="route-count">GPX / 00</span></div><select class="route-select" id="route-select" data-i18n-aria-label="selectRoute" aria-label="Select a route"></select><div class="route-info" id="route-info"></div><div class="route-actions" id="route-actions" hidden><button type="button" id="edit-route" data-i18n="editRoute">Edit route</button><button type="button" id="delete-route" data-i18n="deleteTrace">Delete trace</button></div><p class="route-state" id="route-state" data-i18n="loadingRoutes" role="status">Loading route catalogue...</p></section>
-          <section class="fare-panel" aria-label="Fare calculator"><div class="route-heading"><h3 data-i18n="fareCalculator">Fare calculator</h3><span id="fare-period">DAY RATE</span></div><p class="fare-disclaimer" data-i18n="fareDisclaimer">Prices are estimates, not exact fares. Actual prices may differ.</p><div id="fare-widget" class="fare-widget-host"></div></section>
-        </aside>
-        <section class="map-wrap" data-i18n-aria-label="mapLabel" aria-label="Map of Casablanca taxi dépôts">
-          <div class="map" id="map"></div>
-          <div class="map-search">
-            <div class="map-search-field">
-              <svg class="map-search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input id="map-search" type="search" role="combobox" aria-expanded="false" aria-controls="search-suggestions" aria-autocomplete="list" data-i18n-aria-label="mapSearch" data-i18n-placeholder="mapSearchPlaceholder" aria-label="Search dépôts, districts or destinations" placeholder="Search dépôts, districts, destinations" autocomplete="off" spellcheck="false">
-              <ul class="suggestions" id="search-suggestions" role="listbox" aria-label="Dépôt suggestions" hidden></ul>
-            </div>
-            <p class="sr-status" id="suggestion-status" role="status" aria-live="polite"></p>
-          </div>
-          <div class="map-chip">CASABLANCA · 33.5731° N / 7.5898° W</div>
-          <div class="map-actions"><button id="reset-view" type="button" data-i18n-title="resetMap" data-i18n-aria-label="resetMap" title="Reset map view" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/><path d="M12 8v4l3 2"/></svg></button></div>
-          <section class="bottom-sheet" id="bottom-sheet" hidden data-i18n-aria-label="selectionDetails" aria-label="Selection details">
-            <button class="sheet-grab" id="sheet-grab" type="button" aria-expanded="false" aria-controls="sheet-body"><span class="sheet-grip" aria-hidden="true"></span></button>
-            <div class="sheet-heading">
-              <p class="sheet-eyebrow" id="sheet-eyebrow" data-i18n="selection">Selection</p>
-              <h2 id="sheet-title" data-i18n="details">Details</h2>
-              <button class="sheet-close" id="sheet-close" type="button" data-i18n-aria-label="closeDetails" aria-label="Close details panel">×</button>
-            </div>
-            <div class="sheet-body" id="sheet-body"></div>
-          </section>
-          <div class="map-toast" id="map-toast" role="status" hidden></div>
-        </section>
-      </main>
-      <footer class="app-footer"><span data-i18n="disclaimer">Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.</span><button class="footer-report" id="report-issue" type="button" data-i18n="reportIssue">Report a route or dépôt issue</button></footer>
-      <div class="install-banner" id="install-banner" role="dialog" data-i18n-aria-label="installLabel" aria-label="Install Casaway" hidden><div><strong data-i18n="installTitle">Take Casaway with you</strong><span id="install-hint" data-i18n="installHint">Install for quick access to taxi dépôts.</span></div><button id="install-action" data-i18n="install">Install</button><button class="dismiss-install" id="dismiss-install" data-i18n-aria-label="dismissInstall" aria-label="Dismiss install prompt">×</button></div>
-      <dialog class="feedback-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
-        <form class="feedback-form" id="feedback-form">
-          <div class="form-head">
-            <p class="form-eyebrow" data-i18n="communityCheck">Community check</p>
-            <h2 id="feedback-title" data-i18n="feedbackTitle">Report a route or dépôt update</h2>
-            <p class="form-sub" data-i18n="feedbackIntro">Spotted a closed depot, a renamed depot or a wrong route? Send a community report.</p>
-          </div>
-          <label class="form-field"><span data-i18n="feedbackKind">What is wrong?</span>
-            <select name="kind" required>
-              <option value="route-update" data-i18n="routeUpdateOption">Route update</option>
-              <option value="station-correction" data-i18n="stationCorrectionOption">Incorrect dépôt data</option>
-              <option value="missing-station" data-i18n="missingStationOption">Missing dépôt</option>
-              <option value="other" data-i18n="otherOption">Something else</option>
-            </select>
-          </label>
-          <label class="form-field"><span data-i18n="feedbackSubject">Depot or route</span>
-            <input name="subject" type="text" list="feedback-subjects" maxlength="160" data-i18n-placeholder="subjectPlaceholder" placeholder="e.g. Depot Casa-Port" autocomplete="off">
-            <datalist id="feedback-subjects"></datalist>
-          </label>
-          <label class="form-field"><span><span data-i18n="feedbackDetails">Details</span> <span class="required-mark" data-i18n="required">required</span></span>
-            <textarea name="details" required minlength="10" maxlength="2000" rows="4" data-i18n-placeholder="detailsPlaceholder" placeholder="Describe what changed on the ground…"></textarea>
-          </label>
-          <label class="form-field"><span><span data-i18n="feedbackEmail">Email</span> <span class="optional-mark" data-i18n="optional">optional</span></span>
-            <input name="email" type="email" maxlength="200" data-i18n-placeholder="emailPlaceholder" placeholder="you@example.com" autocomplete="email">
-          </label>
-          <p class="form-status" id="feedback-status" role="status" aria-live="polite"></p>
-          <div class="form-actions">
-            <button type="button" class="btn-ghost" data-close data-i18n="cancel">Cancel</button>
-            <button type="submit" class="btn-gold" id="feedback-submit" data-i18n="sendReport">Send report</button>
-          </div>
-        </form>
-      </dialog>
-      <dialog class="feedback-dialog" id="route-edit-dialog" aria-labelledby="route-edit-title">
-        <form class="feedback-form" id="route-edit-form">
-          <div class="form-head">
-            <p class="form-eyebrow" data-i18n="routeTrace">Route trace</p>
-            <h2 id="route-edit-title" data-i18n="editRoute">Edit route</h2>
-          </div>
-          <label class="form-field"><span data-i18n="routeName">Route name</span><input name="name" type="text" maxlength="160" required></label>
-          <label class="form-field"><span data-i18n="depotName">Depot name</span><input name="depotName" type="text" maxlength="160" required></label>
-          <label class="form-field"><span data-i18n="district">District</span><input name="district" type="text" maxlength="120" required></label>
-          <label class="form-field"><span data-i18n="taxiType">Taxi type</span><select name="taxiType" required><option value="Grand Taxi" data-i18n="grandTaxi">Grand Taxi</option><option value="Petit Taxi" data-i18n="petitTaxi">Petit Taxi</option><option value="Grand &amp; Petit Taxi" data-i18n="mixedTaxi">Grand &amp; Petit Taxi</option></select></label>
-          <label class="form-field"><span data-i18n="trajectory">Trajectory GeoJSON</span><textarea name="trajectory" rows="7" required spellcheck="false" dir="ltr"></textarea></label>
-          <p class="form-status" id="route-edit-status" role="status" aria-live="polite"></p>
-          <div class="form-actions"><button type="button" class="btn-ghost" id="route-edit-cancel" data-i18n="cancel">Cancel</button><button type="submit" class="btn-gold" id="route-edit-save" data-i18n="saveRoute">Save route</button></div>
-        </form>
-      </dialog>
-    </div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.js"></script>
-    <script src="https://unpkg.com/leaflet-geosearch@3.11.1/dist/bundle.min.js"></script>
-    
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
