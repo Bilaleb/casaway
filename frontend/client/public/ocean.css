@@ -1,0 +1,842 @@
+/* =============================================================
+   CASAAWAY — "OCEAN VIBES" DESIGN LAYER
+   Loaded after styles.css so it wins the cascade without touching
+   the behaviour code. Light, soft, rounded, calm, iOS-safe.
+   ============================================================= */
+
+/* ---------- 1. Palette & geometry tokens ---------- */
+:root,
+html:not([data-theme='dark']) {
+  color-scheme: light;
+
+  /* Semantic ocean palette */
+  --ink: #14324a;
+  --ink-soft: #2f5670;
+  --muted: #66859b;
+
+  /* Legacy accent variables are remapped to ocean blue so every
+     existing rule inherits the new palette. */
+  --gold: #2f93c8;
+  --gold-fill: #2f93c8;
+  --gold-line: #a8d6ed;
+  --gold-glow: rgba(47, 147, 200, 0.22);
+
+  --base: #f2f9fd;
+  --panel: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #eef7fd;
+  --surface-hover: #e6f2fb;
+
+  --float: rgba(255, 255, 255, 0.74);
+  --float-strong: rgba(255, 255, 255, 0.92);
+
+  --line: #e0eef7;
+  --line-soft: #ecf6fb;
+  --line-2: #cde3f1;
+  --grip: #c3dbe8;
+  --dot-off: #b3ccda;
+  --chip-on-bg: #e4f4fd;
+
+  --danger: #c25454;
+  --danger-line: #ecc3c3;
+  --ok: #2b8362;
+  --warn: #8a6413;
+  --banner-bg: #e6f4fd;
+  --banner-line: #c3e2f3;
+
+  /* Glass + shadows */
+  --glass-surface: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --ocean-glass: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 18px 44px rgba(23, 74, 105, 0.12);
+  --glass-shadow-strong: 0 24px 60px rgba(23, 74, 105, 0.16);
+  --shadow-soft: 0 6px 18px rgba(23, 74, 105, 0.08);
+  --shadow-soft-lg: 0 14px 34px rgba(23, 74, 105, 0.12);
+
+  /* Radii */
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  /* Type */
+  --sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  --mono: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark stays available behind the toggle, simply softened. */
+[data-theme='dark'] {
+  --glass-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --glass-shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- 2. Page shell: footer never masks content ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background:
+    radial-gradient(120% 80% at 0% 0%, #eaf7ff 0%, transparent 55%),
+    radial-gradient(110% 70% at 100% 100%, #e7f4fd 0%, transparent 60%),
+    var(--base);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Grid rows: header / content / footer. Nothing overlaps — the
+   footer prints below the map instead of floating over it. */
+#app {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.topbar {
+  position: relative;
+  inset: auto;
+  height: auto;
+  min-height: 72px;
+  padding: calc(10px + env(safe-area-inset-top)) 22px 10px;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(190, 219, 235, 0.55);
+  box-shadow: 0 8px 26px rgba(23, 74, 105, 0.06);
+}
+
+.main {
+  position: relative;
+  inset: auto;
+  min-height: 0;
+  height: auto;
+}
+
+.app-footer {
+  position: relative;
+  inset: auto;
+  z-index: 5;
+  min-height: 0;
+  padding: 12px 22px calc(12px + env(safe-area-inset-bottom));
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid rgba(190, 219, 235, 0.55);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  box-shadow: 0 -8px 26px rgba(23, 74, 105, 0.05);
+}
+
+/* ---------- 3. Typography ---------- */
+.brand-copy h1 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.brand-copy span,
+.top-meta,
+.station-sub,
+.route-heading span,
+.route-state,
+.fare-disclaimer,
+.fare-note,
+.sheet-note,
+.map-chip,
+.footer-report,
+.locale-switch select,
+.fare-eyebrow,
+.sheet-eyebrow,
+.eyebrow,
+.form-eyebrow {
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.brand-copy span {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.side-head h2 {
+  font-size: 26px;
+  line-height: 1.16;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.side-head p:last-child {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.side-head .eyebrow,
+.eyebrow,
+.form-eyebrow,
+.sheet-eyebrow,
+.fare-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.station-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.station-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.route-heading h3,
+.fare-head h3,
+.fare-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- 4. Brand mark / logo ---------- */
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-2);
+  background: #fff;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- 5. Ocean glassmorphism (per the requested recipe) ---------- */
+.glass-container,
+html:not([data-theme='dark']) .topbar,
+html:not([data-theme='dark']) .sidebar,
+html:not([data-theme='dark']) .route-panel,
+html:not([data-theme='dark']) .fare-panel,
+html:not([data-theme='dark']) .fare-widget,
+html:not([data-theme='dark']) .fare-head,
+html:not([data-theme='dark']) .fare-toggle,
+html:not([data-theme='dark']) .fare-line.is-courssa,
+html:not([data-theme='dark']) .map-chip,
+html:not([data-theme='dark']) .map-actions,
+html:not([data-theme='dark']) .map-actions button,
+html:not([data-theme='dark']) .app-footer,
+html:not([data-theme='dark']) .bottom-sheet,
+html:not([data-theme='dark']) .sheet-heading,
+html:not([data-theme='dark']) .sheet-body,
+html:not([data-theme='dark']) .sheet-stat,
+html:not([data-theme='dark']) .transit-chip,
+html:not([data-theme='dark']) .transit-chip.is-available,
+html:not([data-theme='dark']) .nearby-popup,
+html:not([data-theme='dark']) .feedback-dialog,
+html:not([data-theme='dark']) .feedback-form,
+html:not([data-theme='dark']) .map-search-field,
+html:not([data-theme='dark']) .suggestions,
+html:not([data-theme='dark']) .sr-status,
+html:not([data-theme='dark']) .install-banner,
+html:not([data-theme='dark']) .map-toast,
+html:not([data-theme='dark']) .leaflet-popup-content-wrapper,
+html:not([data-theme='dark']) .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Opaque-enough pass for text-heavy surfaces so contrast stays high. */
+html:not([data-theme='dark']) .sidebar,
+html:not([data-theme='dark']) .bottom-sheet,
+html:not([data-theme='dark']) .feedback-dialog,
+html:not([data-theme='dark']) .leaflet-popup-content-wrapper,
+html:not([data-theme='dark']) .suggestions,
+html:not([data-theme='dark']) .nearby-popup,
+html:not([data-theme='dark']) .map-toast,
+html:not([data-theme='dark']) .install-banner {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+html:not([data-theme='dark']) .topbar,
+html:not([data-theme='dark']) .app-footer,
+html:not([data-theme='dark']) .sheet-heading,
+html:not([data-theme='dark']) .fare-head,
+html:not([data-theme='dark']) .map-search-field,
+html:not([data-theme='dark']) .route-panel,
+html:not([data-theme='dark']) .fare-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---------- 6. Soft geometry everywhere ---------- */
+button,
+input,
+select,
+textarea,
+.menu-toggle,
+.theme-toggle,
+.map-actions button,
+.footer-report,
+.route-actions button,
+.install-banner button,
+.sheet-close,
+.sheet-report,
+.btn-ghost,
+.btn-gold,
+.fare-mode,
+.fare-seat,
+.find-near-me,
+.locale-switch select,
+.search-box input,
+.form-field input,
+.form-field select,
+.form-field textarea,
+.map-search-field,
+.suggestions,
+.sr-status,
+.map-toast,
+.sheet-stat,
+.fare-widget,
+.transit-chip,
+.transit-chip.is-available,
+.suggestion-row,
+.station-button,
+.fare-tag,
+.dir-link {
+  border-radius: var(--r-md);
+}
+
+.search-box input,
+.map-search input {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8aa6b8;
+}
+
+.sidebar,
+.route-panel,
+.fare-panel,
+.feedback-dialog,
+.install-banner {
+  border-radius: var(--r-xl);
+}
+
+.bottom-sheet {
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+
+.map-chip,
+.distance-badge,
+.station-dist-pill {
+  border-radius: var(--r-pill);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--r-lg);
+}
+
+.leaflet-popup-tip {
+  border-radius: 4px;
+}
+
+.sheet-grip {
+  border-radius: var(--r-pill);
+  background: var(--grip);
+}
+
+/* ---------- 7. Soft shadows instead of hard borders ---------- */
+.search-box input,
+.form-field input,
+.form-field select,
+.form-field textarea,
+.locale-switch select,
+select,
+.route-actions button,
+.footer-report,
+.sheet-close,
+.sheet-report,
+.btn-ghost {
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(23, 74, 105, 0.05);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease, transform 0.18s ease;
+}
+
+.search-box input:focus,
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+select:focus,
+.map-search-field:focus-within {
+  border-color: #8ecbeb;
+  box-shadow: 0 0 0 4px rgba(47, 147, 200, 0.14),
+    0 4px 14px rgba(23, 74, 105, 0.08);
+  outline: none;
+}
+
+.station-button {
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  margin-bottom: 4px;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 2px rgba(23, 74, 105, 0.04);
+  transition: background-color 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.station-button:hover {
+  background: var(--surface-2);
+  border-color: var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.station-button.is-active {
+  background: #e6f4fd;
+  border-color: #9ed3ee;
+  box-shadow: 0 8px 22px rgba(47, 147, 200, 0.16);
+}
+
+.station-number {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  background: #eaf6fd;
+  color: #1f7aa6;
+  font: 700 10px var(--mono);
+  padding: 0;
+}
+
+/* Filled buttons need light text on blue, not the old dark ink. */
+.btn-gold,
+.install-banner button,
+.fare-seat.is-active,
+.fare-mode.is-active,
+.dir-link,
+.find-near-me:hover,
+.find-near-me:focus-visible,
+.taxi-marker.is-active {
+  color: #fff;
+}
+
+.btn-gold,
+.install-banner button {
+  background: linear-gradient(180deg, #3ea3d6, #2f8ec2);
+  border: 0;
+  border-radius: var(--r-md);
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(47, 147, 200, 0.28);
+}
+
+.btn-gold:hover,
+.install-banner button:hover {
+  filter: brightness(1.04);
+}
+
+.find-near-me {
+  border-radius: var(--r-md);
+  background: #eaf6fd;
+  border: 1px solid #b9dff1;
+  color: #1f7aa6;
+  font-weight: 600;
+}
+
+/* ---------- 8. Panel placement inside the new grid shell ---------- */
+.main {
+  --sidebar-width: 380px;
+}
+
+.sidebar {
+  inset: 16px auto 16px 16px;
+  width: var(--sidebar-width);
+  max-height: none;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  overflow: auto;
+}
+
+.map-search {
+  top: 16px;
+  left: calc(var(--sidebar-width) + 32px);
+  width: min(470px, calc(100% - var(--sidebar-width) - 100px));
+}
+
+.map-actions {
+  top: 16px;
+  right: 16px;
+}
+
+.map-chip {
+  top: auto;
+  bottom: 16px;
+  right: 16px;
+}
+
+html[dir='rtl'] .sidebar {
+  left: auto;
+  right: 16px;
+}
+
+html[dir='rtl'] .map-search {
+  left: auto;
+  right: calc(var(--sidebar-width) + 32px);
+}
+
+html[dir='rtl'] .map-actions {
+  right: auto;
+  left: 16px;
+}
+
+html[dir='rtl'] .map-chip {
+  right: auto;
+  left: 16px;
+}
+
+/* ---------- 9. Map surfaces ---------- */
+.map,
+.map-wrap {
+  background: #eaf3f8;
+}
+
+html:not([data-theme='dark']) .leaflet-tile-pane {
+  filter: saturate(0.92) brightness(1.03) contrast(0.97);
+}
+
+.leaflet-container {
+  font-family: var(--sans);
+  background: #eaf3f8;
+}
+
+.leaflet-control-attribution {
+  border-radius: var(--r-sm) 0 0 0;
+  background: rgba(255, 255, 255, 0.86) !important;
+  color: #5f7d92 !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+html:not([data-theme='dark']) .leaflet-control-attribution a {
+  color: #1f7aa6 !important;
+}
+
+.map-actions button {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  color: #2f5670;
+  box-shadow: var(--shadow-soft);
+}
+
+.map-actions button:hover {
+  color: #1f7aa6;
+  border-color: #a8d6ed;
+  box-shadow: var(--shadow-soft-lg);
+}
+
+.map-actions button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Depot pins: soft ocean bubbles */
+.taxi-marker {
+  width: 27px;
+  height: 27px;
+  border-radius: 50% 50% 50% 6px;
+  border: 2px solid #fff;
+  background: linear-gradient(160deg, #4fb0dd, #2c86b8);
+  color: #fff;
+  font: 700 9.5px var(--mono);
+  box-shadow: 0 6px 16px rgba(31, 122, 166, 0.35),
+    0 0 0 4px rgba(47, 147, 200, 0.14);
+}
+
+.taxi-marker.mixed {
+  background: linear-gradient(160deg, #63c2d8, #2f8ec2);
+  color: #fff;
+}
+
+.taxi-marker.is-active {
+  background: #1f7aa6;
+  border-color: #fff;
+  box-shadow: 0 8px 22px rgba(31, 122, 166, 0.45),
+    0 0 0 6px rgba(47, 147, 200, 0.2);
+}
+
+.leaflet-popup-content {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.leaflet-popup-content b {
+  color: #1f7aa6;
+}
+
+.leaflet-popup-content .popup-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.leaflet-popup-content .popup-meta {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+/* ---------- 10. Small labels & misc polish ---------- */
+.top-meta {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5f7d92;
+}
+
+.live-dot {
+  background: #34a97d;
+  box-shadow: 0 0 0 4px rgba(52, 169, 125, 0.16);
+}
+
+.locale-switch select {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #2f5670;
+  box-shadow: 0 2px 8px rgba(23, 74, 105, 0.05);
+}
+
+.menu-toggle {
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #2f5670;
+}
+
+.filter-row label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.route-panel,
+.fare-panel {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-soft);
+}
+
+.fare-widget {
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.fare-seat {
+  border-radius: var(--r-sm);
+}
+
+.fare-mode {
+  border-radius: var(--r-sm);
+  font-weight: 600;
+}
+
+.fare-line.is-total b {
+  color: #1f7aa6;
+}
+
+.sheet-stat {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.sheet-stat-label,
+.fare-label,
+.route-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.sheet-close {
+  border-radius: var(--r-sm);
+}
+
+.install-banner {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.feedback-dialog::backdrop {
+  background: rgba(20, 50, 74, 0.28);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.footer-report {
+  border-radius: var(--r-sm);
+  font-weight: 600;
+}
+
+/* Focus ring in ocean blue */
+:focus-visible {
+  outline: 2px solid #2f93c8;
+  outline-offset: 3px;
+}
+
+/* iOS: no tap flash, momentum scrolling, no rubber-band on the shell */
+button,
+a,
+.station-button,
+.suggestion-row {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sidebar,
+.station-list,
+.bottom-sheet,
+.sheet-body,
+.suggestions {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- 11. Responsive ---------- */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .main {
+    --sidebar-width: 340px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1024px) {
+  .main {
+    --sidebar-width: 310px;
+  }
+
+  .side-head h2 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    font-size: 14px;
+  }
+
+  .main {
+    --sidebar-width: 0px;
+  }
+
+  .topbar {
+    min-height: 64px;
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+  }
+
+  .brand-copy h1 {
+    font-size: 16.5px;
+  }
+
+  .sidebar {
+    inset: 8px 8px auto;
+    width: auto;
+    max-height: calc(100dvh - 190px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding: 18px 16px;
+    border-radius: var(--r-lg);
+  }
+
+  .map-search {
+    top: 10px;
+    left: 10px;
+    width: calc(100% - 76px);
+  }
+
+  .map-actions {
+    top: 10px;
+    right: 10px;
+  }
+
+  .map-actions button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .bottom-sheet {
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+  }
+
+  .app-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    font-size: 10.5px;
+  }
+
+  .footer-report {
+    width: 100%;
+    margin-left: 0;
+    padding: 11px;
+    font-size: 11.5px;
+  }
+
+  .feedback-dialog {
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+  }
+}

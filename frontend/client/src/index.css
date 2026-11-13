@@ -6,12 +6,12 @@
 @custom-variant dark (&:where(html:not([data-theme="light"]) *));
 
 :root {
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
-  line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.55;
   font-weight: 400;
-  color: #edf2f7;
-  background: #0b0f19;
-  color-scheme: dark;
+  color: #14324a;
+  background: #f2f9fd;
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -27,7 +27,7 @@ html, body, #root {
 body {
   min-width: 320px;
   min-height: 100vh;
-  background: #0b0f19;
+  background: #f2f9fd;
 }
 
 button, input, select {
@@ -39,6 +39,15 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #e5c158;
+  outline: 2px solid #2f93c8;
   outline-offset: 3px;
+}
+
+/* Ocean glass surface used by cards and overlay panels. */
+.glass-container {
+  background: rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
 }

@@ -1,4 +1,39 @@
 :root {
+  color-scheme: light;
+  --ink: #18364d;
+  --ink-soft: #35566d;
+  --muted: #5e7a8e;
+  --gold: #287eaa;
+  --gold-fill: #d9effa;
+  --gold-line: #76b2cf;
+  --gold-glow: rgba(49, 137, 180, .25);
+  --base: #f6fbfe;
+  --panel: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #eaf5fb;
+  --surface-hover: #e4f2f9;
+  --float: rgba(255, 255, 255, .86);
+  --float-strong: rgba(255, 255, 255, .95);
+  --line: #d4e5ee;
+  --line-soft: #e3eef4;
+  --line-2: #bfd7e4;
+  --grip: #b5cbd8;
+  --dot-off: #a4bbc8;
+  --chip-on-bg: #e7f4fa;
+  --danger: #b54747;
+  --danger-line: #d9a1a1;
+  --ok: #287e57;
+  --warn: #8a6413;
+  --banner-bg: #e8f5fb;
+  --banner-line: #bfddec;
+  --glass-surface: rgba(255, 255, 255, .82);
+  --glass-border: rgba(255, 255, 255, .94);
+  --glass-shadow: 0 12px 36px rgba(37, 83, 108, .12);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+}
+
+[data-theme="dark"] {
   color-scheme: dark;
   --ink: #f3f1e9;
   --ink-soft: #d3d0c5;
@@ -26,43 +61,40 @@
   --warn: #f0d78c;
   --banner-bg: #3a2f16;
   --banner-line: #57471f;
-  --mono: 'DM Mono', monospace;
-  --sans: 'Space Grotesk', sans-serif;
 }
 
-/* Light theme: same components, warm-paper palette. Gold darkens for text
-   contrast while --gold-fill stays bright wherever it sits under dark ink. */
+/* Explicit light theme values match the ocean palette used on first launch. */
 [data-theme="light"] {
   color-scheme: light;
-  --ink: #161a21;
-  --ink-soft: #333a45;
-  --muted: #5b6472;
-  --gold: #8a6a12;
-  --gold-fill: #dcb63f;
-  --gold-line: #a8851f;
-  --gold-glow: rgba(138, 106, 18, .38);
-  --base: #f6f4ee;
+  --ink: #18364d;
+  --ink-soft: #35566d;
+  --muted: #5e7a8e;
+  --gold: #287eaa;
+  --gold-fill: #d9effa;
+  --gold-line: #76b2cf;
+  --gold-glow: rgba(49, 137, 180, .25);
+  --base: #f6fbfe;
   --panel: #ffffff;
-  --surface: #f0ede4;
-  --surface-2: #ffffff;
-  --surface-hover: #e9e5da;
+  --surface: #ffffff;
+  --surface-2: #eaf5fb;
+  --surface-hover: #e4f2f9;
   --float: rgba(255, 255, 255, .95);
-  --float-strong: rgba(255, 255, 255, .97);
-  --line: #ddd8cb;
-  --line-soft: #e6e1d4;
-  --line-2: #c9c3b4;
-  --grip: #c2bcaa;
-  --dot-off: #9aa1ad;
-  --chip-on-bg: #f1f4e9;
-  --danger: #b23a30;
-  --danger-line: #b23a30;
-  --ok: #2c7a44;
-  --warn: #7d6211;
-  --banner-bg: #fdf4d8;
-  --banner-line: #e3cf8f;
-  --glass-surface: rgba(255, 255, 255, .76);
-  --glass-border: rgba(255, 255, 255, .82);
-  --glass-shadow: 0 12px 36px rgba(37, 45, 58, .16);
+  --float-strong: rgba(255, 255, 255, .96);
+  --line: #d4e5ee;
+  --line-soft: #e3eef4;
+  --line-2: #bfd7e4;
+  --grip: #b5cbd8;
+  --dot-off: #a4bbc8;
+  --chip-on-bg: #e7f4fa;
+  --danger: #b54747;
+  --danger-line: #d9a1a1;
+  --ok: #287e57;
+  --warn: #8a6413;
+  --banner-bg: #e8f5fb;
+  --banner-line: #bfddec;
+  --glass-surface: rgba(255, 255, 255, .82);
+  --glass-border: rgba(255, 255, 255, .94);
+  --glass-shadow: 0 12px 36px rgba(37, 83, 108, .12);
 }
 
 * { box-sizing: border-box; }

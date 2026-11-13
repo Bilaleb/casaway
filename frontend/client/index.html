@@ -6,41 +6,42 @@
     <meta name="description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
     <meta property="og:title" content="Casaway - Your Way Through Casablanca" />
     <meta property="og:description" content="Explore Casablanca grand taxi and petit taxi dépôts and route traces with Casaway." />
-    <meta name="theme-color" content="#0b0f19" />
+    <meta name="theme-color" content="#f2f9fd" />
     <script>
-      // Apply the saved (or OS) theme before first paint to avoid a flash of the wrong theme.
+      // Ocean light is the default look; dark stays available via the toggle.
       (function () {
         try {
           var saved = localStorage.getItem('casaway-theme');
-          var theme = saved === 'light' || saved === 'dark' ? saved
-            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          var theme = saved === 'dark' ? 'dark' : 'light';
           document.documentElement.dataset.theme = theme;
-          document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f6f4ee' : '#0b0f19';
+          document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f2f9fd' : '#0b0f19';
         } catch (error) {
-          document.documentElement.dataset.theme = 'dark';
+          document.documentElement.dataset.theme = 'light';
         }
       })();
     </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Casaway" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="color-scheme" content="light" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.1/dist/geosearch.css" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/ocean.css" />
     <title>Casaway - Your Way Through Casablanca</title>
   </head>
   <body>
     <div id="app">
       <header class="topbar">
         <button class="menu-toggle" id="menu-toggle" data-i18n-aria-label="menuToggle" aria-label="Toggle dépôt explorer" aria-expanded="false">☰</button>
-        <div class="brand"><div class="brand-mark"><img src="/logo.png" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span data-i18n="tagline">Your Casa Your Way</span></div></div>
+        <div class="brand"><div class="brand-mark"><img src="/casaway.JPEG" alt="Casaway logo"></div><div class="brand-copy"><h1>Casaway</h1><span data-i18n="tagline">Your Casa Your Way</span></div></div>
         <div class="top-actions"><label class="locale-switch"><select id="language-select" data-i18n-aria-label="language" aria-label="Language"><option value="en">EN</option><option value="fr">FR</option><option value="ar">AR</option></select></label><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M21 12h-1.5M4.5 12H3m14.4-6.6-1.1 1.1M6.7 17.3l-1.1 1.1m12.8 0-1.1-1.1M6.7 6.7 5.6 5.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><span class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="depot-count">20 dépôts mapped</span></span></div>
       </header>
       <div class="offline-banner" id="offline-banner" role="status" hidden>You are currently offline. Viewing cached maps and dépôts.</div>
