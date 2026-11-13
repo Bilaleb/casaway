@@ -1615,7 +1615,9 @@ html[dir='rtl'] .map-chip {
   }
 }
 
-/* Buttons own their own glass; the wrapper is only a layout row. */
+/* Buttons own their own glass; the wrapper is only a layout row.
+   Matches the specificity of the glass group above so it wins. */
+html:not([data-theme='dark']) .map-actions,
 .map-actions {
   background: transparent;
   border: 0;
