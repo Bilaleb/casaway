@@ -33,6 +33,7 @@ export default function App() {
   const [depots, setDepots] = useState(DEFAULT_DEPOTS);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [selectedId, setSelectedId] = useState(null);
   const [locale, setLocale] = useState(readStoredLocale());
   const [bannerVisible, setBannerVisible] = useState(false);
   const [installed, setInstalled] = useState(false);
