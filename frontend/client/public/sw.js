@@ -3,18 +3,12 @@ const TILE_CACHE = 'casaway-tiles-v1'
 const TILE_HOST = 'tile.openstreetmap.org'
 const APP_SHELL = [
   '/',
-  '/styles.css',
-  '/ocean.css',
-  '/casaway.JPEG',
-  '/app.js',
   '/manifest.json',
+  '/casaway.JPEG',
   '/routes/manifest.json',
   '/routes/casa-port-to-maarif.gpx',
   '/icons/icon.svg',
   '/icons/icon-maskable.svg',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.js',
 ]
 
 self.addEventListener('install', (event) => {

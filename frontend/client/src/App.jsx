@@ -1,20 +1,20 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import './App.css';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import MapContainer from './components/map/MapContainer.jsx';
+import { TileLayer, ZoomControl } from 'react-leaflet';
+import MapContainer, { FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
 import RouteLayer from './components/map/RouteLayer.jsx';
 
-import {
-  Sidebar,
-  SidebarSearch,
-  SidebarRoutePanel,
-} from './components/sidebar/Sidebar.jsx';
+import { Sidebar, SidebarSearch } from './components/sidebar/Sidebar.jsx';
 import TaxiFilter from './components/sidebar/TaxiFilter.jsx';
 import DepotList from './components/sidebar/DepotList.jsx';
 
 import Navbar from './components/header/Navbar.jsx';
+import FareCalculator from './components/ui/FareCalculator.jsx';
 
 import {
   DEFAULT_DEPOTS,
@@ -35,14 +35,13 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
-  const [routes, _setRoutes] = useState([]);
-  const [selectedRouteId, setSelectedRouteId] = useState('');
-  const [routeState, _setRouteState] = useState('Loading route catalogue…');
   const [locale, setLocale] = useState(readStoredLocale());
   const [bannerVisible, setBannerVisible] = useState(false);
   const [installed, setInstalled] = useState(false);
   const [dismissedBanner, _setDismissedBanner] = useState(false);
+  const [online, setOnline] = useState(() => navigator.onLine);
   const deferredPromptRef = useRef(null);
+  const mapRef = useRef(null);
 
   const tr = STRINGS[locale] ?? STRINGS.en;
 
@@ -68,6 +67,17 @@ export default function App() {
         if (Array.isArray(data) && data.length) setDepots(data);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
   }, []);
 
   useEffect(() => {
@@ -140,7 +150,6 @@ export default function App() {
     return list;
   }, [depots, query, filter, position]);
 
-  const activeRoute = routes.find((r) => r.id === selectedRouteId);
   const hiddenLines = useMemo(() => new Set(), []);
   const lineColor = (line) => (theme === 'light' ? line.colorLight : line.color);
 
@@ -157,22 +166,16 @@ export default function App() {
   }, []);
 
   const resetView = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
+    const map = mapRef.current;
     if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    const bounds = L.latLngBounds
-      ? L.latLngBounds(depots.map((d) => d.coordinates))
-      : null;
-    if (bounds?.isValid()) map.fitBounds(bounds, { padding: [35, 35], maxZoom: 12, duration: 0.65 });
+    const bounds = L.latLngBounds(depots.map((d) => d.coordinates));
+    if (bounds?.isValid()) {
+      map.fitBounds(bounds, { padding: [35, 35], maxZoom: 12 });
+    }
   };
 
   const locateCity = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
-    if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    map.flyTo(CASA_CENTER, 12, { duration: 0.65 });
+    mapRef.current?.flyTo(CASA_CENTER, 12, { duration: 0.65 });
   };
 
   return (
@@ -186,6 +189,12 @@ export default function App() {
         onLocaleChange={setLocale}
         tagline={tr.tagline}
       />
+
+      {!online && (
+        <div className="offline-banner" role="status">
+          You are offline — showing the cached depot list and map tiles.
+        </div>
+      )}
 
       <div className="main-layout">
         <Sidebar
@@ -230,22 +239,11 @@ export default function App() {
             noResultsMessage={tr.noResults}
           />
 
-          <SidebarRoutePanel
-            route={activeRoute}
-            routes={routes}
-            value={selectedRouteId}
-            onChange={setSelectedRouteId}
-            state={routeState}
-          />
+          <FareCalculator />
         </Sidebar>
 
         <section className="map-wrap" aria-label="Map of Casablanca taxi stations">
-          <MapContainer
-            center={CASA_CENTER}
-            zoom={12}
-            zoomControl={false}
-            preferCanvas={true}
-          >
+          <MapContainer center={CASA_CENTER} zoom={12} mapRef={mapRef}>
             <TileLayer
               url={basemapFor(theme).url}
               attribution={basemapFor(theme).attribution}
@@ -255,7 +253,6 @@ export default function App() {
             <ZoomControl position="bottomright" />
             <DepotMarkers
               depots={depots}
-              _selectedId={selectedId}
               onSelect={handleSelected}
               userPosition={position}
             />
