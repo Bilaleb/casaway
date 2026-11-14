@@ -3,14 +3,16 @@ import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { haversineMeters, escapeHtml } from '../../utils/geo.js';
 
-const TRAVEL_HTML = `
+function travelHtml(labels) {
+  return `
   <div class="travel-options">
-    <b>Getting there</b>
-    <div class="travel-item"><span class="travel-icon">🚶</span> Walk: ~15–30 min</div>
-    <div class="travel-item"><span class="travel-icon">🚗</span> Taxi: ~5–15 min</div>
-    <div class="travel-item"><span class="travel-icon">🚌</span> Bus/tram: available nearby</div>
+    <b>${labels.travel}</b>
+    <div class="travel-item"><span class="travel-icon">🚶</span> ${labels.walk}: ${labels.walkTime}</div>
+    <div class="travel-item"><span class="travel-icon">🚗</span> ${labels.taxi}: ${labels.taxiTime}</div>
+    <div class="travel-item"><span class="travel-icon">🚌</span> ${labels.transit}: ${labels.transitNote}</div>
   </div>
 `.trim();
+}
 
 function markerKind(taxiType = '') {
   if (taxiType.includes('&')) return 'mixed';
@@ -24,7 +26,7 @@ function markerKind(taxiType = '') {
  * Marker icons are recomputed only when `depots` changes so we do not
  * recreate divIcons on every parent render and cause marker flicker.
  */
-export default function DepotMarkers({ depots, onSelect, userPosition }) {
+export default function DepotMarkers({ depots, onSelect, userPosition, labels = {} }) {
   const icons = useMemo(() => {
     const map = new Map();
     depots.forEach((depot) => {
@@ -62,7 +64,11 @@ export default function DepotMarkers({ depots, onSelect, userPosition }) {
             }}
           >
             <Popup maxWidth={270}>
-              <div dangerouslySetInnerHTML={{ __html: popupHtml(depot, distanceMeters) }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: popupHtml(depot, distanceMeters, labels),
+                }}
+              />
             </Popup>
           </Marker>
         );
@@ -71,16 +77,28 @@ export default function DepotMarkers({ depots, onSelect, userPosition }) {
   );
 }
 
-function popupHtml(depot, distanceMeters) {
+function popupHtml(depot, distanceMeters, labels = {}) {
+  const text = {
+    destinations: 'Destinations',
+    travel: 'Getting there',
+    walk: 'Walk',
+    walkTime: '15–30 min',
+    taxi: 'Taxi',
+    taxiTime: '5–15 min',
+    transit: 'Bus/tram',
+    transitNote: 'available nearby',
+    ...labels,
+  };
   const destinations = (depot.destinations || []).map(escapeHtml).join(' · ');
-  const distanceHtml = distanceMeters != null
-    ? `<p class="popup-meta">${(distanceMeters / 1000).toFixed(1)} km from you</p>`
-    : '';
+  const distanceHtml =
+    distanceMeters != null && labels.kmFromYou
+      ? `<p class="popup-meta">${escapeHtml(labels.kmFromYou((distanceMeters / 1000).toFixed(1)))}</p>`
+      : '';
   return `
     <h3 class="popup-title">${escapeHtml(depot.name)}</h3>
     <p class="popup-meta">${escapeHtml(depot.district)} · ${escapeHtml(depot.taxiType)}</p>
     ${distanceHtml}
-    <p class="popup-destinations"><b>Destinations</b><br>${destinations}</p>
-    ${TRAVEL_HTML}
+    <p class="popup-destinations"><b>${text.destinations}</b><br>${destinations}</p>
+    ${travelHtml(text)}
   `.trim();
 }

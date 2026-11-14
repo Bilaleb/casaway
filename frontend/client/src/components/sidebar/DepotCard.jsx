@@ -12,6 +12,8 @@ const DepotCard = memo(function DepotCard({
   selected = false,
   userPosition,
   onSelect,
+  showDestinations = false,
+  destinationsLabel = 'Destinations',
 }) {
   const distanceMeters =
     userPosition != null
@@ -32,6 +34,11 @@ const DepotCard = memo(function DepotCard({
         <span className="station-sub">
           {depot.district} · {depot.taxiType}
         </span>
+        {showDestinations && depot.destinations?.length > 0 && (
+          <span className="station-destinations">
+            <b>{destinationsLabel}</b> {depot.destinations.join(' · ')}
+          </span>
+        )}
       </span>
 
       <span className="station-meta-right">

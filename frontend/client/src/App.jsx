@@ -39,6 +39,8 @@ export default function App() {
   const [locale, setLocale] = useState(readStoredLocale());
   const [bannerVisible, setBannerVisible] = useState(false);
   const [installed, setInstalled] = useState(false);
+  const [showDestinations, setShowDestinations] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
   const [dismissedBanner, _setDismissedBanner] = useState(false);
   const deferredPromptRef = useRef(null);
 
@@ -154,6 +156,13 @@ export default function App() {
     setSelectedId(id);
   }, []);
 
+  const openSearch = useCallback(() => {
+    setPanelOpen(true);
+    requestAnimationFrame(() => {
+      document.querySelector('.search-box input')?.focus();
+    });
+  }, []);
+
   const resetView = () => {
     const map = document.querySelector('.leaflet-container')?.__map;
     if (!map) return;
@@ -174,22 +183,24 @@ export default function App() {
   };
 
   return (
-    <div className="casaway-app">
+    <div className={`casaway-app ${panelOpen ? '' : 'panel-closed'}`}>
       <Navbar
         brandMark="CW"
         depotCount={depots.length}
         locale={locale}
         onLocaleChange={setLocale}
         tagline={tr.tagline}
+        labels={tr}
+        menuOpen={panelOpen}
+        onMenuToggle={() => setPanelOpen((open) => !open)}
+        onSearchOpen={openSearch}
       />
 
       <div className="main-layout">
         <Sidebar
-          description={
-            position
-              ? tr.locating
-              : 'Use the search box or station list to locate taxi hubs across Casablanca.'
-          }
+          eyebrow={tr.atlasLabel}
+          heading={tr.heroTitle}
+          description={position ? tr.locating : tr.heroBody}
         >
           <AnimatePresence>
             {bannerVisible && (
@@ -240,6 +251,19 @@ export default function App() {
             nearAvailable={!!position}
           />
 
+          <button
+            type="button"
+            className={`dest-toggle ${showDestinations ? 'is-on' : ''}`}
+            onClick={() => setShowDestinations((on) => !on)}
+            aria-pressed={showDestinations}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z" />
+              <circle cx="12" cy="10" r="2.4" />
+            </svg>
+            {showDestinations ? tr.hideDestinations : tr.showDestinations}
+          </button>
+
           <DepotList
             depots={visibleDepots}
             selectedId={selectedId}
@@ -247,10 +271,12 @@ export default function App() {
             userPosition={position}
             activeFilter={filter}
             noResultsMessage={tr.noResults}
+            showDestinations={showDestinations}
+            destinationsLabel={tr.destinationsLabel}
           />
         </Sidebar>
 
-        <section className="map-wrap" aria-label="Map of Casablanca taxi stations">
+        <section className="map-wrap" aria-label={tr.mapLabel}>
           <MapContainer
             center={CASA_CENTER}
             zoom={12}
@@ -270,6 +296,17 @@ export default function App() {
               _selectedId={selectedId}
               onSelect={handleSelected}
               userPosition={position}
+              labels={{
+                destinations: tr.destinationsLabel,
+                travel: tr.travelOptions,
+                walk: tr.travelWalking,
+                walkTime: tr.travelWalkingTime,
+                taxi: tr.travelDriving,
+                taxiTime: tr.travelDrivingTime,
+                transit: tr.travelTransit,
+                transitNote: tr.travelTransitNote,
+                kmFromYou: tr.kmFromYou,
+              }}
             />
             <RouteLayer hiddenLines={hiddenLines} lineColor={lineColor} />
           </MapContainer>
@@ -278,13 +315,13 @@ export default function App() {
         <div className="map-chip">{CITY_CHIP}</div>
 
         <div className="map-actions">
-          <button type="button" onClick={resetView} title="Reset map view" aria-label="Reset map view">
+          <button type="button" onClick={resetView} title={tr.mapReset} aria-label={tr.mapReset}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
               <path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7" />
               <path d="M12 8v4l3 2" />
             </svg>
           </button>
-          <button type="button" onClick={locateCity} title="Center on Casablanca" aria-label="Center map on Casablanca">
+          <button type="button" onClick={locateCity} title={tr.mapLocate} aria-label={tr.mapLocate}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
               <circle cx="12" cy="12" r="7" />
               <circle cx="12" cy="12" r="2" />
@@ -294,9 +331,7 @@ export default function App() {
         </div>
       </div>
 
-      <footer className="app-footer">
-        Casaway is an independent open-source project and is not affiliated with Casa Transport or local transit authorities.
-      </footer>
+      <footer className="app-footer">{tr.footer}</footer>
 
     </div>
   );

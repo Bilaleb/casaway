@@ -18,6 +18,10 @@ export default function Navbar({
   depotCount,
   locale,
   onLocaleChange,
+  labels = {},
+  menuOpen = true,
+  onMenuToggle,
+  onSearchOpen,
 }) {
   const [localeOpen, setLocaleOpen] = useState(false);
   const menuRef = useRef(null);
@@ -52,7 +56,7 @@ export default function Navbar({
         </div>
         <div className="brand-copy">
           <h1>{brandName}</h1>
-          <span>{tagline ?? 'Your Way Through Casablanca'}</span>
+          <span>{tagline ?? 'Your Casa, your way'}</span>
         </div>
       </div>
 
@@ -60,9 +64,39 @@ export default function Navbar({
         {live && (
           <div className="top-meta">
             <span className="live-dot" aria-hidden="true" />
-            <span>{depotCount != null ? `${depotCount} stations mapped` : 'Live'}</span>
+            <span>
+              {depotCount != null && labels.depotCount
+                ? labels.depotCount(depotCount)
+                : 'Live'}
+            </span>
           </div>
         )}
+
+        <button
+          type="button"
+          className="header-icon-btn"
+          onClick={onSearchOpen}
+          aria-label={labels.searchToggle ?? 'Search stations'}
+          title={labels.searchToggle ?? 'Search stations'}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m16.5 16.5 4 4" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          className={`header-icon-btn menu-btn ${menuOpen ? 'is-on' : ''}`}
+          onClick={onMenuToggle}
+          aria-label={labels.menuLabel ?? 'Show or hide the station panel'}
+          aria-expanded={menuOpen}
+          title={labels.menuLabel ?? 'Show or hide the station panel'}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
 
         <div className="locale-wrap" ref={menuRef}>
           <button
@@ -71,7 +105,7 @@ export default function Navbar({
             onClick={() => setLocaleOpen((open) => !open)}
             aria-haspopup="listbox"
             aria-expanded={localeOpen}
-            aria-label="Language"
+            aria-label={labels.localeLabel ?? 'Language'}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
               <circle cx="12" cy="12" r="10" />

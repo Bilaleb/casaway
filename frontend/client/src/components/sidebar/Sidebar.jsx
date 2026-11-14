@@ -6,6 +6,7 @@
  * responsive panel.
  */
 export function Sidebar({
+  eyebrow = 'Casa / Mobility atlas',
   heading = 'Find your next taxi.',
   subheading,
   description,
@@ -18,7 +19,7 @@ export function Sidebar({
       aria-label="Taxi station explorer"
     >
       <div className="side-head">
-        <p className="eyebrow">Casa / Mobility atlas</p>
+        <p className="eyebrow">{eyebrow}</p>
         <h2>{heading}</h2>
         {subheading && <p className="side-sub">{subheading}</p>}
         {description && <p>{description}</p>}

@@ -217,9 +217,9 @@ body {
 }
 
 .station-name {
-  font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--ink);
 }
 
@@ -428,14 +428,15 @@ select:focus,
 }
 
 .station-button {
-  border: 1px solid transparent;
+  border: 0;
+  border-bottom: 0;
   border-radius: var(--r-md);
-  margin-bottom: 4px;
-  padding: 11px 12px;
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 1px 2px rgba(23, 74, 105, 0.04);
+  margin-bottom: 0;
+  padding: 12px 13px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(23, 74, 105, 0.07);
   transition: background-color 0.18s ease, box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    transform 0.18s ease;
 }
 
 .station-button:hover {
@@ -577,9 +578,17 @@ html:not([data-theme='dark']) .leaflet-control-attribution a {
 .map-actions button {
   width: 42px;
   height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  line-height: 0;
   border-radius: var(--r-md);
   color: #2f5670;
   box-shadow: var(--shadow-soft);
+}
+
+.map-actions button svg {
+  display: block;
 }
 
 .map-actions button:hover {
@@ -1181,11 +1190,20 @@ html[data-theme='dark'] .map-shell {
 .casaway-app {
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100vh;
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
+}
+
+/* Grid children must be able to shrink below their min-content width,
+   otherwise the nowrap header widens the whole column past the phone. */
+.topbar,
+.main-layout,
+.app-footer {
+  min-width: 0;
 }
 
 /* ---- Header row ---- */
@@ -1211,6 +1229,8 @@ html[data-theme='dark'] .map-shell {
   margin: 0;
   line-height: 1.05;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .brand-copy span {
@@ -1227,6 +1247,7 @@ html[data-theme='dark'] .map-shell {
   align-items: center;
   gap: 10px;
   flex: none;
+  min-width: 0;
 }
 
 .top-meta {
@@ -1536,22 +1557,64 @@ html[dir='rtl'] .map-chip {
   html[dir='rtl'] .map-actions { right: auto; left: 10px; }
   .map-chip { display: none; }
 
-  .brand-copy span { display: none; }
-  .topbar { gap: 10px; }
+  .brand-copy span {
+    display: block;
+    max-width: 46vw;
+  }
+  .topbar { gap: 8px; }
   .side-head h2 { font-size: 22px; }
 }
 
 @media (max-width: 560px) {
-  .top-meta span:last-child { display: none; }
-  .top-meta { gap: 0; }
+  .top-meta { display: none; }
 
-  .brand-copy h1 { font-size: 17px; }
+  .brand {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .brand-copy h1 { font-size: 16px; }
+
+  .brand-copy span {
+    max-width: 100%;
+    font-size: 9.5px;
+    letter-spacing: 0.01em;
+  }
+
+  .header-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-icon-btn svg {
+    width: 17px;
+    height: 17px;
+  }
 
   .theme-toggle-btn,
   .locale-btn {
-    height: 38px;
-    min-width: 38px;
-    padding: 0 9px;
+    height: 36px;
+    min-width: 44px;
+    padding: 0 8px;
+    gap: 3px;
+  }
+
+  .locale-btn > svg:first-child {
+    display: none;
+  }
+
+  .brand-copy span {
+    max-width: 100%;
+  }
+
+  .topbar {
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .top-actions {
+    gap: 6px;
   }
 
   .footer-report { width: auto; }
@@ -1646,4 +1709,102 @@ html:not([data-theme='dark']) .map-actions,
 .brand-mark img {
   object-fit: contain;
   background: #fff;
+}
+
+/* ---- Header actions: search + panel menu (phones only) ---- */
+.header-icon-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-soft);
+  box-shadow: var(--shadow-sm);
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.header-icon-btn svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+
+.header-icon-btn:hover,
+.header-icon-btn:focus-visible {
+  color: var(--accent-deep);
+  border-color: var(--accent-line);
+}
+
+.menu-btn.is-on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-deep);
+}
+
+@media (max-width: 900px) {
+  .header-icon-btn { display: grid; }
+}
+
+/* ---- Show destinations toggle ---- */
+.dest-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  margin: 0 0 12px;
+  padding: 8px 13px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.dest-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.dest-toggle.is-on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-deep);
+  box-shadow: 0 6px 16px rgba(47, 147, 200, 0.16);
+}
+
+.station-list {
+  gap: 8px;
+}
+
+.station-destinations {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.station-destinations b {
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+/* ---- Panel visibility (phones) ---- */
+@media (max-width: 900px) {
+  .sidebar {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .panel-closed .sidebar {
+    opacity: 0;
+    transform: translateY(22px);
+    visibility: hidden;
+    pointer-events: none;
+  }
 }

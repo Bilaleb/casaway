@@ -14,6 +14,8 @@ export default function DepotList({
   userPosition,
   activeFilter = 'all',
   noResultsMessage,
+  showDestinations = false,
+  destinationsLabel,
 }) {
   const list = [...depots];
 
@@ -42,6 +44,8 @@ export default function DepotList({
           selected={depot.id === selectedId}
           userPosition={userPosition}
           onSelect={() => onSelect(depot.id)}
+          showDestinations={showDestinations}
+          destinationsLabel={destinationsLabel}
         />
       ))}
     </div>
