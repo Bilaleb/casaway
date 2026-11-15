@@ -35,6 +35,17 @@ function AutoResize() {
   return null;
 }
 
+export function FitBounds({ positions, padding = 50, maxZoom = 15 }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map || !positions || positions.length < 2) return;
+    const bounds = L.latLngBounds(positions);
+    if (!bounds.isValid()) return;
+    map.fitBounds(bounds, { padding: [padding, padding], maxZoom });
+  }, [map, positions, padding, maxZoom]);
+  return null;
+}
+
 export function FlyTo({ position, zoom = 14, duration = 0.6 }) {
   const map = useMap();
   useEffect(() => {

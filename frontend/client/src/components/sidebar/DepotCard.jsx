@@ -5,13 +5,14 @@ import { formatDistance, haversineMeters } from '../../utils/geo.js';
  * Individual depot row for the sidebar list.
  *
  * The row is a tinted card with no divider or border; a separate Directions
- * link opens turn-by-turn navigation in the user's maps app.
+ * action draws the route to this depot inside the app's own map.
  */
 const DepotCard = memo(function DepotCard({
   depot,
   selected = false,
   userPosition,
   onSelect,
+  onDirections,
   showDestinations = false,
   destinationsLabel = 'Destinations',
   directionsLabel = 'Directions',
@@ -20,12 +21,6 @@ const DepotCard = memo(function DepotCard({
     userPosition != null
       ? haversineMeters(userPosition, depot.coordinates)
       : null;
-
-  const [lat, lng] = depot.coordinates || [];
-  const mapsUrl =
-    lat != null && lng != null
-      ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(depot.name)}`;
 
   return (
     <div className={`station-item ${selected ? 'is-active' : ''}`}>
@@ -59,11 +54,10 @@ const DepotCard = memo(function DepotCard({
         </span>
       </button>
 
-      <a
+      <button
+        type="button"
         className="station-dir"
-        href={mapsUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        onClick={() => onDirections?.(depot)}
         aria-label={`${directionsLabel} — ${depot.name}`}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -72,7 +66,7 @@ const DepotCard = memo(function DepotCard({
           <path d="M3 12h4" />
         </svg>
         {directionsLabel}
-      </a>
+      </button>
     </div>
   );
 });

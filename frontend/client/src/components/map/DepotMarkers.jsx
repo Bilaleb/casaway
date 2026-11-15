@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Marker, Popup } from 'react-leaflet';
+import { useEffect, useMemo } from 'react';
+import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { haversineMeters, escapeHtml } from '../../utils/geo.js';
 
@@ -26,7 +26,26 @@ function markerKind(taxiType = '') {
  * Marker icons are recomputed only when `depots` changes so we do not
  * recreate divIcons on every parent render and cause marker flicker.
  */
-export default function DepotMarkers({ depots, onSelect, userPosition, labels = {} }) {
+export default function DepotMarkers({ depots, onSelect, onDirections, userPosition, labels = {} }) {
+  const map = useMap();
+
+  // Popup bodies are raw HTML, so the in-app Directions button is handled
+  // through delegation on the map container instead of React props.
+  useEffect(() => {
+    if (!map) return undefined;
+    const container = map.getContainer();
+    const handleClick = (event) => {
+      const button = event.target.closest?.('.popup-dir');
+      if (!button) return;
+      const depot = depots.find((d) => String(d.id) === button.dataset.depotId);
+      if (!depot) return;
+      map.closePopup();
+      onDirections?.(depot);
+    };
+    container.addEventListener('click', handleClick);
+    return () => container.removeEventListener('click', handleClick);
+  }, [map, depots, onDirections]);
+
   const icons = useMemo(() => {
     const map = new Map();
     depots.forEach((depot) => {
@@ -90,8 +109,6 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     ...labels,
   };
   const destinations = (depot.destinations || []).map(escapeHtml).join(' · ');
-  const [lat, lng] = depot.coordinates || [];
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
   const distanceHtml =
     distanceMeters != null && labels.kmFromYou
       ? `<p class="popup-meta">${escapeHtml(labels.kmFromYou((distanceMeters / 1000).toFixed(1)))}</p>`
@@ -101,7 +118,7 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     <p class="popup-meta">${escapeHtml(depot.district)} · ${escapeHtml(depot.taxiType)}</p>
     ${distanceHtml}
     <p class="popup-destinations"><b>${text.destinations}</b><br>${destinations}</p>
-    <a class="popup-dir" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(labels.directions ?? 'Directions')} →</a>
+    <button type="button" class="popup-dir" data-depot-id="${escapeHtml(depot.id)}">${escapeHtml(labels.directions ?? 'Directions')} →</button>
     ${travelHtml(text)}
   `.trim();
 }

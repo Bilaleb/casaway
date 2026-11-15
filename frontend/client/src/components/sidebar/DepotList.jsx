@@ -11,6 +11,7 @@ export default function DepotList({
   depots,
   selectedId,
   onSelect,
+  onDirections,
   userPosition,
   activeFilter = 'all',
   noResultsMessage,
@@ -45,6 +46,7 @@ export default function DepotList({
           selected={depot.id === selectedId}
           userPosition={userPosition}
           onSelect={() => onSelect(depot.id)}
+          onDirections={onDirections ? () => onDirections(depot) : undefined}
           showDestinations={showDestinations}
           destinationsLabel={destinationsLabel}
           directionsLabel={directionsLabel}

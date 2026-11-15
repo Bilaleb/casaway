@@ -1868,7 +1868,10 @@ body {
   gap: 5px;
   margin: 0 10px 8px;
   padding: 5px 10px;
+  border: 0;
   border-radius: var(--r-pill);
+  font-family: inherit;
+  cursor: pointer;
   background: #fff;
   color: var(--accent-deep);
   font-size: 11px;
@@ -2241,15 +2244,108 @@ html[dir='rtl'] .modal-close {
   }
 }
 
-/* Directions link inside map popups */
+/* Directions action inside map popups (in-app route, not an external link) */
 .popup-dir {
   display: inline-flex;
   margin: 2px 0 10px;
   padding: 6px 10px;
+  border: 0;
   border-radius: var(--r-pill);
   background: var(--accent-soft);
   color: var(--accent-deep);
+  font-family: inherit;
   font-size: 11.5px;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.popup-dir:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---- In-app route card ---- */
+.route-card {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(360px, calc(100% - 116px));
+  padding: 9px 11px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.route-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 12px;
+}
+
+.route-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.route-copy strong {
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.route-copy span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.route-locate {
+  flex: none;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.route-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+html[dir='rtl'] .route-card {
+  left: auto;
+  right: 12px;
 }

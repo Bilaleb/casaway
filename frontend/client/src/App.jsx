@@ -3,7 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import MapContainer, { FlyTo, UserMarker } from './components/map/MapContainer.jsx';
+import MapContainer, { FitBounds, FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
 import RouteLayer from './components/map/RouteLayer.jsx';
 
@@ -23,8 +23,8 @@ import {
   CASA_CENTER,
   basemapFor,
 } from './data/depots.js';
-import { TileLayer } from 'react-leaflet';
-import { haversineMeters } from './utils/geo.js';
+import { Polyline, TileLayer } from 'react-leaflet';
+import { formatDistance, haversineMeters } from './utils/geo.js';
 import { useTheme } from './hooks/useTheme.js';
 import { useGeolocation, readStoredLocale } from './hooks/useGeolocation.js';
 
@@ -42,6 +42,8 @@ export default function App() {
   const [installed, setInstalled] = useState(false);
   const [showDestinations, setShowDestinations] = useState(false);
   const [fareOpen, setFareOpen] = useState(false);
+  const [routeTarget, setRouteTarget] = useState(null);
+  const [routeInfo, setRouteInfo] = useState(null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [dismissedBanner, _setDismissedBanner] = useState(false);
   const deferredPromptRef = useRef(null);
@@ -158,6 +160,70 @@ export default function App() {
     setSelectedId(id);
   }, []);
 
+  /** Draw the route to a depot inside the app map — no external redirect. */
+  const handleDirections = useCallback(
+    (depot) => {
+      setSelectedId(depot.id);
+      setRouteTarget(depot);
+      if (!position) requestLocation();
+      if (window.matchMedia?.('(max-width: 900px)').matches) setPanelOpen(false);
+    },
+    [position, requestLocation],
+  );
+
+  // Road geometry comes from OSRM when reachable; a direct line is drawn as a
+  // fallback so the route is always visible inside the app.
+  useEffect(() => {
+    if (!routeTarget || !position) {
+      setRouteInfo(null);
+      return undefined;
+    }
+    let cancelled = false;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4500);
+    const [lat, lng] = position;
+    const [toLat, toLng] = routeTarget.coordinates;
+
+    const fallback = () => {
+      if (cancelled) return;
+      const meters = haversineMeters(position, routeTarget.coordinates);
+      setRouteInfo({
+        path: [position, routeTarget.coordinates],
+        meters,
+        minutes: Math.max(1, Math.round((meters / 1000 / 24) * 60)),
+        direct: true,
+      });
+    };
+
+    fetch(
+      `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${toLng},${toLat}?overview=full&geometries=geojson`,
+      { signal: controller.signal },
+    )
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('route unavailable'))))
+      .then((data) => {
+        const route = data?.routes?.[0];
+        if (!route?.geometry?.coordinates?.length) {
+          fallback();
+          return;
+        }
+        if (cancelled) return;
+        setRouteInfo({
+          path: route.geometry.coordinates.map(([lon, la]) => [la, lon]),
+          meters: route.distance,
+          minutes: Math.max(1, Math.round(route.duration / 60)),
+          direct: false,
+        });
+      })
+      .catch(fallback)
+      .finally(() => clearTimeout(timer));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [routeTarget, position]);
+
   const openSearch = useCallback(() => {
     setPanelOpen(true);
     requestAnimationFrame(() => {
@@ -270,6 +336,7 @@ export default function App() {
             showDestinations={showDestinations}
             destinationsLabel={tr.destinationsLabel}
             directionsLabel={tr.directions}
+            onDirections={handleDirections}
           />
         </Sidebar>
 
@@ -300,6 +367,7 @@ export default function App() {
               depots={depots}
               _selectedId={selectedId}
               onSelect={handleSelected}
+              onDirections={handleDirections}
               userPosition={position}
               labels={{
                 destinations: tr.destinationsLabel,
@@ -315,7 +383,50 @@ export default function App() {
               }}
             />
             <RouteLayer hiddenLines={hiddenLines} lineColor={lineColor} />
+
+            {routeInfo && (
+              <>
+                <Polyline
+                  positions={routeInfo.path}
+                  pathOptions={{ color: '#ffffff', weight: 9, opacity: 0.9 }}
+                />
+                <Polyline
+                  positions={routeInfo.path}
+                  pathOptions={{ color: '#2f93c8', weight: 5 }}
+                />
+                <FitBounds positions={routeInfo.path} />
+              </>
+            )}
           </MapContainer>
+
+          {routeTarget && (
+            <div className="route-card" role="status">
+              <span className="route-icon" aria-hidden="true">➤</span>
+              <div className="route-copy">
+                <strong>{routeTarget.name}</strong>
+                <span>
+                  {routeInfo
+                    ? `${formatDistance(routeInfo.meters)} · ~${routeInfo.minutes} min${routeInfo.direct ? ` · ${tr.routeDirect}` : ''}`
+                    : position
+                      ? tr.routeLoading
+                      : tr.routeNeedLocation}
+                </span>
+              </div>
+              {!position && (
+                <button type="button" className="route-locate" onClick={requestLocation}>
+                  {tr.fareLocate}
+                </button>
+              )}
+              <button
+                type="button"
+                className="route-close"
+                onClick={() => setRouteTarget(null)}
+                aria-label={tr.routeClear}
+              >
+                ×
+              </button>
+            </div>
+          )}
         </section>
 
         <div className="map-chip">{CITY_CHIP}</div>
