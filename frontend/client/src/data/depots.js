@@ -41,14 +41,12 @@ export function basemapFor(theme) {
       attribution: `${osm} &copy; <a href="https://carto.com/attributions">CARTO</a>`,
     };
   }
-  const service =
-    theme === 'light' ? 'World_Light_Gray_Base' : 'World_Dark_Gray_Base';
+  // Street-level canvas: Esri's street map is keyless and already labels
+  // avenues, boulevards, streets and places across Casablanca, so no extra
+  // reference layer is needed on top of it.
   return {
-    url: `https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/${service}/MapServer/tile/{z}/{y}/{x}`,
-    // Transparent reference layer that adds Casablanca place, street and
-    // district names on top of the label-free grey canvas.
-    labelUrl:
-      'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    labelUrl: '',
     attribution: `Sources: <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, FAO, NOAA, USGS, ${osm}`,
   };
 }

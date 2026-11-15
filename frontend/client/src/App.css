@@ -452,14 +452,16 @@ select:focus,
 }
 
 .station-number {
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
-  border-radius: var(--r-sm);
-  background: #eaf6fd;
-  color: #1f7aa6;
-  font: 700 10px var(--mono);
+  border-radius: 11px;
+  background: linear-gradient(160deg, #2f93c8, #1f7aa6);
+  color: #fff;
+  font: 800 12.5px var(--sans);
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 10px rgba(31, 122, 166, 0.28);
   padding: 0;
 }
 
@@ -604,20 +606,26 @@ html:not([data-theme='dark']) .leaflet-control-attribution a {
 
 /* Depot pins: soft ocean bubbles */
 .taxi-marker {
-  width: 27px;
-  height: 27px;
-  border-radius: 50% 50% 50% 6px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   border: 2px solid #fff;
-  background: linear-gradient(160deg, #4fb0dd, #2c86b8);
+  background: #1f7aa6;
   color: #fff;
-  font: 700 9.5px var(--mono);
-  box-shadow: 0 6px 16px rgba(31, 122, 166, 0.35),
-    0 0 0 4px rgba(47, 147, 200, 0.14);
+  font: 800 11.5px var(--sans);
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(23, 74, 105, 0.35),
+    0 0 0 3px rgba(47, 147, 200, 0.18);
 }
 
-.taxi-marker.mixed {
-  background: linear-gradient(160deg, #63c2d8, #2f8ec2);
-  color: #fff;
+.taxi-marker--mixed {
+  background: #2f93c8;
+}
+
+.taxi-marker--petit {
+  background: #4aa3c9;
 }
 
 .taxi-marker.is-active {

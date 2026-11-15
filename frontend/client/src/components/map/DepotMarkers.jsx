@@ -50,7 +50,7 @@ export default function DepotMarkers({ depots, onSelect, onDirections, userPosit
     const map = new Map();
     depots.forEach((depot) => {
       const kind = markerKind(depot.taxiType || '');
-      const size = kind === 'petit' ? 21 : 25;
+      const size = 30;
       map.set(
         depot.id,
         L.divIcon({

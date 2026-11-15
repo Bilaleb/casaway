@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import MapContainer, { FitBounds, FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
-import RouteLayer from './components/map/RouteLayer.jsx';
 
 import {
   Sidebar,
@@ -44,9 +43,14 @@ export default function App() {
   const [fareOpen, setFareOpen] = useState(false);
   const [routeTarget, setRouteTarget] = useState(null);
   const [routeInfo, setRouteInfo] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(true);
+  // The depot list starts hidden on phones: the map is the entry point and
+  // the menu button reveals the list on demand.
+  const [panelOpen, setPanelOpen] = useState(
+    () => !window.matchMedia?.('(max-width: 900px)').matches,
+  );
   const [dismissedBanner, _setDismissedBanner] = useState(false);
   const deferredPromptRef = useRef(null);
+  const mapRef = useRef(null);
 
   const tr = STRINGS[locale] ?? STRINGS.en;
 
@@ -86,11 +90,13 @@ export default function App() {
   useEffect(() => {
     try {
       if (dismissedBanner || installed) return;
-      const dismissed = localStorage.getItem('casaway-install-dismissed') === 'true';
       const standalone =
         window.matchMedia?.('(display-mode: standalone)').matches ||
         window.navigator.standalone;
-      if (dismissed || standalone) return;
+      // Once per browsing session, so the reminder reappears on a new visit
+      // instead of being silenced forever after the first dismissal.
+      const prompted = sessionStorage.getItem('casaway-install-prompted') === 'true';
+      if (prompted || standalone) return;
     } catch {
       /* private mode */
     }
@@ -111,13 +117,18 @@ export default function App() {
     }
     setBannerVisible(false);
     setInstalled(true);
+    try {
+      sessionStorage.setItem('casaway-install-prompted', 'true');
+    } catch {
+      /* private mode */
+    }
   };
 
   const dismissBanner = () => {
     setBannerVisible(false);
     setInstalled(true);
     try {
-      localStorage.setItem('casaway-install-dismissed', 'true');
+      sessionStorage.setItem('casaway-install-prompted', 'true');
     } catch {
       /* private mode */
     }
@@ -144,9 +155,7 @@ export default function App() {
     return list;
   }, [depots, query, filter, position]);
 
-  const hiddenLines = useMemo(() => new Set(), []);
   const basemap = useMemo(() => basemapFor(theme), [theme]);
-  const lineColor = (line) => (theme === 'light' ? line.colorLight : line.color);
 
   const handleFilter = useCallback(
     (id) => {
@@ -232,22 +241,16 @@ export default function App() {
   }, []);
 
   const resetView = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
+    const map = mapRef.current;
     if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    const bounds = L.latLngBounds
-      ? L.latLngBounds(depots.map((d) => d.coordinates))
-      : null;
-    if (bounds?.isValid()) map.fitBounds(bounds, { padding: [35, 35], maxZoom: 12, duration: 0.65 });
+    map.fitBounds(
+      depots.map((d) => d.coordinates),
+      { padding: [35, 35], maxZoom: 12, duration: 0.65 },
+    );
   };
 
   const locateCity = () => {
-    const map = document.querySelector('.leaflet-container')?.__map;
-    if (!map) return;
-    const L = window.L;
-    if (!L) return;
-    map.flyTo(CASA_CENTER, 12, { duration: 0.65 });
+    mapRef.current?.flyTo(CASA_CENTER, 14, { duration: 0.65 });
   };
 
   return (
@@ -343,7 +346,8 @@ export default function App() {
         <section className="map-wrap" aria-label={tr.mapLabel}>
           <MapContainer
             center={CASA_CENTER}
-            zoom={12}
+            zoom={14}
+            mapRef={mapRef}
             zoomControl={false}
             preferCanvas={true}
           >
@@ -382,7 +386,6 @@ export default function App() {
                 kmFromYou: tr.kmFromYou,
               }}
             />
-            <RouteLayer hiddenLines={hiddenLines} lineColor={lineColor} />
 
             {routeInfo && (
               <>
