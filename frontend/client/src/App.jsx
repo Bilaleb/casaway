@@ -249,8 +249,12 @@ export default function App() {
     );
   };
 
-  const locateCity = () => {
-    mapRef.current?.flyTo(CASA_CENTER, 14, { duration: 0.65 });
+  /** Geolocation button: reveal and centre the user's own position. */
+  const locateMe = () => {
+    requestLocation();
+    if (position && mapRef.current) {
+      mapRef.current.flyTo(position, 15, { duration: 0.7 });
+    }
   };
 
   return (
@@ -366,7 +370,7 @@ export default function App() {
               />
             )}
             <FlyTo position={position} />
-            <UserMarker />
+            <UserMarker position={position} />
             <DepotMarkers
               depots={depots}
               _selectedId={selectedId}
@@ -383,6 +387,8 @@ export default function App() {
                 taxiTime: tr.travelDrivingTime,
                 transit: tr.travelTransit,
                 transitNote: tr.travelTransitNote,
+                travelNeedLocation: tr.travelNeedLocation,
+                minutes: tr.minutes,
                 kmFromYou: tr.kmFromYou,
               }}
             />
@@ -441,7 +447,7 @@ export default function App() {
               <path d="M12 8v4l3 2" />
             </svg>
           </button>
-          <button type="button" onClick={locateCity} title={tr.mapLocate} aria-label={tr.mapLocate}>
+          <button type="button" onClick={locateMe} title={tr.mapLocate} aria-label={tr.mapLocate}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
               <circle cx="12" cy="12" r="7" />
               <circle cx="12" cy="12" r="2" />

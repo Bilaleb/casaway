@@ -3,12 +3,27 @@ import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { haversineMeters, escapeHtml } from '../../utils/geo.js';
 
-function travelHtml(labels) {
+// Average city speeds used for the per-depot travel estimates.
+const WALK_KMH = 4.8;
+const DRIVE_KMH = 24;
+
+function travelHtml(labels, distanceMeters) {
+  if (distanceMeters == null) {
+    return `
+  <div class="travel-options">
+    <b>${labels.travel}</b>
+    <p class="travel-hint">${labels.travelNeedLocation}</p>
+  </div>
+`.trim();
+  }
+  const km = distanceMeters / 1000;
+  const walkMinutes = Math.max(1, Math.round((km / WALK_KMH) * 60));
+  const driveMinutes = Math.max(1, Math.round((km / DRIVE_KMH) * 60));
   return `
   <div class="travel-options">
     <b>${labels.travel}</b>
-    <div class="travel-item"><span class="travel-icon">🚶</span> ${labels.walk}: ${labels.walkTime}</div>
-    <div class="travel-item"><span class="travel-icon">🚗</span> ${labels.taxi}: ${labels.taxiTime}</div>
+    <div class="travel-item"><span class="travel-icon">🚶</span> ${labels.walk}: ${labels.minutes(walkMinutes)}</div>
+    <div class="travel-item"><span class="travel-icon">🚗</span> ${labels.taxi}: ${labels.minutes(driveMinutes)}</div>
     <div class="travel-item"><span class="travel-icon">🚌</span> ${labels.transit}: ${labels.transitNote}</div>
   </div>
 `.trim();
@@ -106,6 +121,8 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     taxiTime: '5–15 min',
     transit: 'Bus/tram',
     transitNote: 'available nearby',
+    travelNeedLocation: 'Allow location to see travel times.',
+    minutes: (n) => `${n} min`,
     ...labels,
   };
   const destinations = (depot.destinations || []).map(escapeHtml).join(' · ');
@@ -119,6 +136,6 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     ${distanceHtml}
     <p class="popup-destinations"><b>${text.destinations}</b><br>${destinations}</p>
     <button type="button" class="popup-dir" data-depot-id="${escapeHtml(depot.id)}">${escapeHtml(labels.directions ?? 'Directions')} →</button>
-    ${travelHtml(text)}
+    ${travelHtml(text, distanceMeters)}
   `.trim();
 }

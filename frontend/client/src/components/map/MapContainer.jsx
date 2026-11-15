@@ -55,10 +55,9 @@ export function FlyTo({ position, zoom = 14, duration = 0.6 }) {
 }
 
 /** User position marker, created imperatively so it survives re-renders. */
-export function UserMarker({ className = '' }) {
+export function UserMarker({ position, className = '' }) {
   const map = useMap();
   const markerRef = useRef(null);
-  const { position } = useGeolocation();
 
   useEffect(() => {
     if (!map) return;
