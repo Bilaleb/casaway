@@ -2358,6 +2358,11 @@ html[dir='rtl'] .route-card {
   right: 12px;
 }
 
+/* Keep an open depot popup above the floating map controls. */
+.leaflet-popup-pane {
+  z-index: 950;
+}
+
 /* Travel estimates inside depot popups */
 .travel-options {
   margin-top: 8px;
