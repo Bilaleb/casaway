@@ -16,6 +16,7 @@ export default function DepotList({
   noResultsMessage,
   showDestinations = false,
   destinationsLabel,
+  directionsLabel,
 }) {
   const list = [...depots];
 
@@ -46,6 +47,7 @@ export default function DepotList({
           onSelect={() => onSelect(depot.id)}
           showDestinations={showDestinations}
           destinationsLabel={destinationsLabel}
+          directionsLabel={directionsLabel}
         />
       ))}
     </div>

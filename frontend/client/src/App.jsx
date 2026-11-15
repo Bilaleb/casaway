@@ -13,6 +13,7 @@ import {
 } from './components/sidebar/Sidebar.jsx';
 import TaxiFilter from './components/sidebar/TaxiFilter.jsx';
 import DepotList from './components/sidebar/DepotList.jsx';
+import EstimatedFare from './components/ui/EstimatedFare.jsx';
 
 import Navbar from './components/header/Navbar.jsx';
 
@@ -31,7 +32,7 @@ const CITY_CHIP = 'CASABLANCA · 33.5731° N / 7.5898° W';
 
 export default function App() {
   const { theme } = useTheme();
-  const { position, requestLocation } = useGeolocation();
+  const { position, notice, requestLocation } = useGeolocation();
   const [depots, setDepots] = useState(DEFAULT_DEPOTS);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
@@ -40,6 +41,7 @@ export default function App() {
   const [bannerVisible, setBannerVisible] = useState(false);
   const [installed, setInstalled] = useState(false);
   const [showDestinations, setShowDestinations] = useState(false);
+  const [fareOpen, setFareOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [dismissedBanner, _setDismissedBanner] = useState(false);
   const deferredPromptRef = useRef(null);
@@ -192,7 +194,7 @@ export default function App() {
         tagline={tr.tagline}
         labels={tr}
         menuOpen={panelOpen}
-        onMenuToggle={() => setPanelOpen((open) => !open)}
+        onMenuToggle={() => setPanelOpen(true)}
         onSearchOpen={openSearch}
       />
 
@@ -201,30 +203,9 @@ export default function App() {
           eyebrow={tr.atlasLabel}
           heading={tr.heroTitle}
           description={position ? tr.locating : tr.heroBody}
+          onClose={() => setPanelOpen(false)}
+          closeLabel={tr.closePanel}
         >
-          <AnimatePresence>
-            {bannerVisible && (
-              <motion.div
-                className="install-banner"
-                role="dialog"
-                aria-label={tr.bannerAria}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div>
-                  <strong>{tr.bannerTitle}</strong>
-                  <span id="install-hint">{tr.bannerBody}</span>
-                </div>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <button onClick={confirmInstall} className="btn-gold">{tr.install}</button>
-                  <button onClick={dismissBanner} aria-label={tr.dismiss}>×</button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <SidebarSearch
             query={query}
             onQueryChange={setQuery}
@@ -251,18 +232,33 @@ export default function App() {
             nearAvailable={!!position}
           />
 
-          <button
-            type="button"
-            className={`dest-toggle ${showDestinations ? 'is-on' : ''}`}
-            onClick={() => setShowDestinations((on) => !on)}
-            aria-pressed={showDestinations}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z" />
-              <circle cx="12" cy="10" r="2.4" />
-            </svg>
-            {showDestinations ? tr.hideDestinations : tr.showDestinations}
-          </button>
+          <div className="list-tools">
+            <button
+              type="button"
+              className={`dest-toggle ${showDestinations ? 'is-on' : ''}`}
+              onClick={() => setShowDestinations((on) => !on)}
+              aria-pressed={showDestinations}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z" />
+                <circle cx="12" cy="10" r="2.4" />
+              </svg>
+              {showDestinations ? tr.hideDestinations : tr.showDestinations}
+            </button>
+
+            <button
+              type="button"
+              className={`dest-toggle ${fareOpen ? 'is-on' : ''}`}
+              onClick={() => setFareOpen((open) => !open)}
+              aria-expanded={fareOpen}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <rect x="3" y="6" width="18" height="12" rx="3" />
+                <circle cx="12" cy="12" r="2.5" />
+              </svg>
+              {tr.fareTitle}
+            </button>
+          </div>
 
           <DepotList
             depots={visibleDepots}
@@ -273,6 +269,7 @@ export default function App() {
             noResultsMessage={tr.noResults}
             showDestinations={showDestinations}
             destinationsLabel={tr.destinationsLabel}
+            directionsLabel={tr.directions}
           />
         </Sidebar>
 
@@ -289,6 +286,14 @@ export default function App() {
               attribution={basemap.attribution}
               maxZoom={19}
             />
+            {basemap.labelUrl && (
+              <TileLayer
+                key={`${theme}-labels`}
+                url={basemap.labelUrl}
+                maxZoom={19}
+                opacity={1}
+              />
+            )}
             <FlyTo position={position} />
             <UserMarker />
             <DepotMarkers
@@ -298,6 +303,7 @@ export default function App() {
               userPosition={position}
               labels={{
                 destinations: tr.destinationsLabel,
+                directions: tr.directions,
                 travel: tr.travelOptions,
                 walk: tr.travelWalking,
                 walkTime: tr.travelWalkingTime,
@@ -333,6 +339,90 @@ export default function App() {
 
       <footer className="app-footer">{tr.footer}</footer>
 
+      {fareOpen && (
+        <div
+          className="fare-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={tr.fareTitle}
+          onClick={() => setFareOpen(false)}
+        >
+          <div
+            className="fare-modal-card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="modal-close"
+              onClick={() => setFareOpen(false)}
+              aria-label={tr.closePanel}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+
+            <EstimatedFare
+              onLocate={requestLocation}
+              locating={notice === tr.locating}
+              notice={notice && notice !== tr.locating ? notice : ''}
+              labels={{
+                title: tr.fareTitle,
+                day: tr.fareDay,
+                night: tr.fareNight,
+                from: tr.fareFrom,
+                to: tr.fareTo,
+                perSeat: tr.farePerSeat,
+                whole: tr.fareWhole,
+                noMatch: tr.fareNoMatch,
+                hint: tr.fareHint,
+                locate: tr.fareLocate,
+                locating: tr.fareLocating,
+                estimate: tr.fareEstimate,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {bannerVisible && (
+          <motion.div
+            className="install-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={dismissBanner}
+          >
+            <motion.div
+              className="install-banner"
+              role="dialog"
+              aria-modal="true"
+              aria-label={tr.bannerAria}
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.22 }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="install-copy">
+                <strong>{tr.bannerTitle}</strong>
+                <span>{tr.bannerBody}</span>
+                <p className="install-hint">{tr.bannerHint}</p>
+              </div>
+              <div className="install-actions">
+                <button type="button" className="btn-gold" onClick={confirmInstall}>
+                  {tr.install}
+                </button>
+                <button type="button" className="btn-quiet" onClick={dismissBanner}>
+                  {tr.dismiss}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

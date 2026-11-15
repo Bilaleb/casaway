@@ -1827,3 +1827,332 @@ body {
     pointer-events: none;
   }
 }
+
+/* ---- Depot cards: no dividers, tinted rows ---- */
+.station-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.station-item:hover {
+  background: var(--surface-hover);
+}
+
+.station-item.is-active {
+  background: var(--accent-soft);
+  box-shadow: 0 8px 20px rgba(47, 147, 200, 0.14);
+}
+
+.station-item .station-button,
+.station-item .station-button.is-active,
+.station-item .station-button:hover {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 11px 12px 4px;
+}
+
+.station-dir {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 10px 8px;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  background: #fff;
+  color: var(--accent-deep);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(23, 74, 105, 0.1);
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.station-dir svg {
+  width: 13px;
+  height: 13px;
+}
+
+.station-dir:hover,
+.station-dir:focus-visible {
+  background: var(--accent);
+  color: #fff;
+}
+
+html[dir='rtl'] .station-dir {
+  align-self: flex-start;
+}
+
+/* ---- Tools row (destinations + fare) ---- */
+.list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.list-tools .dest-toggle {
+  margin-bottom: 0;
+}
+
+/* ---- Sheet close button ---- */
+.side-head {
+  position: relative;
+}
+
+.sheet-close-btn {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  display: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+}
+
+.sheet-close-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+html[dir='rtl'] .sheet-close-btn {
+  right: auto;
+  left: -2px;
+}
+
+@media (max-width: 900px) {
+  /* The sheet must sit above the map action buttons so its close control
+     is always tappable. */
+  .sidebar {
+    z-index: 900;
+  }
+
+  .sheet-close-btn {
+    display: grid;
+    z-index: 2;
+  }
+
+  .side-head {
+    padding-right: 42px;
+  }
+
+  html[dir='rtl'] .side-head {
+    padding-right: 0;
+    padding-left: 42px;
+  }
+
+  .side-head p:last-child {
+    display: none;
+  }
+
+  .side-head h2 {
+    font-size: 21px;
+  }
+
+  .sidebar {
+    max-height: min(64dvh, 620px);
+  }
+}
+
+/* ---- Estimated fare panel ---- */
+.fare-panel {
+  flex: none;
+  margin: 0 0 12px;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.fare-panel .route-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fare-locate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  border-radius: var(--r-md);
+}
+
+.fare-locate svg {
+  width: 16px;
+  height: 16px;
+}
+
+.fare-mode {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fare-mode.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- Add to Home Screen modal ---- */
+.install-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(20, 50, 74, 0.32);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.install-modal .install-banner {
+  position: relative;
+  inset: auto;
+  display: block;
+  width: min(420px, 100%);
+  margin: 0;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  background: #fff;
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.install-copy strong {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.install-copy span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.install-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-quiet {
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+/* The filled install button style must not leak onto the quiet action. */
+.install-modal .install-banner .btn-quiet {
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  box-shadow: none;
+  filter: none;
+}
+
+/* ---- Estimated fare dialog ---- */
+.fare-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1900;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: auto;
+  background: rgba(20, 50, 74, 0.32);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.fare-modal-card {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: 88dvh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: #fff;
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.fare-modal-card .fare-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+}
+
+.modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+html[dir='rtl'] .modal-close {
+  right: auto;
+  left: 10px;
+}
+
+/* Directions link inside map popups */
+.popup-dir {
+  display: inline-flex;
+  margin: 2px 0 10px;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-decoration: none;
+}

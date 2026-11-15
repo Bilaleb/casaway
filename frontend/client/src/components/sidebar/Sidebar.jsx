@@ -12,6 +12,8 @@ export function Sidebar({
   description,
   children,
   className,
+  onClose,
+  closeLabel = 'Close the station panel',
 }) {
   return (
     <aside
@@ -20,6 +22,19 @@ export function Sidebar({
     >
       <div className="side-head">
         <p className="eyebrow">{eyebrow}</p>
+        {onClose && (
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={closeLabel}
+            title={closeLabel}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        )}
         <h2>{heading}</h2>
         {subheading && <p className="side-sub">{subheading}</p>}
         {description && <p>{description}</p>}

@@ -90,6 +90,8 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     ...labels,
   };
   const destinations = (depot.destinations || []).map(escapeHtml).join(' · ');
+  const [lat, lng] = depot.coordinates || [];
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
   const distanceHtml =
     distanceMeters != null && labels.kmFromYou
       ? `<p class="popup-meta">${escapeHtml(labels.kmFromYou((distanceMeters / 1000).toFixed(1)))}</p>`
@@ -99,6 +101,7 @@ function popupHtml(depot, distanceMeters, labels = {}) {
     <p class="popup-meta">${escapeHtml(depot.district)} · ${escapeHtml(depot.taxiType)}</p>
     ${distanceHtml}
     <p class="popup-destinations"><b>${text.destinations}</b><br>${destinations}</p>
+    <a class="popup-dir" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(labels.directions ?? 'Directions')} →</a>
     ${travelHtml(text)}
   `.trim();
 }
