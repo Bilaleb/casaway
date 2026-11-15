@@ -41,13 +41,12 @@ export function basemapFor(theme) {
       attribution: `${osm} &copy; <a href="https://carto.com/attributions">CARTO</a>`,
     };
   }
-  // Street-level canvas: Esri's street map is keyless and already labels
-  // avenues, boulevards, streets and places across Casablanca, so no extra
-  // reference layer is needed on top of it.
+  // Street-level canvas: the OSM standard style labels every avenue, rue,
+  // boulevard and place in Casablanca with its local name.
   return {
-    url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     labelUrl: '',
-    attribution: `Sources: <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, FAO, NOAA, USGS, ${osm}`,
+    attribution: osm,
   };
 }
 
