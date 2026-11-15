@@ -1194,7 +1194,7 @@ html[data-theme='dark'] .map-shell {
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100vh;
   height: 100dvh;
-  min-height: 0;
+  min-height: 100svh;
   overflow: hidden;
 }
 
@@ -1325,6 +1325,9 @@ html[dir='rtl'] .top-actions {
 .search-box input {
   width: 100%;
   min-height: 46px;
+  /* 16px keeps iOS Safari from auto-zooming the page on focus, which
+     otherwise scrolls the fixed shell and strands the footer. */
+  font-size: 16px;
   padding: 11px 40px 11px 38px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
@@ -1793,6 +1796,22 @@ html:not([data-theme='dark']) .map-actions,
 .station-destinations b {
   color: var(--accent-deep);
   font-weight: 700;
+}
+
+/* iOS: any control below 16px triggers a page zoom on focus. */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+}
+
+#root {
+  overflow: hidden;
 }
 
 /* ---- Panel visibility (phones) ---- */
