@@ -53,10 +53,15 @@ The panel starts open on desktop and closed on phones (`panelOpen` initialised
 from `matchMedia('(max-width: 900px)')`), so the map is the entry point on a
 phone.
 
-**Current header state:** the `Navbar` component is still mounted and
-functional, but the last rule in `App.css` hides it (`.topbar { display: none }`)
-so the map owns the screen. Consequence to keep in mind: the menu button that
-reopens the phone panel lives in that hidden header — see §7.
+**Header and floating controls:** the `Navbar` component is still mounted but
+hidden (`.topbar { display: none }`), so the shell switches to a two-row grid
+(`minmax(0, 1fr) auto`) — with a three-row template the hidden header left an
+empty `auto` row and the map collapsed to zero height. Because the header's
+hamburger and search button disappeared with it, a small `.map-quick` cluster
+floats on the map: a panel toggle and a search button. It is a horizontal row
+in the bottom-right corner on phones and a vertical column on desktop (above
+the city chip), and it fades out while the phone panel is open, since that
+panel already carries its own search field and close button.
 
 ---
 
@@ -117,6 +122,10 @@ and receive callbacks; `DepotCard` and `TaxiFilter` are `memo`ised.
   move the camera. Directions is the action that changes the view.
 - The list announces changes with `aria-live="polite"`; an empty result renders
   `.no-results` with the localised message.
+- The floating `.map-quick` cluster replaces the hidden header controls: the
+  menu button toggles `panelOpen` (with `aria-expanded` and an `.is-on` state),
+  the search button opens the panel and focuses the field through
+  `openSearch()`. Both use the localised `menuLabel` / `searchToggle` strings.
 
 ### 3.2 Geolocation and the user radar
 - `useGeolocation` calls `getCurrentPosition` once per request
@@ -291,9 +300,10 @@ Implemented and mounted: map shell, depot markers/popups, radar user marker,
 directions + route card, search/filter/list, destinations toggle, fare modal,
 locale switching, install banner, footer, light-only theme.
 
-Wired but currently hidden: `Navbar` (`.topbar` is `display: none`), which also
-hides the only phone menu/search buttons — the panel cannot be reopened below
-900 px until a floating trigger is added.
+Wired but currently hidden: `Navbar` (`.topbar` is `display: none`). The map's
+`.map-quick` cluster takes over its panel toggle and search action, but the
+brand block, live depot count and language switcher have no surface while the
+header stays hidden.
 
 Present in code, not part of the UI: `RouteLayer` (transit polylines),
 `FareCalculator`, `NearestChip`, `LocateButton`, the `TRANSIT_LINES` /

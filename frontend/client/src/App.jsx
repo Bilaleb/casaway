@@ -455,6 +455,28 @@ export default function App() {
             </svg>
           </button>
         </div>
+
+        {/* The header is hidden, so the panel toggle and search live on the map. */}
+        <div className="map-quick">
+          <button
+            type="button"
+            className={panelOpen ? 'is-on' : ''}
+            onClick={() => setPanelOpen((open) => !open)}
+            aria-label={tr.menuLabel}
+            aria-expanded={panelOpen}
+            title={tr.menuLabel}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+          <button type="button" onClick={openSearch} aria-label={tr.searchToggle} title={tr.searchToggle}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m16.5 16.5 4 4" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <footer className="app-footer">{tr.footer}</footer>
