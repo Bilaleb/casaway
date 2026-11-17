@@ -18,7 +18,7 @@ The app is a single full-screen map with one floating station panel:
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│ (header rendered by Navbar, currently hidden by CSS)  │
+│ Header · logo, name, tagline · search · menu · EN/FR/AR │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
 │  ┌ Sidebar / bottom panel ─┐   ┌──── map ─────────┐  │
@@ -53,15 +53,14 @@ The panel starts open on desktop and closed on phones (`panelOpen` initialised
 from `matchMedia('(max-width: 900px)')`), so the map is the entry point on a
 phone.
 
-**Header and floating controls:** the `Navbar` component is still mounted but
-hidden (`.topbar { display: none }`), so the shell switches to a two-row grid
-(`minmax(0, 1fr) auto`) — with a three-row template the hidden header left an
-empty `auto` row and the map collapsed to zero height. Because the header's
-hamburger and search button disappeared with it, a small `.map-quick` cluster
-floats on the map: a panel toggle and a search button. It is a horizontal row
-in the bottom-right corner on phones and a vertical column on desktop (above
-the city chip), and it fades out while the phone panel is open, since that
-panel already carries its own search field and close button.
+**Header:** `Navbar` is the top row of the shell (`auto`): brand mark
+(`/casaway.JPEG`), name, localised tagline, live depot count, then the search
+button, the three-line panel button and the language switcher. Every string it
+renders comes from `STRINGS[locale]` — tagline, `menuLabel`, `searchToggle`,
+`localeLabel`, `depotCount(n)` — so the header switches with EN/FR/AR (and the
+`dir` flip to RTL for Arabic). The two icon buttons are visible at all widths;
+the depot counter is dropped below 700 px and the header tightens below 420 px
+so logo, name and both icons stay on one line on a phone.
 
 ---
 
@@ -122,10 +121,10 @@ and receive callbacks; `DepotCard` and `TaxiFilter` are `memo`ised.
   move the camera. Directions is the action that changes the view.
 - The list announces changes with `aria-live="polite"`; an empty result renders
   `.no-results` with the localised message.
-- The floating `.map-quick` cluster replaces the hidden header controls: the
-  menu button toggles `panelOpen` (with `aria-expanded` and an `.is-on` state),
-  the search button opens the panel and focuses the field through
-  `openSearch()`. Both use the localised `menuLabel` / `searchToggle` strings.
+- The header's menu button toggles `panelOpen` (with `aria-expanded` and an
+  `.is-on` state) and its search button opens the panel and focuses the field
+  through `openSearch()`. Both use the localised `menuLabel` / `searchToggle`
+  strings, so the controls read in the current language.
 
 ### 3.2 Geolocation and the user radar
 - `useGeolocation` calls `getCurrentPosition` once per request
@@ -154,8 +153,8 @@ and receive callbacks; `DepotCard` and `TaxiFilter` are `memo`ised.
   line) and `FitBounds` frames it.
 - The floating `.route-card` (top-left, `role="status"`) shows the depot name,
   `distance · ~minutes` (plus "direct line" for the fallback), a locate button
-  when no position is known, and a close button. It stacks under the hidden
-  header's space at the top of the map.
+  when no position is known, and a close button. It sits at the top-left of the
+  map, under the header row.
 
 ### 3.4 Popups and travel estimates
 - Markers are 30 px divIcons with the depot id, classed
@@ -300,10 +299,9 @@ Implemented and mounted: map shell, depot markers/popups, radar user marker,
 directions + route card, search/filter/list, destinations toggle, fare modal,
 locale switching, install banner, footer, light-only theme.
 
-Wired but currently hidden: `Navbar` (`.topbar` is `display: none`). The map's
-`.map-quick` cluster takes over its panel toggle and search action, but the
-brand block, live depot count and language switcher have no surface while the
-header stays hidden.
+Header: `Navbar` is visible again. It carries the brand mark, name, localised
+tagline, depot count, search, panel toggle and the language switcher, and all
+of its text is translated through `STRINGS`.
 
 Present in code, not part of the UI: `RouteLayer` (transit polylines),
 `FareCalculator`, `NearestChip`, `LocateButton`, the `TRANSIT_LINES` /

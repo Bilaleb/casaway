@@ -1722,9 +1722,9 @@ html:not([data-theme='dark']) .map-actions,
   background: #fff;
 }
 
-/* ---- Header actions: search + panel menu (phones only) ---- */
+/* ---- Header actions: search + panel menu ---- */
 .header-icon-btn {
-  display: none;
+  display: grid;
   width: 40px;
   height: 40px;
   place-items: center;
@@ -1753,10 +1753,6 @@ html:not([data-theme='dark']) .map-actions,
   background: var(--accent-soft);
   border-color: var(--accent-line);
   color: var(--accent-deep);
-}
-
-@media (max-width: 900px) {
-  .header-icon-btn { display: grid; }
 }
 
 /* ---- Show destinations toggle ---- */
@@ -2453,92 +2449,20 @@ html[dir='rtl'] .route-card {
   }
 }
 
-/* ---- Header hidden: the map owns the screen ---- */
-.topbar {
-  display: none;
+
+/* ---- Header on small screens ----
+   The logo, name, tagline, menu, search and language controls all stay
+   visible; only the station counter drops out so the icons keep their size. */
+@media (max-width: 700px) {
+  .top-meta { display: none; }
 }
 
-/* With the header out of the flow the shell has two children, not three:
-   without this the grid still reserved an `auto` row and the map collapsed. */
-.casaway-app {
-  grid-template-rows: minmax(0, 1fr) auto;
-}
-
-/* ---- Floating map controls (panel toggle + search) ---- */
-.map-quick {
-  position: absolute;
-  right: 16px;
-  bottom: 58px;
-  z-index: 800;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.map-quick button {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  line-height: 0;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: var(--r-md);
-  background: var(--glass-strong);
-  color: #2f5670;
-  box-shadow: var(--shadow-soft);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
-  cursor: pointer;
-  transition: color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-}
-
-.map-quick button svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-.map-quick button:hover,
-.map-quick button:focus-visible {
-  color: #1f7aa6;
-  border-color: #a8d6ed;
-  box-shadow: var(--shadow-soft-lg);
-}
-
-.map-quick button.is-on {
-  background: var(--accent-soft);
-  border-color: var(--accent-line);
-  color: var(--accent-deep);
-}
-
-html[dir='rtl'] .map-quick {
-  right: auto;
-  left: 16px;
-}
-
-@media (max-width: 900px) {
-  .map-quick {
-    right: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    flex-direction: row;
-  }
-
-  .map-quick button {
-    width: 46px;
-    height: 46px;
-  }
-
-  html[dir='rtl'] .map-quick {
-    right: auto;
-    left: 10px;
-  }
-
-  /* The open panel covers the map corner and carries its own search + close,
-     so the floating controls step aside instead of sitting under it. */
-  .casaway-app:not(.panel-closed) .map-quick {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
+@media (max-width: 420px) {
+  .topbar { gap: 8px; }
+  .brand { gap: 9px; }
+  .brand-copy h1 { font-size: 16px; }
+  .brand-copy span { font-size: 9.5px; }
+  .top-actions { gap: 6px; }
+  .header-icon-btn { width: 38px; height: 38px; }
+  .locale-btn span svg { display: none; }
 }

@@ -56,7 +56,7 @@ export default function Navbar({
         </div>
         <div className="brand-copy">
           <h1>{brandName}</h1>
-          <span>{tagline ?? 'Your Casa, your way'}</span>
+          <span>{tagline ?? labels.tagline ?? 'Your Casa, your way'}</span>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export default function Navbar({
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.16 }}
                 role="listbox"
-                aria-label="Language"
+                aria-label={labels.localeLabel ?? 'Language'}
               >
                 {LOCALES.map((option) => (
                   <li key={option.code}>
