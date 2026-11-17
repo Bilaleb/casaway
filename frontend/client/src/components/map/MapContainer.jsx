@@ -68,10 +68,10 @@ export function UserMarker({ position, className = '' }) {
     if (!position) return;
 
     const icon = L.divIcon({
-      className,
-      html: '<span class="user-marker"><span class="user-marker-ring"></span><span class="user-marker-dot"></span></span>',
-      iconSize: [16, 16],
-      iconAnchor: [8, 8],
+      className: `user-location-icon ${className}`.trim(),
+      html: '<span class="user-radar"><span class="user-radar-ring"></span><span class="user-radar-dot"></span></span>',
+      iconSize: [72, 72],
+      iconAnchor: [36, 36],
     });
 
     const marker = L.marker(position, { icon, interactive: false }).addTo(map);
