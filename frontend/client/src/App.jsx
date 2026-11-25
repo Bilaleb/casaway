@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import MapContainer, { FitBounds, FlyTo, UserMarker } from './components/map/MapContainer.jsx';
 import DepotMarkers from './components/map/DepotMarkers.jsx';
@@ -13,6 +12,7 @@ import {
 import TaxiFilter from './components/sidebar/TaxiFilter.jsx';
 import DepotList from './components/sidebar/DepotList.jsx';
 import EstimatedFare from './components/ui/EstimatedFare.jsx';
+import InstallGuide from './components/ui/InstallGuide.jsx';
 
 import Navbar from './components/header/Navbar.jsx';
 
@@ -29,6 +29,23 @@ import { useGeolocation, readStoredLocale } from './hooks/useGeolocation.js';
 
 const CITY_CHIP = 'CASABLANCA · 33.5731° N / 7.5898° W';
 
+/**
+ * Phone platform for the install sheet: 'ios', 'android' or null.
+ * iPadOS reports itself as a Mac, hence the touch-point check.
+ */
+function detectPlatform() {
+  if (typeof navigator === 'undefined') return null;
+  const ua = navigator.userAgent || '';
+  if (
+    /iphone|ipad|ipod/i.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  ) {
+    return 'ios';
+  }
+  if (/android/i.test(ua)) return 'android';
+  return null;
+}
+
 export default function App() {
   const { theme } = useTheme();
   const { position, notice, requestLocation } = useGeolocation();
@@ -37,8 +54,8 @@ export default function App() {
   const [filter, setFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
   const [locale, setLocale] = useState(readStoredLocale());
-  const [bannerVisible, setBannerVisible] = useState(false);
-  const [installed, setInstalled] = useState(false);
+  const [installGuideOpen, setInstallGuideOpen] = useState(false);
+  const platform = useMemo(() => detectPlatform(), []);
   const [showDestinations, setShowDestinations] = useState(false);
   const [fareOpen, setFareOpen] = useState(false);
   const [routeTarget, setRouteTarget] = useState(null);
@@ -48,8 +65,6 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(
     () => !window.matchMedia?.('(max-width: 900px)').matches,
   );
-  const [dismissedBanner, _setDismissedBanner] = useState(false);
-  const deferredPromptRef = useRef(null);
   const mapRef = useRef(null);
 
   const tr = STRINGS[locale] ?? STRINGS.en;
@@ -79,54 +94,23 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handler = (event) => {
-      event.preventDefault();
-      deferredPromptRef.current = event;
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
-
-  useEffect(() => {
+    if (!platform) return undefined;
     try {
-      if (dismissedBanner || installed) return;
       const standalone =
         window.matchMedia?.('(display-mode: standalone)').matches ||
         window.navigator.standalone;
-      // Once per browsing session, so the reminder reappears on a new visit
-      // instead of being silenced forever after the first dismissal.
+      // Once per browsing session, so the sheet reappears on a new visit.
       const prompted = sessionStorage.getItem('casaway-install-prompted') === 'true';
-      if (prompted || standalone) return;
+      if (prompted || standalone) return undefined;
     } catch {
       /* private mode */
     }
-    const timer = setTimeout(() => setBannerVisible(true), 1500);
+    const timer = setTimeout(() => setInstallGuideOpen(true), 1500);
     return () => clearTimeout(timer);
-  }, [installed, dismissedBanner]);
+  }, [platform]);
 
-  const confirmInstall = async () => {
-    const promptEvent = deferredPromptRef.current;
-    if (promptEvent) {
-      try {
-        promptEvent.prompt();
-        await promptEvent.userChoice;
-      } catch {
-        /* prompt already consumed */
-      }
-      deferredPromptRef.current = null;
-    }
-    setBannerVisible(false);
-    setInstalled(true);
-    try {
-      sessionStorage.setItem('casaway-install-prompted', 'true');
-    } catch {
-      /* private mode */
-    }
-  };
-
-  const dismissBanner = () => {
-    setBannerVisible(false);
-    setInstalled(true);
+  const closeInstallGuide = () => {
+    setInstallGuideOpen(false);
     try {
       sessionStorage.setItem('casaway-install-prompted', 'true');
     } catch {
@@ -249,9 +233,14 @@ export default function App() {
     );
   };
 
-  /** Geolocation button: reveal and centre the user's own position. */
+  /**
+   * Blue locate button: centre the map on the user and list the depots
+   * around them, nearest first (the panel opens so the list is visible).
+   */
   const locateMe = () => {
     requestLocation();
+    setFilter('near');
+    setPanelOpen(true);
     if (position && mapRef.current) {
       mapRef.current.flyTo(position, 15, { duration: 0.7 });
     }
@@ -505,44 +494,9 @@ export default function App() {
         </div>
       )}
 
-      <AnimatePresence>
-        {bannerVisible && (
-          <motion.div
-            className="install-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={dismissBanner}
-          >
-            <motion.div
-              className="install-banner"
-              role="dialog"
-              aria-modal="true"
-              aria-label={tr.bannerAria}
-              initial={{ opacity: 0, y: 16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.98 }}
-              transition={{ duration: 0.22 }}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="install-copy">
-                <strong>{tr.bannerTitle}</strong>
-                <span>{tr.bannerBody}</span>
-                <p className="install-hint">{tr.bannerHint}</p>
-              </div>
-              <div className="install-actions">
-                <button type="button" className="btn-gold" onClick={confirmInstall}>
-                  {tr.install}
-                </button>
-                <button type="button" className="btn-quiet" onClick={dismissBanner}>
-                  {tr.dismiss}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {installGuideOpen && platform && (
+        <InstallGuide labels={tr} platform={platform} onClose={closeInstallGuide} />
+      )}
     </div>
   );
 }

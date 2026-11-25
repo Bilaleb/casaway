@@ -282,7 +282,6 @@ html:not([data-theme='dark']) .feedback-form,
 html:not([data-theme='dark']) .map-search-field,
 html:not([data-theme='dark']) .suggestions,
 html:not([data-theme='dark']) .sr-status,
-html:not([data-theme='dark']) .install-banner,
 html:not([data-theme='dark']) .map-toast,
 html:not([data-theme='dark']) .leaflet-popup-content-wrapper,
 html:not([data-theme='dark']) .leaflet-popup-tip {
@@ -300,8 +299,7 @@ html:not([data-theme='dark']) .feedback-dialog,
 html:not([data-theme='dark']) .leaflet-popup-content-wrapper,
 html:not([data-theme='dark']) .suggestions,
 html:not([data-theme='dark']) .nearby-popup,
-html:not([data-theme='dark']) .map-toast,
-html:not([data-theme='dark']) .install-banner {
+html:not([data-theme='dark']) .map-toast {
   background: rgba(255, 255, 255, 0.82);
 }
 
@@ -326,7 +324,6 @@ textarea,
 .map-actions button,
 .footer-report,
 .route-actions button,
-.install-banner button,
 .sheet-close,
 .sheet-report,
 .btn-ghost,
@@ -368,8 +365,7 @@ textarea::placeholder {
 .sidebar,
 .route-panel,
 .fare-panel,
-.feedback-dialog,
-.install-banner {
+.feedback-dialog {
   border-radius: var(--r-xl);
 }
 
@@ -467,7 +463,6 @@ select:focus,
 
 /* Filled buttons need light text on blue, not the old dark ink. */
 .btn-gold,
-.install-banner button,
 .fare-seat.is-active,
 .fare-mode.is-active,
 .dir-link,
@@ -477,8 +472,7 @@ select:focus,
   color: #fff;
 }
 
-.btn-gold,
-.install-banner button {
+.btn-gold {
   background: linear-gradient(180deg, #3ea3d6, #2f8ec2);
   border: 0;
   border-radius: var(--r-md);
@@ -486,8 +480,7 @@ select:focus,
   box-shadow: 0 8px 20px rgba(47, 147, 200, 0.28);
 }
 
-.btn-gold:hover,
-.install-banner button:hover {
+.btn-gold:hover {
   filter: brightness(1.04);
 }
 
@@ -739,11 +732,6 @@ html:not([data-theme='dark']) .leaflet-control-attribution a {
 
 .sheet-close {
   border-radius: var(--r-sm);
-}
-
-.install-banner {
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: var(--glass-shadow-strong);
 }
 
 .feedback-dialog::backdrop {
@@ -1141,18 +1129,6 @@ html[data-theme='dark'] .map-shell {
   font-size: 12px;
 }
 
-/* Circular clear button in the install banner */
-.install-banner button[aria-label] {
-  width: 30px;
-  height: 30px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface-2);
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1;
-}
-
 .btn-gold {
   padding: 10px 16px;
   border-radius: var(--r-md);
@@ -1500,43 +1476,6 @@ html[dir='rtl'] .map-chip {
   direction: ltr;
 }
 
-/* ---- Install banner floats above content, never in the grid ---- */
-.install-banner {
-  position: fixed;
-  left: 16px;
-  right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom));
-  z-index: 1200;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--r-lg);
-}
-
-.install-banner strong {
-  display: block;
-  font-size: 13px;
-  color: var(--ink);
-}
-
-.install-banner span {
-  display: block;
-  margin-top: 3px;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-
-@media (min-width: 900px) {
-  .install-banner {
-    left: auto;
-    right: 24px;
-    width: min(420px, calc(100% - 720px));
-  }
-}
-
 /* ---- Tablet / phone ---- */
 @media (max-width: 900px) {
   .main-layout {
@@ -1698,28 +1637,6 @@ html:not([data-theme='dark']) .map-actions,
   box-shadow: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-}
-
-/* The install card lives inside the sidebar, so it can never cover the
-   depot list, the map readouts or the footer. */
-.install-banner {
-  position: static;
-  inset: auto;
-  width: auto;
-  flex: none;
-  margin: 0 0 14px;
-  padding: 14px;
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-soft);
-}
-
-.install-banner > div:first-child {
-  min-width: 0;
-}
-
-.brand-mark img {
-  object-fit: contain;
-  background: #fff;
 }
 
 /* ---- Header actions: search + panel menu ---- */
@@ -2023,76 +1940,6 @@ html[dir='rtl'] .sheet-close-btn {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
-}
-
-/* ---- Add to Home Screen modal ---- */
-.install-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: grid;
-  place-items: center;
-  padding: 18px;
-  background: rgba(20, 50, 74, 0.32);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-
-.install-modal .install-banner {
-  position: relative;
-  inset: auto;
-  display: block;
-  width: min(420px, 100%);
-  margin: 0;
-  padding: 18px;
-  border-radius: var(--r-lg);
-  background: #fff;
-  box-shadow: var(--glass-shadow-strong);
-}
-
-.install-copy strong {
-  display: block;
-  font-size: 15px;
-  color: var(--ink);
-}
-
-.install-copy span {
-  display: block;
-  margin-top: 4px;
-  font-size: 12.5px;
-  color: var(--muted);
-}
-
-.install-hint {
-  margin: 10px 0 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-
-.install-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.btn-quiet {
-  padding: 10px 14px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--ink-soft);
-  font-weight: 600;
-}
-
-/* The filled install button style must not leak onto the quiet action. */
-.install-modal .install-banner .btn-quiet {
-  background: #fff;
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  box-shadow: none;
-  filter: none;
 }
 
 /* ---- Estimated fare dialog ---- */
@@ -2465,4 +2312,224 @@ html[dir='rtl'] .route-card {
   .top-actions { gap: 6px; }
   .header-icon-btn { width: 38px; height: 38px; }
   .locale-btn span svg { display: none; }
+}
+
+/* ---- Install guide: Add to Home screen ----
+   The reference sheet layout (logo, title, app name, numbered step cards,
+   tip, confirm button) drawn with the site's own ocean palette. */
+.install-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(20, 50, 74, 0.32);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.install-guide {
+  width: min(400px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--panel);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.install-guide-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.install-guide-logo {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.install-guide-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.install-guide-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.install-guide-kicker,
+.install-guide-copy h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--ink-soft);
+}
+
+.install-guide-copy h2 {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.install-guide-device {
+  margin: 5px 0 0;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.install-guide-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.install-guide-close:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+.install-guide-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.install-guide-steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 18px 0;
+  list-style: none;
+}
+
+.install-guide-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.install-guide-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--accent-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--accent-deep);
+}
+
+.install-guide-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.install-guide-step-copy {
+  min-width: 0;
+}
+
+.install-guide-step-copy strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.install-guide-step-copy p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.install-guide-step-copy b {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.install-guide-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border: 1px solid var(--accent-line);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 12.5px;
+  font-weight: 700;
+  vertical-align: -4px;
+}
+
+.install-guide-tip {
+  margin: 14px 18px 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.install-guide-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 18px 18px;
+}
+
+.install-guide-confirm {
+  min-height: 46px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: linear-gradient(180deg, #3ea3d6, #2f8ec2);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(47, 147, 200, 0.28);
+}
+
+.install-guide-confirm:hover {
+  filter: brightness(1.04);
+}
+
+@media (max-width: 380px) {
+  .install-guide-actions {
+    display: block;
+  }
+
+  .install-guide-confirm {
+    width: 100%;
+  }
 }
