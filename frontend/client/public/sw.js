@@ -1,4 +1,4 @@
-const CACHE_NAME = 'casaway-v9'
+const CACHE_NAME = 'casaway-v10'
 const TILE_CACHE = 'casaway-tiles-v1'
 const TILE_HOST = 'tile.openstreetmap.org'
 const APP_SHELL = [
@@ -7,8 +7,10 @@ const APP_SHELL = [
   '/casaway.JPEG',
   '/routes/manifest.json',
   '/routes/casa-port-to-maarif.gpx',
-  '/icons/icon.svg',
-  '/icons/icon-maskable.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
+  '/icons/apple-touch-icon.png',
 ]
 
 self.addEventListener('install', (event) => {
